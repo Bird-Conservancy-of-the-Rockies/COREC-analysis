@@ -207,7 +207,7 @@ covariates <- covariates %>%
   mutate(Grid_year = str_c(TransectNum, Year, sep = "-"),
          HumanPresence = ifelse(HumanTraffic > 0, 1, 0),
          LogTrafficNoZeros = ifelse(HumanTraffic == 0, NA, log(HumanTraffic)),
-         LogTraffic = log(HumanTraffic + 0.001),
+         LogTraffic = log(HumanTraffic + 0.1),
          GrdYrInd = Grid_year %>% as.factor %>% as.integer,
          GridInd = TransectNum %>% as.factor %>% as.integer,
          YearInd = Year %>% as.factor %>% as.integer) %>%
