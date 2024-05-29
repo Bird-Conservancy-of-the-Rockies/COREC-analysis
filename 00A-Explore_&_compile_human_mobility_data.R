@@ -5,25 +5,16 @@ library(stringr)
 library(GetDataBCR)
 
 # Compile and expore covariates:
-# 1. Human traffic - ping rate x residency time. Scales: 50, 100, 250, and 500. Time frames: May, June, July, All months.
-# 2. Speed - Mean speed of pings. Scale: 100m on grid cell. Time frames: May, June, July, All months.
-# 3. Time of day - Mode. Scale: 50, 100, 250, and 500. Time frames: May, June, July, All months.
-# 4. Human traffic x Speed - Mean speed of pings. Scale: 100m on grid cell. Time frames: May, June, July, All months.
-# 5. Human traffic x Time of day - Mode. Scale: 50, 100, 250, and 500. Time frames: May, June, July, All months.
-
-# Additional summaries:
-# 1. Histogram of dates (day of year) across all pings.
-# 2. Proportion of activity types (building, vehicle, hiking, etc.)
+# 1. Human traffic - ping rate x residency time.
+# 2. Speed - Mean speed of pings.
+# 3. Time of day - mean.
+# 4. Date (day of year) - mean.
 
 #_______ Script inputs _______#
 years <- 2021:2023
 # List grid cell IDs
-file_list <- list.files("data/AllDataRDS_19April2024") %>%
-  (function(x) x[which(str_detect(x, "ResidencyTime"))])
-dat <- readRDS(str_c("data/AllDataRDS_19April2024/", file_list[1]))
-for(i in 2:length(file_list)) dat <- dat %>% bind_rows(readRDS(str_c("data/AllDataRDS_19April2024/", file_list[i])))
-grid.list <- unique(dat$grid_transect)
-rm(dat)
+grid.list <- readRDS("data/AllDataRDS_19April2024/ResidencyTime_updt4_16May2024.rds") %>%
+  pull(grid_transect) %>% unique
 #_____________________________#
 
 ## Gather & collate data ##
@@ -71,7 +62,6 @@ dat <- dat_samples %>%
               mutate(ResTime_mn = ifelse(is.na(ResTime_mn), mean(ResTime_mn, na.rm = TRUE), ResTime_mn)), # Human traffic is virtually the same if I impute with the min or mean. Picked the mean.
             by = "TransectNum") %>%
   left_join(dat_TOD %>%
-              rename(TransectNum = Site) %>%
               group_by(TransectNum) %>%
               summarise(TOD_mean = mean(TOD_mean)) %>%
               ungroup(), by = "TransectNum") %>%

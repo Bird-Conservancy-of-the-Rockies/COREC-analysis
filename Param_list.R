@@ -1,8 +1,10 @@
 # List covariates #
 Eco.vars <- c("HumanPresence", "LogTrafficNoZeros", "Traffic_DOY_mn", "Speed", "TOD_mean",
+              "TrailTotm", "RoadTotm", "Prp_MotRestricted", "Prp_HorseRestricted",
               "Shrubland", "PinyonJuniper", "ConiferForest", "Aspen", "OakWoodland",
               "GrasslandMeadow", "Mesic", "Alpine")
 Eco.vars.quad <- c(F, F, T, F, T,
+                   F, F, F, F,
                    F, F, F, F, F,
                    F, F, F)
 

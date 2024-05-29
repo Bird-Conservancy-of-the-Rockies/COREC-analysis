@@ -7,18 +7,11 @@ setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 
 #_______ Script inputs _______#
 years <- 2021:2023
-# List grid cell IDs
-file_list <- list.files("data/AllDataRDS_19April2024") %>%
-  (function(x) x[which(str_detect(x, "ResidencyTime"))])
-dat <- readRDS(str_c("data/AllDataRDS_19April2024/", file_list[1]))
-for(i in 2:length(file_list)) dat <- dat %>% bind_rows(readRDS(str_c("data/AllDataRDS_19April2024/", file_list[i])))
-grid.list <- dat %>% pull(grid_transect) %>% unique()
-rm(dat)
-
 dat_traffic <- read.csv("data/HumanTraffic_covariates.csv", header = TRUE, stringsAsFactors = FALSE)
+grid.list <- dat_traffic %>% pull(TransectNum)
 #_____________________________#
 
-## Frequencies ##
+## Primary habitat frequencies ##
 grab <- VegData(select.cols = c("TransectNum",
                                 "Year",
                                 'primaryHabitat',
@@ -38,6 +31,18 @@ grab %>% dplyr::group_by(primaryHabitat, HabitatCommonName) %>%
   arrange(desc(n)) %>%
   write.csv(str_c("Primary_habitats.csv"), row.names = F)
 
+# Get trail densities #
+dat_trails <- read.table("data/COrecGridsTrailDensity.txt", header = TRUE, stringsAsFactors = FALSE, sep = "\t") %>%
+  rename(TransectNum = TransNum) %>%
+  mutate(TrailTotm = ifelse(is.na(TrailTotm), 0, TrailTotm),
+         RoadTotm = ifelse(is.na(RoadTotm), 0, RoadTotm)) %>%
+  mutate(Prp_MotRestricted = ifelse(is.na(atvohvrm), 0, atvohvrm) / TrailTotm,
+         Prp_HorseRestricted = ifelse(is.na(horsesRestm), 0, horsesRestm) / TrailTotm) %>%
+  mutate(Prp_MotRestricted = ifelse(is.na(Prp_MotRestricted), mean(Prp_MotRestricted, na.rm = TRUE), Prp_MotRestricted),
+         Prp_HorseRestricted = ifelse(is.na(Prp_HorseRestricted), mean(Prp_HorseRestricted, na.rm = TRUE), Prp_HorseRestricted)) %>%
+  select(TransectNum:RoadTotm, Prp_MotRestricted, Prp_HorseRestricted)
+# Only 19 had any proportion of trails with no horses allowed, so only including prp motorized restricted
+
 # Correlate veg categories with human traffic #
 veg.classes <- list(
   SageShrubland = "SA",
@@ -56,7 +61,10 @@ veg.classes <- list(
 )
 dat <- grab %>% select(TransectNum, Year) %>% distinct() %>%
   left_join(dat_traffic %>% select(TransectNum, HumanTraffic), by = "TransectNum") %>%
-  mutate(LogTraffic = log(HumanTraffic + 0.001))
+  mutate(HumanPresence = HumanTraffic > 0,
+         LogTraffic = ifelse(HumanTraffic == 0, log(mean(HumanTraffic)), log(HumanTraffic))) %>%
+  select(-HumanTraffic) %>%
+  left_join(dat_trails, by = "TransectNum")
 for(i in 1:length(veg.classes)) {
   dat <- dat %>%
     left_join(
@@ -75,13 +83,14 @@ dat <- dat %>% left_join(
   by = c("TransectNum", "Year")
 )
 pdf(file = "HumTraffic_veg_relations.pdf",   # The directory you want to save the file in
-    width = 11, # The width of the plot in inches
-    height = 11,  # The height of the plot in inches
+    width = 40, # The width of the plot in inches
+    height = 40,  # The height of the plot in inches
     paper="USr")
-pairs.panels(dat %>% select(HumanTraffic:ShrubHt),
+pairs.panels(dat %>% select(HumanPresence:ShrubHt),
              method = "pearson",
              hist.col = "#00AFBB",
-             cex.cor = 1)
+             cex.cor = 1,
+             cex.labels = 0.5)
 dev.off()
 
 # Select veg variables and save #

@@ -9,6 +9,15 @@ setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 years <- 2021:2023
 Spp_list <- read.csv("Species_list.csv", header = TRUE, stringsAsFactors = FALSE)
 dat_human <- read.csv("data/HumanTraffic_covariates.csv", header = TRUE, stringsAsFactors = FALSE)
+dat_trails <- read.table("data/COrecGridsTrailDensity.txt", header = TRUE, stringsAsFactors = FALSE, sep = "\t") %>%
+  rename(TransectNum = TransNum) %>%
+  mutate(TrailTotm = ifelse(is.na(TrailTotm), 0, TrailTotm),
+         RoadTotm = ifelse(is.na(RoadTotm), 0, RoadTotm)) %>%
+  mutate(Prp_MotRestricted = ifelse(is.na(atvohvrm), 0, atvohvrm) / TrailTotm,
+         Prp_HorseRestricted = ifelse(is.na(horsesRestm), 0, horsesRestm) / TrailTotm) %>%
+  mutate(Prp_MotRestricted = ifelse(is.na(Prp_MotRestricted), mean(Prp_MotRestricted, na.rm = TRUE), Prp_MotRestricted),
+         Prp_HorseRestricted = ifelse(is.na(Prp_HorseRestricted), mean(Prp_HorseRestricted, na.rm = TRUE), Prp_HorseRestricted)) %>%
+  select(TransectNum:RoadTotm, Prp_MotRestricted, Prp_HorseRestricted)
 grid.list <- sort(unique(dat_human$TransectNum))
 trunc.pct <- 0.95 # Distance quantile at which detections are truncated for distance sampling (and thus defining point count plot radius)
 nG <- 10 # number of distance categories
@@ -149,7 +158,8 @@ gridXyears.list <- samples %>%
 ## Covariates ##
 # Human traffic #
 covariates <- samples %>% left_join(dat_human, by = "TransectNum") %>%
-  rename(Traffic_DOY_mn = Date_mn)
+  rename(Traffic_DOY_mn = Date_mn) %>%
+  left_join(dat_trails, by = "TransectNum")
 
 # Vegetation classes #
 grab <- VegData(select.cols = c("TransectNum",
@@ -212,10 +222,10 @@ covariates <- covariates %>%
          GridInd = TransectNum %>% as.factor %>% as.integer,
          YearInd = Year %>% as.factor %>% as.integer) %>%
   select(Grid_year, TransectNum, Year, GrdYrInd:YearInd, Date:Survey_tssr, HumanPresence:LogTraffic,
-         Traffic_DOY_mn:TOD_mean, Shrubland:Alpine)
+         Traffic_DOY_mn:TOD_mean, TrailTotm:Alpine)
 CovIndMat <- data.frame(Grid_year = gridXyears.list, stringsAsFactors = F) %>%
   left_join(covariates, by = "Grid_year") %>%
-  select(GrdYrInd:YearInd, Effort, Survey_DOY:Alpine) %>%
+  select(GrdYrInd:YearInd, Effort, Survey_DOY, Survey_tssr:Alpine) %>%
   data.matrix
 
 ## Clean & save workspace ##
