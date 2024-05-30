@@ -13,12 +13,10 @@ pa.vars.quad <- c(F, T, T)
 pp.vars <- c("LogTraffic")
 
 # List parameters to save
-parameters <- c("zeta0.mu", "zeta0", "b.mu", "b.sd", "b",
+parameters <- c("zeta0.mu", "zeta0.sd", "zeta0", "b.mu", "b.sd", "b",
                 "zetaVec.mu", "zetaVec.sd", "zetaVec",
-                "zeta0.sd", "zeta0.sd.yr", "dev.zeta0",
                 
                 "theta0.mu", "theta0.sd", "theta0",
-                "theta0.sd.yr", "dev.theta0",
                 "thetaVec.mu", "thetaVec.sd", "thetaVec",
                 
                 "alpha0.mu", "alpha0.sd", "alpha0",
