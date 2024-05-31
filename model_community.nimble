@@ -74,7 +74,12 @@ model <<- nimbleCode({
         ##~~~~~~~~~~~~~~~ Observation models ~~~~~~~~~~~~~~~~~~~##
         # Distance sampling
         
-        log(a[s, j]) <- zeta0[s] + inprod(zetaVec[s, 1:n.Xpp], X.pp[j, 1:n.Xpp])
+        if(n.Xpp > 1) {
+          log(a[s, j]) <- zeta0[s] + inprod(zetaVec[s, 1:n.Xpp], X.pp[j, 1:n.Xpp])
+        }
+        if(n.Xpp == 1) {
+          log(a[s, j]) <- zeta0[s] + zetaVec[s, 1] * X.pp[j, 1]
+        }
 
         for(d in 1:nD)  {
           pp_d[s, j, d] <- 1 - exp(-pow(((breaks[d] + breaks[d + 1]) / 2) / a[s, j], -b[s]))
