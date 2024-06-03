@@ -8,6 +8,11 @@ Eco.vars.quad <- c(F, F, T, F, T,
                    F, F, F, F, F,
                    F, F, F)
 
+alpha.vars <- c("Shrubland", "PinyonJuniper", "ConiferForest", "Aspen", "OakWoodland",
+                "GrasslandMeadow", "Mesic", "Alpine")
+beta.vars <- c("HumanPresence", "LogTrafficNoZeros", "Traffic_DOY_mn", "Speed", "TOD_mean",
+               "TrailTotm", "RoadTotm", "Prp_MotRestricted", "Prp_HorseRestricted")
+
 pa.vars <- c("LogTraffic", "Survey_DOY", "Survey_tssr")
 pa.vars.quad <- c(F, T, T)
 pp.vars <- c("LogTraffic")
@@ -21,7 +26,6 @@ parameters <- c("zeta0.mu", "zeta0.sd", "zeta0", "b.mu", "b.sd", "b",
                 
                 "alpha0.mu", "alpha0.sd", "alpha0",
                 "alphaVec.mu", "alphaVec.sd", "alphaVec",
-                "dev.alpha0", "alpha0.sd.yr",
 
                 "beta0.mu", "beta0.sd", "beta0", "rho.ab",
                 "betaVec.mu", "betaVec.sd", "betaVec",

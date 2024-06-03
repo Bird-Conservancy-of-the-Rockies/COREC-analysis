@@ -14,8 +14,7 @@ model <<- nimbleCode({
     # Ecological parameters (occupancy, abundance, and their dynamics)
     alpha0.mu ~ dnorm(0, 0.66667)
     alpha0.sd ~ dgamma(1, 1)
-    alpha0.sd.yr ~ dgamma(1, 1)
-    
+
     beta0.mu ~ dnorm(0, 1)
     beta0.sd ~ dgamma(1, 1)
     beta0.sd.yr ~ dgamma(1, 1)
@@ -66,7 +65,6 @@ model <<- nimbleCode({
         betaVec[s, k] ~ dnorm(betaVec.mu[k], pow(betaVec.sd[k], -2))
       }
       for(t in 1:nyear) {
-        dev.alpha0[s, t] ~ dnorm(0, pow(alpha0.sd.yr, -2))
         dev.beta0[s, t] ~ dnorm(0, pow(beta0.sd.yr, -2))
       }
 
@@ -101,15 +99,17 @@ model <<- nimbleCode({
         prob_n[s, j] <- pp[s, j] * pa[s, j] * (effort[j] / 16)
         n[s, j] ~ dbin(prob_n[s, j], N[s, j])
         
-        ##~~~~~~~~~~~~~~ State process occupancy model ~~~~~~~~~~~~~~##
-        logit(psi[s, j]) <- alpha0[s] + dev.alpha0[s, yearInd[j]] + inprod(alphaVec[s, 1:n.Xalpha], X.alpha[j, 1:n.Xalpha])
-        z[s, j] ~ dbern(psi[s, j]) # Occupancy state
-        
         ##~~~~~~~~~~~~~~ State process abundance model ~~~~~~~~~~~~~~##
         log(lambda[s, j]) <- beta0[s] + dev.beta0[s, yearInd[j]] + inprod(betaVec[s, 1:n.Xbeta], X.beta[j, 1:n.Xbeta])
-        N[s, j] ~ dpois(lambda[s, j] * z[s, j]) # Abundance state
+        N[s, j] ~ dpois(lambda[s, j] * z[s, gridInd[j]]) # Abundance state
         
       } # End gridXyear loop
+      
+      for(j in 1:ngrid) {
+        ##~~~~~~~~~~~~~~ State process occupancy model ~~~~~~~~~~~~~~##
+        logit(psi[s, j]) <- alpha0[s] + inprod(alphaVec[s, 1:n.Xalpha], X.alpha[j, 1:n.Xalpha])
+        z[s, j] ~ dbern(psi[s, j]) # Occupancy state
+      }
     } # End species loop
     
     for(i in 1:nDet) { ## Start loop through detections (i.e., occassions when the species was detected) ##

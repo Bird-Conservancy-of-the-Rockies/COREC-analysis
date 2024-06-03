@@ -4,7 +4,7 @@ library(tidyr)
 library(dplyr)
 library(FunctionsBCR)
 
-setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
+setwd("~/COREC")
 #setwd("~/Rec_overlay")
 
 #_____ Script inputs _____#
@@ -12,7 +12,7 @@ git.repo <- "COREC-analysis/"
 #GOF <- FALSE # Set to true to include and monitor goodness of fit metrics (not sure if/how I'll do this.)
 mod.nam <- "community"
 model.file <- str_c("model_", mod.nam, ".nimble")
-parallel.process <- F # Set to true if running nimble on analysis server (i.e., not Windows)
+parallel.process <- T # Set to true if running nimble on analysis server (i.e., not Windows)
 max.samples.saved <- 1000 # Maximum number of posterior samples to save.
 par.ignore.Rht <- c() # Parameters to ignore for calculating Rhat and neff.
 #source(str_c(scripts.loc, "RunNimbleParallel_", data.set, ".R"))
@@ -34,6 +34,7 @@ data.nams <- c("n", "dclass", "tint",
 
 constant.nams <- c("nspp", "ngrdyrs",
                    "yearInd", "nyear",
+                   "gridInd", "ngrid",
                    "breaks", "area.prop", "nD",
                    "K", "ndet", "effort",
                    
