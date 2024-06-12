@@ -2,19 +2,19 @@
 Eco.vars <- c("HumanPresence", "LogTrafficNoZeros", "Traffic_DOY_mn", "Speed", "TOD_mean",
               "TrailTotm", "RoadTotm", "Prp_MotRestricted", "Prp_HorseRestricted",
               "Shrubland", "PinyonJuniper", "ConiferForest", "Aspen", "OakWoodland",
-              "GrasslandMeadow", "Mesic", "Alpine")
+              "GrasslandMeadow", "Mesic")
 Eco.vars.quad <- c(F, F, T, F, T,
                    F, F, F, F,
                    F, F, F, F, F,
-                   F, F, F)
+                   F, F)
 
 alpha.vars <- c("Shrubland", "PinyonJuniper", "ConiferForest", "Aspen", "OakWoodland",
-                "GrasslandMeadow", "Mesic", "Alpine")
+                "GrasslandMeadow", "Mesic")
 beta.vars <- c("HumanPresence", "LogTrafficNoZeros", "Traffic_DOY_mn", "Speed", "TOD_mean",
                "TrailTotm", "RoadTotm", "Prp_MotRestricted", "Prp_HorseRestricted")
 
 pa.vars <- c("LogTraffic", "Survey_DOY", "Survey_tssr")
-pa.vars.quad <- c(F, T, T)
+pa.vars.quad <- c(F, F, T)
 pp.vars <- c("LogTraffic")
 
 # List parameters to save
