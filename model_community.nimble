@@ -11,7 +11,7 @@ model <<- nimbleCode({
     theta0.mu ~ dnorm(0, 0.666667)
     theta0.sd ~ dgamma(1, 1)
 
-    # Ecological parameters (occupancy, abundance, and their dynamics)
+    # Ecological parameters (occupancy and abundance)
     alpha0.mu ~ dnorm(0, 0.66667)
     alpha0.sd ~ dgamma(1, 1)
 
@@ -32,10 +32,10 @@ model <<- nimbleCode({
       thetaVec.sd[k] ~ dgamma(1, 1)
     }
     
-    for(k in 1:n.Xalpha) {
-      alphaVec.mu[k] ~ dnorm(0, 1)
-      alphaVec.sd[k] ~ dgamma(1, 1)
-    }
+    #for(k in 1:n.Xalpha) {
+    #  alphaVec.mu[k] ~ dnorm(0, 1)
+    #  alphaVec.sd[k] ~ dgamma(1, 1)
+    #}
     
     for(k in 1:n.Xbeta) {
       betaVec.mu[k] ~ dnorm(0, 1)
@@ -56,9 +56,9 @@ model <<- nimbleCode({
       }
 
       alpha0[s] ~ dnorm(alpha0.mu, pow(alpha0.sd, -2))
-      for(k in 1:n.Xalpha) {
-        alphaVec[s, k] ~ dnorm(alphaVec.mu[k], pow(alphaVec.sd[k], -2))
-      }
+      #for(k in 1:n.Xalpha) {
+      #  alphaVec[s, k] ~ dnorm(alphaVec.mu[k], pow(alphaVec.sd[k], -2))
+      #}
       beta0[s] ~ dnorm(beta0.mu + (rho.ab * beta0.sd / alpha0.sd) * (alpha0[s] - alpha0.mu),
         pow(beta0.sd, -2) / (1 - pow(rho.ab, 2)))
       for(k in 1:n.Xbeta) {
@@ -107,7 +107,7 @@ model <<- nimbleCode({
       
       for(j in 1:ngrid) {
         ##~~~~~~~~~~~~~~ State process occupancy model ~~~~~~~~~~~~~~##
-        logit(psi[s, j]) <- alpha0[s] + inprod(alphaVec[s, 1:n.Xalpha], X.alpha[j, 1:n.Xalpha])
+        logit(psi[s, j]) <- alpha0[s]# + inprod(alphaVec[s, 1:n.Xalpha], X.alpha[j, 1:n.Xalpha])
         z[s, j] ~ dbern(psi[s, j]) # Occupancy state
       }
     } # End species loop

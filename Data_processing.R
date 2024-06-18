@@ -74,8 +74,8 @@ if(any(Eco.vars.quad)) {
 }
 n.Xeco <- ncol(X.eco)
 
-X.alpha <- X.eco[, which(str_detect_any(dimnames(X.eco)[[2]], alpha.vars))] %>%
-  apply(2, function(x) tapply(x, gridInd, mean))
-n.Xalpha <- dim(X.alpha)[2]
+# X.alpha <- X.eco[, which(str_detect_any(dimnames(X.eco)[[2]], alpha.vars))] %>%
+#   apply(2, function(x) tapply(x, gridInd, mean))
+# n.Xalpha <- dim(X.alpha)[2]
 X.beta <- X.eco[, which(str_detect_any(dimnames(X.eco)[[2]], beta.vars))]
 n.Xbeta <- dim(X.beta)[2]

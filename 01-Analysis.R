@@ -30,7 +30,7 @@ nt <- 100 # thinning
 
 # Data objects to send to JAGS
 data.nams <- c("n", "dclass", "tint",
-               "X.alpha", "X.beta", "X.pp", "X.pa")
+               "X.beta", "X.pp", "X.pa") # "X.alpha", 
 
 constant.nams <- c("nspp", "ngrdyrs",
                    "yearInd", "nyear",
@@ -38,7 +38,7 @@ constant.nams <- c("nspp", "ngrdyrs",
                    "breaks", "area.prop", "nD",
                    "K", "ndet", "effort",
                    
-                   "n.Xpa", "n.Xpp", "n.Xalpha", "n.Xbeta",
+                   "n.Xpa", "n.Xpp", "n.Xbeta", # "n.Xalpha",
                    "det.ind", "spp.ind", "nDet")
 
 source(str_c(git.repo, "Param_list.R"))
