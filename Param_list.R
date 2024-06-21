@@ -1,11 +1,14 @@
 # List covariates #
-Eco.vars <- c("HumanPresence", "LogTrafficNoZeros", "Traffic_DOY_mn", "Speed", "TOD_mean",
-              "TrailTotm", "RoadTotm", "Prp_MotRestricted", "Prp_HorseRestricted")
-Eco.vars.quad <- c(F, F, T, F, T,
-                   F, F, F, F)
+Mangmt.vars <- c("TrailTotm", "RoadTotm", "Prp_MotRestricted", "Prp_HorseRestricted")
+Mangmt.vars.quad <- c(F, F, F, F)
+Human.vars <- c("HumanPresence", "LogTrafficNoZeros", "Traffic_DOY_mn", "Speed", "TOD_mean")
+Human.vars.quad <- c(F, F, T, F, T)
+Hab.vars <- c("Shrubland", "PinyonJuniper", "ConiferForest", "Aspen", "OakWoodland",
+              "GrasslandMeadow", "Mesic", "Alpine")
+Hab.vars.quad <- c(F, F, F, F, F,
+                   F, F, F)
 
-beta.vars <- c("HumanPresence", "LogTrafficNoZeros", "Traffic_DOY_mn", "Speed", "TOD_mean",
-               "TrailTotm", "RoadTotm", "Prp_MotRestricted", "Prp_HorseRestricted")
+beta.vars <- c(Mangmt.vars, Human.vars, Hab.vars)
 
 pa.vars <- c("LogTraffic", "Survey_DOY", "Survey_tssr")
 pa.vars.quad <- c(F, F, T)

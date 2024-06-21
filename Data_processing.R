@@ -52,24 +52,23 @@ X.pa <- apply(X.pa, 2, function(x) (x - mean(x, na.rm = T))/ sd(x, na.rm = T))
 # X.pa[which(is.na(X.pa))] <- 0
 if(any(pa.vars.quad)) {
   X.pa2 <- as.matrix(X.pa[,which(pa.vars.quad)] ^ 2)
-  dimnames(X.pa2)[[2]] <- str_c(dimnames(X.pa2)[[2]], "2")
+  dimnames(X.pa2)[[2]] <- str_c(dimnames(X.pa2)[[2]][which(pa.vars.quad)], "2")
   X.pa <- cbind(X.pa, X.pa2)
   rm(X.pa2)
 }
 n.Xpa <- ncol(X.pa)
 
 # Ecological covariates #
-X.eco <- as.matrix(CovIndMat[,Eco.vars])
-dimnames(X.eco)[[2]] <- Eco.vars
-X.eco <- apply(X.eco, 2, function(x) (x - mean(x, na.rm = T))/ sd(x, na.rm = T))
-X.eco[which(is.na(X.eco))] <- 0
-if(any(Eco.vars.quad)) {
-  X.ecp2 <- X.eco[,which(Eco.vars.quad)] ^ 2
-  dimnames(X.ecp2)[[2]] <- str_c(dimnames(X.ecp2)[[2]], "2")
-  X.eco <- cbind(X.eco, X.ecp2)
-  rm(X.ecp2)
+beta.vars <- c(Mangmt.vars, Human.vars, Hab.vars)
+X.beta <- as.matrix(CovIndMat[, beta.vars])
+dimnames(X.beta)[[2]] <- beta.vars
+X.beta <- apply(X.beta, 2, function(x) (x - mean(x, na.rm = T))/ sd(x, na.rm = T))
+X.beta[which(is.na(X.beta))] <- 0
+beta.vars.quad <- c(Mangmt.vars.quad, Human.vars.quad, Hab.vars.quad)
+if(any(beta.vars.quad)) {
+  X.beta2 <- X.beta[,which(beta.vars.quad)] ^ 2
+  dimnames(X.beta2)[[2]] <- str_c(beta.vars[which(beta.vars.quad)], "2")
+  X.beta <- cbind(X.beta, X.beta2)
+  rm(X.beta2)
 }
-n.Xeco <- ncol(X.eco)
-
-X.beta <- X.eco[, which(str_detect_any(dimnames(X.eco)[[2]], beta.vars))]
 n.Xbeta <- dim(X.beta)[2]
