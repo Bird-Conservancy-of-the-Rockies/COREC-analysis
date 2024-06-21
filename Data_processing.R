@@ -4,8 +4,6 @@ ngrdyrs <- max(CovIndMat[, "GrdYrInd"])
 nDet <- sum(n > 0)
 yearInd <- CovIndMat[, "YearInd"]
 nyear <- max(yearInd)
-gridInd <- CovIndMat[, "GridInd"]
-ngrid <- max(gridInd)
 
 effort <- CovIndMat[, "Effort"]
 
@@ -40,7 +38,6 @@ rm(k, d, add)
 
 # Initial values for latent states #
 N.init <- n
-z.init <- ((n > 0) * 1) %>% apply(1, function(x) tapply(x, gridInd, max)) %>% t
 
 # Covariate matrices #
 X.pp <- as.matrix(CovIndMat[,pp.vars])
@@ -74,8 +71,5 @@ if(any(Eco.vars.quad)) {
 }
 n.Xeco <- ncol(X.eco)
 
-# X.alpha <- X.eco[, which(str_detect_any(dimnames(X.eco)[[2]], alpha.vars))] %>%
-#   apply(2, function(x) tapply(x, gridInd, mean))
-# n.Xalpha <- dim(X.alpha)[2]
 X.beta <- X.eco[, which(str_detect_any(dimnames(X.eco)[[2]], beta.vars))]
 n.Xbeta <- dim(X.beta)[2]

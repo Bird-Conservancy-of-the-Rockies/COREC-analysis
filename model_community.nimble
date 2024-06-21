@@ -12,14 +12,9 @@ model <<- nimbleCode({
     theta0.sd ~ dgamma(1, 1)
 
     # Ecological parameters (occupancy and abundance)
-    alpha0.mu ~ dnorm(0, 0.66667)
-    alpha0.sd ~ dgamma(1, 1)
-
     beta0.mu ~ dnorm(0, 1)
     beta0.sd ~ dgamma(1, 1)
     beta0.sd.yr ~ dgamma(1, 1)
-    
-    rho.ab ~ dunif(-1, 1) # Correlation between occupancy and abundance among species
 
     # Covariate effects
     for(k in 1:n.Xpp) {
@@ -31,11 +26,6 @@ model <<- nimbleCode({
       thetaVec.mu[k] ~ dnorm(0, 1)
       thetaVec.sd[k] ~ dgamma(1, 1)
     }
-    
-    #for(k in 1:n.Xalpha) {
-    #  alphaVec.mu[k] ~ dnorm(0, 1)
-    #  alphaVec.sd[k] ~ dgamma(1, 1)
-    #}
     
     for(k in 1:n.Xbeta) {
       betaVec.mu[k] ~ dnorm(0, 1)
@@ -55,12 +45,7 @@ model <<- nimbleCode({
         thetaVec[s, k] ~ dnorm(thetaVec.mu[k], pow(thetaVec.sd[k], -2))
       }
 
-      alpha0[s] ~ dnorm(alpha0.mu, pow(alpha0.sd, -2))
-      #for(k in 1:n.Xalpha) {
-      #  alphaVec[s, k] ~ dnorm(alphaVec.mu[k], pow(alphaVec.sd[k], -2))
-      #}
-      beta0[s] ~ dnorm(beta0.mu + (rho.ab * beta0.sd / alpha0.sd) * (alpha0[s] - alpha0.mu),
-        pow(beta0.sd, -2) / (1 - pow(rho.ab, 2)))
+      beta0[s] ~ dnorm(beta0.mu, pow(beta0.sd, -2))
       for(k in 1:n.Xbeta) {
         betaVec[s, k] ~ dnorm(betaVec.mu[k], pow(betaVec.sd[k], -2))
       }
@@ -101,15 +86,9 @@ model <<- nimbleCode({
         
         ##~~~~~~~~~~~~~~ State process abundance model ~~~~~~~~~~~~~~##
         log(lambda[s, j]) <- beta0[s] + dev.beta0[s, yearInd[j]] + inprod(betaVec[s, 1:n.Xbeta], X.beta[j, 1:n.Xbeta])
-        N[s, j] ~ dpois(lambda[s, j] * z[s, gridInd[j]]) # Abundance state
+        N[s, j] ~ dpois(lambda[s, j]) # Abundance state
         
       } # End gridXyear loop
-      
-      for(j in 1:ngrid) {
-        ##~~~~~~~~~~~~~~ State process occupancy model ~~~~~~~~~~~~~~##
-        logit(psi[s, j]) <- alpha0[s]# + inprod(alphaVec[s, 1:n.Xalpha], X.alpha[j, 1:n.Xalpha])
-        z[s, j] ~ dbern(psi[s, j]) # Occupancy state
-      }
     } # End species loop
     
     for(i in 1:nDet) { ## Start loop through detections (i.e., occassions when the species was detected) ##
