@@ -14,7 +14,7 @@ model <<- nimbleCode({
     # Ecological parameters (occupancy and abundance)
     beta0.mu ~ dnorm(0, 1)
     beta0.sd ~ dgamma(1, 1)
-    beta0.sd.yr ~ dgamma(1, 1)
+    #beta0.sd.yr ~ dgamma(1, 1)
 
     # Covariate effects
     for(k in 1:n.Xpp) {
@@ -49,9 +49,9 @@ model <<- nimbleCode({
       for(k in 1:n.Xbeta) {
         betaVec[s, k] ~ dnorm(betaVec.mu[k], pow(betaVec.sd[k], -2))
       }
-      for(t in 1:nyear) {
-        dev.beta0[s, t] ~ dnorm(0, pow(beta0.sd.yr, -2))
-      }
+      #for(t in 1:nyear) {
+      #  dev.beta0[s, t] ~ dnorm(0, pow(beta0.sd.yr, -2))
+      #}
 
       for(j in 1:ngrdyrs) { # Start gridXyear observation loop
         ##~~~~~~~~~~~~~~~ Observation models ~~~~~~~~~~~~~~~~~~~##
@@ -85,7 +85,7 @@ model <<- nimbleCode({
         n[s, j] ~ dbin(prob_n[s, j], N[s, j])
         
         ##~~~~~~~~~~~~~~ State process abundance model ~~~~~~~~~~~~~~##
-        log(lambda[s, j]) <- beta0[s] + dev.beta0[s, yearInd[j]] + inprod(betaVec[s, 1:n.Xbeta], X.beta[j, 1:n.Xbeta])
+        log(lambda[s, j]) <- beta0[s] + inprod(betaVec[s, 1:n.Xbeta], X.beta[j, 1:n.Xbeta]) #  + dev.beta0[s, yearInd[j]]
         N[s, j] ~ dpois(lambda[s, j]) # Abundance state
         
       } # End gridXyear loop

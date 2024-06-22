@@ -22,5 +22,5 @@ parameters <- c("zeta0.mu", "zeta0.sd", "zeta0", "b.mu", "b.sd", "b",
                 "thetaVec.mu", "thetaVec.sd", "thetaVec",
                 
                 "beta0.mu", "beta0.sd", "beta0",
-                "betaVec.mu", "betaVec.sd", "betaVec",
-                "dev.beta0", "beta0.sd.yr")
+                "betaVec.mu", "betaVec.sd", "betaVec")#,
+                #"dev.beta0", "beta0.sd.yr")
