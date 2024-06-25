@@ -5,12 +5,12 @@ library(dplyr)
 library(FunctionsBCR)
 
 setwd("~/COREC")
-#setwd("~/Rec_overlay")
+#setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
 #GOF <- FALSE # Set to true to include and monitor goodness of fit metrics (not sure if/how I'll do this.)
-mod.nam <- "community"
+mod.nam <- "path" # Options: "community", "interm_paths", "path
 model.file <- str_c("model_", mod.nam, ".nimble")
 parallel.process <- T # Set to true if running nimble on analysis server (i.e., not Windows)
 max.samples.saved <- 1000 # Maximum number of posterior samples to save.
@@ -29,16 +29,36 @@ nt <- 100 # thinning
 #_________________________#
 
 # Data objects to send to JAGS
-data.nams <- c("n", "dclass", "tint",
-               "X.beta", "X.pp", "X.pa") 
+data.nams.comm <- c("n", "dclass", "tint",
+                    "X.beta", "X.pp", "X.pa")
+data.nams.paths <- c("HumanPresence", "Traffic", "TOD_mean",
+                     "Traffic_DOY_mn", "Speed", "X.beta")
 
-constant.nams <- c("nspp", "ngrdyrs",
-                   "yearInd", "nyear",
-                   "breaks", "area.prop", "nD",
-                   "K", "ndet", "effort",
-                   
-                   "n.Xpa", "n.Xpp", "n.Xbeta",
-                   "det.ind", "spp.ind", "nDet")
+constant.nams.comm <- c("nspp", "ngrdyrs",
+                        "yearInd", "nyear",
+                        "breaks", "area.prop", "nD",
+                        "K", "ndet", "effort",
+                        
+                        "n.Xpa", "n.Xpp", "n.Xbeta",
+                        "det.ind", "spp.ind", "nDet")
+constant.nams.path <- c("ngrdyrs", "ngrdyrs.hpresent",
+                        "ngrdyrs.DOY_Speed",
+                        
+                        "ind.hpresent", "ind.DOY_Speed",
+                        
+                        "ind.TrailTotm", "ind.RoadTotm",
+                        "ind.Prp_MotRestricted", "ind.Prp_HorseRestricted")
+
+if(mod.nam == "community") {
+  data.nams <- data.nams.comm
+  constant.nams <- constant.nams.comm
+} else if(mod.nam == "interm_paths") {
+  data.nams <- data.nams.paths
+  constant.nams <- constant.nams.path
+} else {
+  data.nams <- c(data.nams.comm, data.nams.paths) %>% unique()
+  constant.nams <- c(constant.nams.comm, constant.nams.path) %>% unique()
+}
 
 source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
@@ -73,7 +93,7 @@ if(!parallel.process) {
                     data=data,
                     inits=inits,
                     nchains = nc,
-                    nburnin = ni * nb,
+                    nburnin = ifelse(nb < 1, ni * nb, nb),
                     niter = ni,
                     thin = nt,
                     samplesAsCodaMCMC = T,
@@ -81,10 +101,10 @@ if(!parallel.process) {
                     WAIC = FALSE,
                     monitors = parameters)
   
-  mod <- coda::as.mcmc.list(lapply(out, coda::as.mcmc)) # Not sure if this will work.
+  mod <- coda::as.mcmc.list(lapply(out$samples, coda::as.mcmc)) # Not sure if this will work.
   library(mcmcOutput)
   #if(nc > 1) mod.raw <- coda::as.mcmc.list(lapply(out$samples, coda::mcmc))
-  mod <- mcmcOutput(out.mcmc)
+  mod <- mcmcOutput(mod)
   sumTab <- summary(mod, MCEpc = F, Rhat = T, n.eff = T, f = T, overlap0 = T, verbose = F)
   sumTab <- sumTab %>%
     as_tibble() %>%

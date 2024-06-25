@@ -18,6 +18,32 @@ inits <- list(N = N.init,
               b.mu = 3.16, b.sd = 0.005, b = rep(3.16, nspp),
               zetaVec.mu = rep(0, n.Xpp), zetaVec.sd = rep(sd.init, n.Xpp), zetaVec = matrix(0, nspp, n.Xpp))
 
+inits.path <- list(BETA0.HumanPresence = 0, BETA.TrailTotm.HumanPresence = 0,
+                   BETA.Prp_MotRestricted.HumanPresence = 0, BETA.Prp_HorseRestricted.HumanPresence = 0,
+                   BETA.RoadTotm.HumanPresence = 0,
+                   
+                   BETA0.Traffic = 0, BETA.TrailTotm.Traffic = 0,
+                   BETA.RoadTotm.Traffic = 0, BETA.Prp_MotRestricted.Traffic = 0,
+                   BETA.Prp_HorseRestricted.Traffic = 0, shape.Traffic =1,
+                   
+                   BETA0.TOD_mean = 0, BETA.TrailTotm.TOD_mean = 0, 
+                   BETA.RoadTotm.TOD_mean = 0, BETA.Prp_MotRestricted.TOD_mean = 0,
+                   BETA.Prp_HorseRestricted.TOD_mean = 0, shape.TOD_mean = 1,
+                   
+                   BETA0.Traffic_DOY_mn = 0, BETA.TrailTotm.Traffic_DOY_mn = 0,
+                   BETA.RoadTotm.Traffic_DOY_mn = 0, BETA.Prp_MotRestricted.Traffic_DOY_mn = 0,
+                   BETA.Prp_HorseRestricted.Traffic_DOY_mn = 0, shape.Traffic_DOY_mn = 1,
+                   
+                   BETA0.Speed = 0, BETA.TrailTotm.Speed = 0, BETA.RoadTotm.Speed = 0,
+                   BETA.Prp_MotRestricted.Speed = 0, BETA.Prp_HorseRestricted.Speed = 0,
+                   shape.Speed = 1)
+
+if(mod.nam == "interm_paths") {
+  inits <- inits.path
+} else if(mod.nam == "path") {
+  inits <- c(inits, inits.path)
+}
+
 if(any(is.na(unlist(inits)) | unlist(inits) %in% c(Inf, -Inf))) {
   ind.undefined <- which(is.na(unlist(inits)) | unlist(inits) %in% c(Inf, -Inf))
   print(str_c("Warning: Initial values are undefined for ", str_c(names(unlist(inits)), collapse = ", "), "."))

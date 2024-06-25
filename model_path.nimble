@@ -1,12 +1,145 @@
-#nimLogDgamma <- nimbleFunction(
-# run = function(x = double(0), shape = double(0), scale = double(0)) {
-#    ans <- log(dgamma(x, shape = shape, scale = scale))
-#    return(ans)
-#    returnType(double(0))
-#  })
-#CnimLogDgamma <- compileNimble(nimLogDgamma)
-
 model <<- nimbleCode({
+    ########################
+    # Bird community model #
+    ########################
+    
+    ##~~~~~~~~~~~ Prior distributions for basic parameters ~~~~~~~~~~~~##
+    # Perceptibility parameters
+    zeta0.mu ~ dnorm(4.5, 0.666667)
+    zeta0.sd ~ dgamma(1, 1)
+    b.mu ~ dunif(0, 20)
+    b.sd ~ dgamma(1, 1)
+    
+    # Availability parameters
+    theta0.mu ~ dnorm(0, 0.666667)
+    theta0.sd ~ dgamma(1, 1)
+
+    # Ecological parameters (occupancy and abundance)
+    beta0.mu ~ dnorm(0, 1)
+    beta0.sd ~ dgamma(1, 1)
+    beta0.sd.yr ~ dgamma(1, 1)
+
+    # Covariate effects
+    for(k in 1:n.Xpp) {
+      zetaVec.mu[k] ~ dnorm(0, 1)
+      zetaVec.sd[k] ~ dgamma(1, 1)
+    }
+
+    for(k in 1:n.Xpa) {
+      thetaVec.mu[k] ~ dnorm(0, 1)
+      thetaVec.sd[k] ~ dgamma(1, 1)
+    }
+    
+    for(k in 1:n.Xbeta) {
+      betaVec.mu[k] ~ dnorm(0, 1)
+      betaVec.sd[k] ~ dgamma(1, 1)
+    }
+
+    for(s in 1:nspp) { ## Start species loop ##
+    
+      ##~~~~~~~~~~~ Species-specific parameters ~~~~~~~~~~~~##
+      zeta0[s] ~ dnorm(zeta0.mu, pow(zeta0.sd, -2))
+      b[s] ~ T(dnorm(b.mu, pow(b.sd, -2)), 0, 20)
+      for(k in 1:n.Xpp) {
+        zetaVec[s, k] ~ dnorm(zetaVec.mu[k], pow(zetaVec.sd[k], -2))
+      }
+      theta0[s] ~ dnorm(theta0.mu, pow(theta0.sd, -2))
+      for(k in 1:n.Xpa) {
+        thetaVec[s, k] ~ dnorm(thetaVec.mu[k], pow(thetaVec.sd[k], -2))
+      }
+
+      beta0[s] ~ dnorm(beta0.mu, pow(beta0.sd, -2))
+      for(k in 1:n.Xbeta) {
+        betaVec[s, k] ~ dnorm(betaVec.mu[k], pow(betaVec.sd[k], -2))
+      }
+      for(t in 1:nyear) {
+        dev.beta0[s, t] ~ dnorm(0, pow(beta0.sd.yr, -2))
+      }
+
+      for(j in 1:ngrdyrs) { # Start gridXyear observation loop
+        ##~~~~~~~~~~~~~~~ Observation models ~~~~~~~~~~~~~~~~~~~##
+        # Distance sampling
+        
+        if(n.Xpp > 1) {
+          log(a[s, j]) <- zeta0[s] + inprod(zetaVec[s, 1:n.Xpp], X.pp[j, 1:n.Xpp])
+        }
+        if(n.Xpp == 1) {
+          log(a[s, j]) <- zeta0[s] + zetaVec[s, 1] * X.pp[j, 1]
+        }
+
+        for(d in 1:nD)  {
+          pp_d[s, j, d] <- 1 - exp(-pow(((breaks[d] + breaks[d + 1]) / 2) / a[s, j], -b[s]))
+          pi_pp[s, j, d] <- pp_d[s, j, d] * area.prop[d]
+          pi_pp_c[s, j, d] <- pi_pp[s, j, d] / pp[s, j]
+          }
+        pp[s, j] <- sum(pi_pp[s, j, 1:nD]) # Probability of detection at all
+
+        # Time-removal probabilities
+    
+        logit(p_a[s, j]) <- theta0[s] + inprod(thetaVec[s, 1:n.Xpa], X.pa[j, 1:n.Xpa])
+    
+        for(k in 1:K)  {
+          pi_pa[s, j, k] <- p_a[s, j] * pow(1 - p_a[s, j], (k - 1))
+          pi_pa_c[s, j, k] <- pi_pa[s, j, k] / pa[s, j] # Conditional probabilities of availability
+          }
+        pa[s, j] <- sum(pi_pa[s, j, 1:K]) # Probability of ever available
+        
+        prob_n[s, j] <- pp[s, j] * pa[s, j] * (effort[j] / 16)
+        n[s, j] ~ dbin(prob_n[s, j], N[s, j])
+        
+        ##~~~~~~~~~~~~~~ State process abundance model ~~~~~~~~~~~~~~##
+        log(lambda[s, j]) <- beta0[s] + dev.beta0[s, yearInd[j]] + inprod(betaVec[s, 1:n.Xbeta], X.beta[j, 1:n.Xbeta])
+        N[s, j] ~ dpois(lambda[s, j]) # Abundance state
+        
+      } # End gridXyear loop
+    } # End species loop
+    
+    for(i in 1:nDet) { ## Start loop through detections (i.e., occassions when the species was detected) ##
+    
+      ##~~~~~~~~~~~~~~~ Multinomial distance and removal processes ~~~~~~~~~~~~~~~~~~~##
+      dclass[i, 1:nD] ~ dmulti(pi_pp_c[spp.ind[i], det.ind[i], 1:nD], n[spp.ind[i], det.ind[i]])
+      tint[i, 1:K] ~ dmulti(pi_pa_c[spp.ind[i], det.ind[i], 1:K], n[spp.ind[i], det.ind[i]])
+    }
+  
+  ###############
+  # Path models #
+  ###############
+  
+  #~~~~~~~~~~ Prior distributions ~~~~~~~~~~~~~#
+  BETA0.HumanPresence ~ dnorm(0, 0.66667)
+  BETA.TrailTotm.HumanPresence ~ dnorm(0, 0.66667)
+  BETA.Prp_MotRestricted.HumanPresence ~ dnorm(0, 0.66667)
+  BETA.Prp_HorseRestricted.HumanPresence ~ dnorm(0, 0.66667)
+  BETA.RoadTotm.HumanPresence ~ dnorm(0, 0.66667)
+
+  BETA0.Traffic ~ dnorm(0, 0.66667)
+  BETA.TrailTotm.Traffic ~ dnorm(0, 0.66667)
+  BETA.RoadTotm.Traffic ~ dnorm(0, 0.66667)
+  BETA.Prp_MotRestricted.Traffic ~ dnorm(0, 0.66667)
+  BETA.Prp_HorseRestricted.Traffic ~ dnorm(0, 0.66667)
+  shape.Traffic ~ dgamma(1, 1)
+
+  BETA0.TOD_mean ~ dnorm(0, 0.66667)
+  BETA.TrailTotm.TOD_mean ~ dnorm(0, 0.66667)
+  BETA.RoadTotm.TOD_mean ~ dnorm(0, 0.66667)
+  BETA.Prp_MotRestricted.TOD_mean ~ dnorm(0, 0.66667)
+  BETA.Prp_HorseRestricted.TOD_mean ~ dnorm(0, 0.66667)
+  shape.TOD_mean ~ dgamma(1, 0.01)
+
+  BETA0.Traffic_DOY_mn ~ dnorm(0, 0.66667)
+  BETA.TrailTotm.Traffic_DOY_mn ~ dnorm(0, 0.66667)
+  BETA.RoadTotm.Traffic_DOY_mn ~ dnorm(0, 0.66667)
+  BETA.Prp_MotRestricted.Traffic_DOY_mn ~ dnorm(0, 0.66667)
+  BETA.Prp_HorseRestricted.Traffic_DOY_mn ~ dnorm(0, 0.66667)
+  shape.Traffic_DOY_mn ~ dgamma(1, 0.1)
+
+  BETA0.Speed ~ dnorm(0, 0.66667)
+  BETA.TrailTotm.Speed ~ dnorm(0, 0.66667)
+  BETA.RoadTotm.Speed ~ dnorm(0, 0.66667)
+  BETA.Prp_MotRestricted.Speed ~ dnorm(0, 0.66667)
+  BETA.Prp_HorseRestricted.Speed ~ dnorm(0, 0.66667)
+  shape.Speed ~ dgamma(1, 0.1)
+  
   for(j in 1:ngrdyrs) {
     ## Human presence ##
     HumanPresence[j] ~ dbern(pred.HumanPresence[j])
@@ -34,14 +167,10 @@ model <<- nimbleCode({
       BETA.Prp_HorseRestricted.Traffic * X.beta[ind.hpresent[j], ind.Prp_HorseRestricted]
     rate.Traffic[j] <- shape.Traffic / pred.Traffic[j]
     #_____ GOF _____#
-    #LLobs.Traffic[j] <- CnimLogDgamma(Traffic[j],
-    #  shape.Traffic, shape.Traffic / pred.Traffic[j])
     LLobs.Traffic[j] <- log((pow(rate.Traffic[j], shape.Traffic) *
       Traffic[j] * exp(-1 * rate.Traffic[j] * Traffic[j]))) -
       loggam(shape.Traffic)
     X.sim.Traffic[j] ~ dgamma(shape.Traffic, rate.Traffic[j])
-    #LLsim.Traffic[j] <- CnimLogDgamma(X.sim.Traffic[j],
-    #  shape.Traffic, shape.Traffic / pred.Traffic[j])
     LLsim.Traffic[j] <- log((pow(rate.Traffic[j], shape.Traffic) *
       X.sim.Traffic[j] * exp(-1 * rate.Traffic[j] * X.sim.Traffic[j]))) -
       loggam(shape.Traffic)
@@ -103,42 +232,7 @@ model <<- nimbleCode({
       loggam(shape.Speed)
     #_______________#
   }
-
-  ### Prior distributions ###
-  BETA0.HumanPresence ~ dnorm(0, 0.66667)
-  BETA.TrailTotm.HumanPresence ~ dnorm(0, 0.66667)
-  BETA.Prp_MotRestricted.HumanPresence ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.HumanPresence ~ dnorm(0, 0.66667)
-  BETA.RoadTotm.HumanPresence ~ dnorm(0, 0.66667)
-
-  BETA0.Traffic ~ dnorm(0, 0.66667)
-  BETA.TrailTotm.Traffic ~ dnorm(0, 0.66667)
-  BETA.RoadTotm.Traffic ~ dnorm(0, 0.66667)
-  BETA.Prp_MotRestricted.Traffic ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.Traffic ~ dnorm(0, 0.66667)
-  shape.Traffic ~ dgamma(1, 1)
-
-  BETA0.TOD_mean ~ dnorm(0, 0.66667)
-  BETA.TrailTotm.TOD_mean ~ dnorm(0, 0.66667)
-  BETA.RoadTotm.TOD_mean ~ dnorm(0, 0.66667)
-  BETA.Prp_MotRestricted.TOD_mean ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.TOD_mean ~ dnorm(0, 0.66667)
-  shape.TOD_mean ~ dgamma(1, 0.01)
-
-  BETA0.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  BETA.TrailTotm.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  BETA.RoadTotm.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  BETA.Prp_MotRestricted.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  shape.Traffic_DOY_mn ~ dgamma(1, 0.1)
-
-  BETA0.Speed ~ dnorm(0, 0.66667)
-  BETA.TrailTotm.Speed ~ dnorm(0, 0.66667)
-  BETA.RoadTotm.Speed ~ dnorm(0, 0.66667)
-  BETA.Prp_MotRestricted.Speed ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.Speed ~ dnorm(0, 0.66667)
-  shape.Speed ~ dgamma(1, 0.1)
-
+  
   #_______ GOF _______#
   dev.obs.HumanPresence <- -2 * sum(LLobs.HumanPresence[1:ngrdyrs])
   dev.sim.HumanPresence <- -2 * sum(LLsim.HumanPresence[1:ngrdyrs])
