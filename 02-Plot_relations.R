@@ -12,7 +12,8 @@ load(str_c("Data_compiled.RData"))
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
-mod <- R.utils::loadObject("mod_community")
+mod.nam <- "community"
+mod <- R.utils::loadObject(str_c("mod_", mod.nam))
 source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
 #________________________#
@@ -58,7 +59,7 @@ p <- ggdraw() +
 
 save_plot("Figure_Managmt_effects.jpg", p, ncol = 3, nrow = 5.5, dpi = 300)
 
-# Set 2 #
+# Human mobility #
 p <- ggdraw() + 
   draw_plot(p_HumanPresence,     x = 0.05,      y = 0, width = 0.1357143, height = 1) +
   draw_plot(p_LogTrafficNoZeros, x = 0.1857143, y = 0, width = 0.1357143, height = 1) +
@@ -71,85 +72,16 @@ p <- ggdraw() +
 
 save_plot("Figure_Human_effects.jpg", p, ncol = 5, nrow = 5.5, dpi = 300)
 
-# ## 5-year trend ##
-# # Summary table of trends #
-# col.nams <- c("Species", "Treatment_type", "Untreated", "Treated", "p")
-# Spp_trends <- matrix(NA, nrow = 0, ncol = 5,
-#                      dimnames = list(NULL, col.nams))
-# 
-# for(species in Spp) {
-#   ind.spp <- which(Spp == species)
-# 
-#   ind.EA <- which(str_detect(grid.list, "NFWF-EA"))
-#   ind.yrs <- which(year >= 2018)
-#   ind.EA <- which(Cov_grid[,"gridID"] %in% ind.EA & Cov_grid[,"YearID"] %in% ind.yrs)
-#   ind.GZ <- which(str_detect(grid.list, "NFWF-GZ"))
-#   ind.GZ <- which(Cov_grid[,"gridID"] %in% ind.GZ & Cov_grid[,"YearID"] %in% ind.yrs)
-#   
-#   dplt.view_Trt_trend.fn(ind.EA = ind.EA, ind.GZ = ind.GZ, nsamp = nsamp,
-#                          alpha0 = mod$mcmcOutput$alpha0[,ind.spp],
-#                          alphaVec = mod$mcmcOutput$alphaVec[,ind.spp,],
-#                          X.alpha = X.alpha,
-#                          DELTA0 = mod$mcmcOutput$DELTA0[,ind.spp],
-#                          DELTAVec = mod$mcmcOutput$DELTAVec[,ind.spp,],
-#                          X.DELTA = X.DELTA,
-#                          ETA0 = mod$mcmcOutput$ETA0[,ind.spp],
-#                          ETAVec = mod$mcmcOutput$ETAVec[,ind.spp,],
-#                          X.ETA = X.ETA,
-#                          beta0 = mod$mcmcOutput$beta0[,ind.spp],
-#                          betaVec = mod$mcmcOutput$betaVec[,ind.spp,],
-#                          X.beta = X.beta,
-#                          delta0 = mod$mcmcOutput$delta0[,ind.spp],
-#                          deltaVec = mod$mcmcOutput$deltaVec[,ind.spp,],
-#                          X.delta = X.delta)
-#   assign(str_c("trend.EA.", species), trend.EA)
-#   assign(str_c("trend.GZ.", species), trend.GZ)
-#   assign(str_c("dat.plt.EA.", species), dat.plt.EA)
-#   assign(str_c("dat.plt.GZ.", species), dat.plt.GZ)
-#   trend.EA <- c(species, "Conservation easement", trend.EA)
-#   trend.GZ <- c(species, "Grazing management", trend.GZ)
-#   Spp_trends <- rbind(Spp_trends, trend.EA, trend.GZ)
-# }
-# 
-# write.csv(Spp_trends, str_c("Treatment_effects_trend_community_model_", data.set, ".csv"), row.names = F)
-# 
-# # Plot trends where differences are supported #
-# Spp_trends <- data.frame(Spp_trends) %>%
-#   mutate(p = as.numeric(p))
-# Spp.plot <- Spp_trends %>% filter(p < 0.1 | p > 0.9) %>%
-#   pull(Species) %>% unique
-# 
-# for(species in Spp.plot) {
-#   dat.plt.EA <- eval(as.name(str_c("dat.plt.EA.", species))) %>%
-#     rename(Treatment = Trt_EA) %>%
-#     mutate(Treatment = as.character(Treatment)) %>%
-#     mutate(Treatment = factor(Treatment, levels = c(0, 100)))
-#   p <- ggplot(dat.plt.EA, aes(x = Year, y = N.md)) +
-#     geom_line(aes(color = Treatment), linewidth = 2) +
-#     geom_errorbar(aes(ymin = N.lo, ymax = N.hi, color = Treatment), width = 0.1,
-#                   position = position_dodge(width = 0.1)) +
-#     geom_point(aes(color = Treatment), size = 5,
-#                position = position_dodge(width = 0.1)) +
-#     scale_color_manual(values = c("#999999", "#000000")) +
-#     ylab("Bird density (per km sqr)") +
-#     theme(axis.text.x = element_text(size=25),
-#           axis.text.y = element_text(size=25))
-#   save_plot(str_c("Plot_EA_trend_effect_", species, "_", data.set, ".jpg"), p, ncol = 1, nrow = 1, dpi = 300)
-#   
-#   dat.plt.GZ <- eval(as.name(str_c("dat.plt.GZ.", species))) %>%
-#     rename(Treatment = Trt_GZ) %>%
-#     mutate(Treatment = as.character(Treatment)) %>%
-#     mutate(Treatment = factor(Treatment, levels = c(0, 100)))
-#   p <- ggplot(dat.plt.GZ, aes(x = Year, y = N.md)) +
-#     geom_line(aes(color = Treatment), linewidth = 2) +
-#     geom_errorbar(aes(ymin = N.lo, ymax = N.hi, color = Treatment), width = 0.1,
-#                   position = position_dodge(width = 0.1)) +
-#     geom_point(aes(color = Treatment), size = 5,
-#                position = position_dodge(width = 0.1)) +
-#     scale_color_manual(values = c("#999999", "#000000")) +
-#     ylab("Bird density (per km sqr)") +
-#     theme(axis.text.x = element_text(size=25),
-#           axis.text.y = element_text(size=25))
-#   save_plot(str_c("Plot_GZ_trend_effect_", species, "_", data.set, ".jpg"), p, ncol = 1, nrow = 1, dpi = 300)
-# }
+# Habitat #
+p <- ggdraw() + 
+  draw_plot(p_Shrubland,       x = 0.05,    y = 0, width = 0.11875, height = 1) +
+  draw_plot(p_PinyonJuniper,   x = 0.16875, y = 0, width = 0.11875, height = 1) +
+  draw_plot(p_ConiferForest,   x = 0.28750, y = 0, width = 0.11875, height = 1) +
+  draw_plot(p_Aspen,           x = 0.40625, y = 0, width = 0.11875, height = 1) +
+  draw_plot(p_OakWoodland,     x = 0.52500, y = 0, width = 0.11875, height = 1) +
+  draw_plot(p_GrasslandMeadow, x = 0.64375, y = 0, width = 0.11875, height = 1) +
+  draw_plot(p_Mesic,           x = 0.76250, y = 0, width = 0.11875, height = 1) +
+  draw_plot(p_Alpine,          x = 0.88125, y = 0, width = 0.11875, height = 1) +
+  draw_plot_label("Species", x = 0, y = 0.5, size = 40, angle = 90, hjust = 0)
 
+save_plot("Figure_Habitat_effects.jpg", p, ncol = 5, nrow = 5.5, dpi = 300)

@@ -10,20 +10,21 @@ load(str_c("Data_compiled.RData"))
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
-mod <- R.utils::loadObject("mod_community")
+mod.nam <- "path"
+mod <- R.utils::loadObject(str_c("mod_", mod.nam))
 source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
 #________________________#
 
 params <- c("N0", str_c("beta.", dimnames(X.beta)[[2]]),
-            str_c("zeta.", dimnames(X.pp)[[2]]),
-            str_c("theta.", dimnames(X.pa)[[2]]))
+            "a0", str_c("zeta.", dimnames(X.pp)[[2]]),
+            "pa0", str_c("theta.", dimnames(X.pa)[[2]]))
 cols <- c(Spp)
 out <- matrix("", nrow = length(params), ncol = length(cols),
               dimnames = list(params, cols))
 
 logit.parms <- c("pa0")
-logit.parms.coefs <- c("alpha0", "theta0")
+logit.parms.coefs <- c("theta0")
 names(logit.parms.coefs) <- logit.parms
 
 log.parms <- c("N0", "a0")
@@ -41,7 +42,7 @@ for(p in params) {
     par.ind <- which(str_detect(names(mod$mcmcOutput),
                                 str_c(log.parms.coefs[p], "\\[")) &
                        !str_detect(names(mod$mcmcOutput), "dev"))
-    prm <- FunctionsBCR::expit(mod$mcmcOutput[,par.ind])
+    prm <- exp(mod$mcmcOutput[,par.ind])
     out[p, ] <- apply(prm, 2, FunctionsBCR::BCI, flag.sig = F)
   } else {
     prm.nam <- str_c(str_split(p, "\\.", simplify = T)[1], "Vec")
@@ -57,3 +58,43 @@ for(p in params) {
 }
 
 write.csv(t(out), str_c("Parameter_est.csv"), row.names = T)
+
+#################################################################
+# Summarize species results for preliminary report (June, 2024) #
+#################################################################
+
+SGCN_spp <- read.csv("C:/Users/quresh.latif/files/data/CPW SWAP Species List.csv", header = TRUE) %>%
+  filter(Group == "Birds")
+library(GetDataBCR)
+library(FunctionsBCR)
+database_spp <- BirdData(select.cols = c("ScientificName", "BirdCode"), State.filter = "CO", group_by = TRUE)
+SGCN_spp <- database_spp %>% filter(str_detect_any(ScientificName, SGCN_spp$Species)) %>% pull(BirdCode)
+SGCN_spp <- SGCN_spp[which(SGCN_spp %in% Spp)]
+
+rows <- c(str_sub(dimnames(out)[[1]][2:10], 6, -1))
+cols <- c("positive", "negative", "positive_SGCN", "negative_SGCN")
+sum.out <- matrix(NA, nrow = length(rows), ncol = length(cols),
+                  dimnames = list(rows, cols))
+
+sum.out[1:9, "positive"] <- apply(out[2:10,], 1,
+                                  function(x) sum(str_sub(x, 1, 1) != "-" &
+                                                    str_sub(x, -1, -1) == "*"))
+sum.out[1:9, "negative"] <- apply(out[2:10,], 1,
+                                  function(x) sum(str_sub(x, 1, 1) == "-" &
+                                                    str_sub(x, -1, -1) == "*"))
+sum.out[1:9, "positive_SGCN"] <- apply(out[2:10, SGCN_spp], 1,
+                                  function(x) sum(str_sub(x, 1, 1) != "-" &
+                                                    str_sub(x, -1, -1) == "*"))
+sum.out[1:9, "negative_SGCN"] <- apply(out[2:10, SGCN_spp], 1,
+                                  function(x) sum(str_sub(x, 1, 1) == "-" &
+                                                    str_sub(x, -1, -1) == "*"))
+write.csv(sum.out, "Summary_spp_relations.csv")
+
+# Number of species with negative human presence but positive traffic relations:
+sum(str_sub(out["beta.HumanPresence",], 1, 1) == "-" & str_sub(out["beta.HumanPresence",], -1, -1) == "*" &
+      str_sub(out["beta.LogTrafficNoZeros",], 1, 1) != "-" & str_sub(out["beta.LogTrafficNoZeros",], -1, -1) == "*")
+dimnames(out)[[2]][which(str_sub(out["beta.HumanPresence",], 1, 1) == "-" & str_sub(out["beta.HumanPresence",], -1, -1) == "*" &
+      str_sub(out["beta.LogTrafficNoZeros",], 1, 1) != "-" & str_sub(out["beta.LogTrafficNoZeros",], -1, -1) == "*")]
+
+# Number of species with quadratic relationships with date or time of traffic
+sum(str_sub(out["beta.Traffic_DOY_mn2",], -1, -1) == "*" | str_sub(out["beta.TOD_mean2",], -1, -1) == "*")

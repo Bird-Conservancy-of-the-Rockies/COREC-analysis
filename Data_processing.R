@@ -52,7 +52,7 @@ X.pa <- apply(X.pa, 2, function(x) (x - mean(x, na.rm = T))/ sd(x, na.rm = T))
 # X.pa[which(is.na(X.pa))] <- 0
 if(any(pa.vars.quad)) {
   X.pa2 <- as.matrix(X.pa[,which(pa.vars.quad)] ^ 2)
-  dimnames(X.pa2)[[2]] <- str_c(dimnames(X.pa2)[[2]][which(pa.vars.quad)], "2")
+  dimnames(X.pa2)[[2]] <- str_c(pa.vars[which(pa.vars.quad)], "2")
   X.pa <- cbind(X.pa, X.pa2)
   rm(X.pa2)
 }

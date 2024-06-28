@@ -19,8 +19,9 @@ dat_trails <- read.table("data/COrecGridsTrailDensity.txt", header = TRUE, strin
          Prp_HorseRestricted = ifelse(is.na(Prp_HorseRestricted), mean(Prp_HorseRestricted, na.rm = TRUE), Prp_HorseRestricted)) %>%
   select(TransectNum:RoadTotm, Prp_MotRestricted, Prp_HorseRestricted)
 grid.list <- sort(unique(dat_human$TransectNum))
-trunc.pct <- 0.95 # Distance quantile at which detections are truncated for distance sampling (and thus defining point count plot radius)
+trunc.pct <- 1 # Distance quantile at which detections are truncated for distance sampling (and thus defining point count plot radius). If 1, no truncation.
 nG <- 10 # number of distance categories
+breaks.set <- c(0.01, 5, 15) # Set smallest distance bin breaks; remainder of bins will be generated on the log scale so that largest bins are relatively wide.
 #_____________________________#
 
 Spp <- Spp_list$BirdCode
@@ -115,11 +116,21 @@ rm(ind.drop, ind.keep)
 
 det.proc.cutoff <- det.proc %>% filter(radialDistance <= cutoff)
 area.circle <- as.numeric(pi * (cutoff / 1000) ^ 2) # area of point count circle in km^2
-breaks <- seq(0, cutoff, length.out = nG + 1) # breaks for distance categories
+breaks.log <- c(log(breaks.set[-length(breaks.set)]),
+                seq(log(breaks.set[length(breaks.set)]),
+                    log(cutoff), length.out = nG - length(breaks.set) + 2)) # breaks for distance categories
+breaks <- exp(breaks.log)
+breaks[1] <- 0
 area.band <- (pi * breaks[-1]^2) - (pi * breaks[-(nG+1)]^2) # area of each distance category
 area.prop <- area.band / sum(area.band)
+dclass.fn <- function(x.vec, breaks) {
+  dclass <- integer(length = length(x.vec))
+  for(i in 1:length(x.vec))
+    dclass[i] <- which(breaks[-1] > x.vec[i] & breaks[-length(breaks)] <= x.vec[i])
+  return(dclass)
+}
 det.proc.cutoff <- det.proc.cutoff %>%
-  mutate(dclass = ceiling(radialDistance / breaks[2])) %>%
+  mutate(dclass = dclass.fn(radialDistance, breaks)) %>%
   select(Grid_year:radialDistance, dclass, TimePeriod, CL_Count)
 
 # Check correlations between distance and time period #
@@ -143,7 +154,7 @@ detection.trim.summary <- detection.trim.summary %>%
 #   ggtitle(sp)
 
 detects.all <- det.proc %>%
-  mutate(dclass = ceiling(radialDistance / breaks[2])) %>%
+  mutate(dclass = dclass.fn(radialDistance, breaks)) %>%
   select(Grid_year:radialDistance, dclass, TimePeriod, CL_Count)
 detects.cutoff <- detects.all %>% filter(dclass <= 10)
 detects.drop <- detects.all %>% filter(dclass > 10)
