@@ -19,9 +19,9 @@ dat_trails <- read.table("data/COrecGridsTrailDensity.txt", header = TRUE, strin
          Prp_HorseRestricted = ifelse(is.na(Prp_HorseRestricted), mean(Prp_HorseRestricted, na.rm = TRUE), Prp_HorseRestricted)) %>%
   select(TransectNum:RoadTotm, Prp_MotRestricted, Prp_HorseRestricted)
 grid.list <- sort(unique(dat_human$TransectNum))
-trunc.pct <- 1 # Distance quantile at which detections are truncated for distance sampling (and thus defining point count plot radius). If 1, no truncation.
+trunc.pct <- 0.95 # Distance quantile at which detections are truncated for distance sampling (and thus defining point count plot radius). If 1, no truncation.
+min.n.trunc <- 75 # Minimum number of detections required for truncation
 nG <- 10 # number of distance categories
-breaks.set <- c(0.01, 5, 15) # Set smallest distance bin breaks; remainder of bins will be generated on the log scale so that largest bins are relatively wide.
 #_____________________________#
 
 Spp <- Spp_list$BirdCode
@@ -99,9 +99,17 @@ det.proc <- detections %>% filter(is.na(CL_ID)) %>%
 # }
 
 # Derive parameters for distance sampling #
-cutoff <- quantile(det.proc$radialDistance, trunc.pct, na.rm=TRUE)
-ind.keep <- which(det.proc$radialDistance <= cutoff)
-ind.drop <- which(det.proc$radialDistance > cutoff)
+cutoff.fn <- function(distances, trunc.pct, min.n.trunc) {
+  if(length(distances) > min.n.trunc) {
+    cutoff <- quantile(distances, trunc.pct, na.rm = TRUE)
+  } else {
+    cutoff <- max(distances, na.rm = TRUE)
+  }
+  return(cutoff)
+}
+cutoff <- tapply(det.proc$radialDistance, det.proc$BirdCode, function(x) cutoff.fn(x, trunc.pct, min.n.trunc))
+ind.keep <- which(det.proc$radialDistance <= cutoff[det.proc$BirdCode])
+ind.drop <- which(det.proc$radialDistance > cutoff[det.proc$BirdCode])
 detection.trim.summary <- data.frame(Spp = Spp,
                                      total = (det.proc$BirdCode %>%
                                                 tapply(.,.,length))[Spp],
@@ -112,25 +120,29 @@ detection.trim.summary <- data.frame(Spp = Spp,
   mutate(prp.keep = round(n.keep / total, digits = 3),
          prp.drop = round(n.drop / total, digits = 3))
 #View(det.trim.log)
-rm(ind.drop, ind.keep)
 
-det.proc.cutoff <- det.proc %>% filter(radialDistance <= cutoff)
+det.proc.cutoff <- det.proc %>% slice(ind.keep)
 area.circle <- as.numeric(pi * (cutoff / 1000) ^ 2) # area of point count circle in km^2
-breaks.log <- c(log(breaks.set[-length(breaks.set)]),
-                seq(log(breaks.set[length(breaks.set)]),
-                    log(cutoff), length.out = nG - length(breaks.set) + 2)) # breaks for distance categories
-breaks <- exp(breaks.log)
-breaks[1] <- 0
-area.band <- (pi * breaks[-1]^2) - (pi * breaks[-(nG+1)]^2) # area of each distance category
-area.prop <- area.band / sum(area.band)
+breaks <- matrix(NA, nrow = length(Spp), ncol = nG + 1, dimnames = list(Spp, NULL))
+area.band <- matrix(NA, nrow = length(Spp), ncol = nG, dimnames = list(Spp, NULL))
+for(i in 1:length(Spp)) {
+  breaks[i,] <- seq(0, cutoff[i], length.out = nG + 1)
+  area.band[i,] <- (pi * breaks[i, -1]^2) - (pi * breaks[i, -(nG+1)]^2) # area of each distance category
+}
+area.prop <- apply(area.band, 2, sum) %>% (function(x) x / sum(x)) # All are the same, so just need one set of values across species.
 dclass.fn <- function(x.vec, breaks) {
   dclass <- integer(length = length(x.vec))
   for(i in 1:length(x.vec))
-    dclass[i] <- which(breaks[-1] > x.vec[i] & breaks[-length(breaks)] <= x.vec[i])
+    dclass[i] <- which(breaks[-1] >= x.vec[i] & breaks[-length(breaks)] < x.vec[i])
   return(dclass)
 }
+det.proc.cutoff <- det.proc.cutoff %>% mutate(dclass = as.integer(NA))
+for(i in 1:length(Spp)) {
+  ind.spp <- which(det.proc.cutoff$BirdCode == Spp[i])
+  det.proc.cutoff$dclass[ind.spp] <- dclass.fn(det.proc.cutoff$radialDistance[ind.spp],
+                                               breaks[Spp[i],])
+}
 det.proc.cutoff <- det.proc.cutoff %>%
-  mutate(dclass = dclass.fn(radialDistance, breaks)) %>%
   select(Grid_year:radialDistance, dclass, TimePeriod, CL_Count)
 
 # Check correlations between distance and time period #
@@ -153,12 +165,21 @@ detection.trim.summary <- detection.trim.summary %>%
 #   geom_jitter(alpha = 0.3) +
 #   ggtitle(sp)
 
-detects.all <- det.proc %>%
-  mutate(dclass = dclass.fn(radialDistance, breaks)) %>%
+detects.all <- det.proc %>% mutate(dclass = as.integer(NA))
+for(i in 1:length(Spp)) {
+  ind.spp <- which(detects.all$BirdCode == Spp[i])
+  breaks.spp <- breaks[Spp[i],]
+  if(max(breaks.spp) < max(detects.all$radialDistance[ind.spp]))
+    breaks.spp <- c(breaks.spp, max(detects.all$radialDistance[ind.spp]))
+  detects.all$dclass[ind.spp] <- dclass.fn(detects.all$radialDistance[ind.spp],
+                                               breaks.spp)
+}
+rm(breaks.spp)
+detects.all <- detects.all %>%
   select(Grid_year:radialDistance, dclass, TimePeriod, CL_Count)
 detects.cutoff <- detects.all %>% filter(dclass <= 10)
 detects.drop <- detects.all %>% filter(dclass > 10)
-rm(detects.all, det.proc, det.proc.cutoff)
+rm(detects.all, det.proc, det.proc.cutoff, ind.drop, ind.keep)
 
 # List all grid_year IDs
 gridXyears.list <- samples %>%

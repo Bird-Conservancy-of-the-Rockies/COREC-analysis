@@ -68,7 +68,7 @@ model <<- nimbleCode({
         }
 
         for(d in 1:nD)  {
-          pp_d[s, j, d] <- 1 - exp(-pow(((breaks[d] + breaks[d + 1]) / 2) / a[s, j], -b[s]))
+          pp_d[s, j, d] <- 1 - exp(-pow(((breaks[s, d] + breaks[s, d + 1]) / 2) / a[s, j], -b[s]))
           pi_pp[s, j, d] <- pp_d[s, j, d] * area.prop[d]
           pi_pp_c[s, j, d] <- pi_pp[s, j, d] / pp[s, j]
           }
