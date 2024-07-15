@@ -10,7 +10,7 @@ setwd("~/COREC")
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
 #GOF <- FALSE # Set to true to include and monitor goodness of fit metrics (not sure if/how I'll do this.)
-mod.nam <- "interm_paths" # Options: "community", "interm_paths", "path
+mod.nam <- "path" # Options: "community", "interm_paths", "path
 model.file <- str_c("model_", mod.nam, ".nimble")
 parallel.process <- F # Set to true if running nimble on analysis server (i.e., not Windows)
 max.samples.saved <- 1000 # Maximum number of posterior samples to save.
@@ -43,7 +43,7 @@ constant.nams.comm <- c("nspp", "ngrdyrs",
 constant.nams.path <- c("ngrdyrs", "ngrdyrs.hpresent",
                         "ngrdyrs.Speed",
                         
-                        "ind.hpresent", "ind.Speed",
+                        "ind.hpresent", "ind.SpeedPresent",
                         
                         "ind.TrailTotm", "ind.RoadTotm",
                         "ind.Prp_MotRestricted", "ind.Prp_HorseRestricted")

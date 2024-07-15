@@ -74,22 +74,12 @@ if(any(beta.vars.quad)) {
 }
 n.Xbeta <- dim(X.beta)[2]
 
-# constant.nams.path <- c("ngrdyrs", "ngrdyrs.hpresent",
-#                         "ngrdyrs.Speed",
-#                         
-#                         "ind.hpresent", "ind.Speed",
-#                         
-#                         "ind.HumanPresence", "ind.LogTrafficNoZeros", "ind.TOD_mean",
-#                         "ind.Traffic_DOY_mn", "ind.Speed",
-#                         
-#                         "ind.TrailTotm", "ind.RoadTotm",
-#                         "ind.Prp_MotRestricted", "ind.Prp_HorseRestricted")
 if(str_detect(mod.nam, "path")) {
   ngrdyrs.hpresent <- sum(CovIndMat[, "HumanPresence"] == 1)
   ind.hpresent <- which(CovIndMat[, "HumanPresence"] == 1)
   
-  ngrdyrs.Speed <- sum(!is.na(CovIndMat[, "Traffic_DOY_mn"]) & !is.na(CovIndMat[, "Speed"]))
-  ind.Speed <- which(!is.na(CovIndMat[, "Traffic_DOY_mn"]) & !is.na(CovIndMat[, "Speed"]))
+  ngrdyrs.Speed <- sum(!is.na(CovIndMat[, "Speed"]))
+  ind.SpeedPresent <- which(!is.na(CovIndMat[, "Speed"]))
   
   for(i in 1:length(Human.vars)) assign(str_c("ind.", Human.vars[i]),
                                         which(dimnames(X.beta.raw)[[2]] == Human.vars[i]))
@@ -97,5 +87,5 @@ if(str_detect(mod.nam, "path")) {
                                          which(dimnames(X.beta)[[2]] == Mangmt.vars[i]))
   HumanPresence <- X.beta.raw[, ind.HumanPresence]
   Traffic <- exp(X.beta.raw[ind.hpresent, ind.LogTrafficNoZeros])
-  Speed <- X.beta.raw[ind.Speed, ind.Speed]
+  Speed <- X.beta.raw[ind.SpeedPresent, ind.Speed]
 }

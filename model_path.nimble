@@ -167,10 +167,10 @@ model <<- nimbleCode({
     ## Traffic speed where humans are present ##
     Speed[j] ~ dgamma(shape.Speed, rate.Speed[j])
     log(pred.Speed[j]) <- BETA0.Speed +
-      BETA.TrailTotm.Speed * X.beta[ind.Speed[j], ind.TrailTotm] +
-      BETA.Prp_MotRestricted.Speed * X.beta[ind.Speed[j], ind.Prp_MotRestricted] +
-      BETA.Prp_HorseRestricted.Speed * X.beta[ind.Speed[j], ind.Prp_HorseRestricted] +
-      BETA.RoadTotm.Speed * X.beta[ind.Speed[j], ind.RoadTotm]
+      BETA.TrailTotm.Speed * X.beta[ind.SpeedPresent[j], ind.TrailTotm] +
+      BETA.Prp_MotRestricted.Speed * X.beta[ind.SpeedPresent[j], ind.Prp_MotRestricted] +
+      BETA.Prp_HorseRestricted.Speed * X.beta[ind.SpeedPresent[j], ind.Prp_HorseRestricted] +
+      BETA.RoadTotm.Speed * X.beta[ind.SpeedPresent[j], ind.RoadTotm]
     rate.Speed[j] <- shape.Speed / pred.Speed[j]
     #_____ GOF _____#
     LLobs.Speed[j] <- log((pow(rate.Speed[j], shape.Speed) *
@@ -192,8 +192,8 @@ model <<- nimbleCode({
   dev.sim.Traffic <- -2 * sum(LLsim.Traffic[1:ngrdyrs.hpresent])
   test.Traffic <- step(dev.sim.Traffic - dev.obs.Traffic)
   
-  dev.obs.Speed <- -2 * sum(LLobs.Speed[1:ngrdyrs.DOY_Speed])
-  dev.sim.Speed <- -2 * sum(LLsim.Speed[1:ngrdyrs.DOY_Speed])
+  dev.obs.Speed <- -2 * sum(LLobs.Speed[1:ngrdyrs.Speed])
+  dev.sim.Speed <- -2 * sum(LLsim.Speed[1:ngrdyrs.Speed])
   test.Speed <- step(dev.sim.Speed - dev.obs.Speed)
   #___________________#
   })
