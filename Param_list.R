@@ -1,11 +1,11 @@
 # List covariates #
 Mangmt.vars <- c("TrailTotm", "RoadTotm", "Prp_MotRestricted", "Prp_HorseRestricted")
 Mangmt.vars.quad <- c(F, F, F, F)
-Human.vars <- c("HumanPresence", "LogTrafficNoZeros", "Traffic_DOY_mn", "Speed", "TOD_mean")
-Human.vars.quad <- c(F, F, T, F, T)
-Hab.vars <- c("Shrubland", "PinyonJuniper", "ConiferForest", "Aspen", "OakWoodland",
+Human.vars <- c("HumanPresence", "LogTrafficNoZeros", "Speed")
+Human.vars.quad <- c(F, F, T)
+Hab.vars <- c("Shrubland", "ConiferForest", "Aspen", "OakWoodland", # "PinyonJuniper" dropped to reduce multicollinearity and improve convergence
               "GrasslandMeadow", "Mesic", "Alpine")
-Hab.vars.quad <- c(F, F, F, F, F,
+Hab.vars.quad <- c(F, F, F, F,# F,
                    F, F, F)
 
 beta.vars <- c(Mangmt.vars, Human.vars, Hab.vars)

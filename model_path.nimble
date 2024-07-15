@@ -119,20 +119,6 @@ model <<- nimbleCode({
   BETA.Prp_HorseRestricted.Traffic ~ dnorm(0, 0.66667)
   shape.Traffic ~ dgamma(1, 1)
 
-  BETA0.TOD_mean ~ dnorm(0, 0.66667)
-  BETA.TrailTotm.TOD_mean ~ dnorm(0, 0.66667)
-  BETA.RoadTotm.TOD_mean ~ dnorm(0, 0.66667)
-  BETA.Prp_MotRestricted.TOD_mean ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.TOD_mean ~ dnorm(0, 0.66667)
-  shape.TOD_mean ~ dgamma(1, 0.01)
-
-  BETA0.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  BETA.TrailTotm.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  BETA.RoadTotm.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  BETA.Prp_MotRestricted.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.Traffic_DOY_mn ~ dnorm(0, 0.66667)
-  shape.Traffic_DOY_mn ~ dgamma(1, 0.1)
-
   BETA0.Speed ~ dnorm(0, 0.66667)
   BETA.TrailTotm.Speed ~ dnorm(0, 0.66667)
   BETA.RoadTotm.Speed ~ dnorm(0, 0.66667)
@@ -175,52 +161,16 @@ model <<- nimbleCode({
       X.sim.Traffic[j] * exp(-1 * rate.Traffic[j] * X.sim.Traffic[j]))) -
       loggam(shape.Traffic)
     #_______________#
-    
-    ## Traffic diel timing where humans are present ##
-    TOD_mean[j] ~ dgamma(shape.TOD_mean, rate.TOD_mean[j])
-    log(pred.TOD_mean[j]) <- BETA0.TOD_mean +
-      BETA.TrailTotm.TOD_mean * X.beta[ind.hpresent[j], ind.TrailTotm] +
-      BETA.RoadTotm.TOD_mean * X.beta[ind.hpresent[j], ind.RoadTotm] +
-      BETA.Prp_MotRestricted.TOD_mean * X.beta[ind.hpresent[j], ind.Prp_MotRestricted] +
-      BETA.Prp_HorseRestricted.TOD_mean * X.beta[ind.hpresent[j], ind.Prp_HorseRestricted]
-    rate.TOD_mean[j] <- shape.TOD_mean / pred.TOD_mean[j]
-    #_____ GOF _____#
-    LLobs.TOD_mean[j] <- log((pow(rate.TOD_mean[j], shape.TOD_mean) *
-      TOD_mean[j] * exp(-1 * rate.TOD_mean[j] * TOD_mean[j]))) -
-      loggam(shape.TOD_mean)
-    X.sim.TOD_mean[j] ~ dgamma(shape.TOD_mean, rate.TOD_mean[j])
-    LLsim.TOD_mean[j] <- log((pow(rate.TOD_mean[j], shape.TOD_mean) *
-      X.sim.TOD_mean[j] * exp(-1 * rate.TOD_mean[j] * X.sim.TOD_mean[j]))) -
-      loggam(shape.TOD_mean)
-    #_______________#
   }
   
-  for(j in 1:ngrdyrs.DOY_Speed) {
-    ## Traffic seasonal timing where humans are present ##
-    Traffic_DOY_mn[j] ~ dgamma(shape.Traffic_DOY_mn, rate.Traffic_DOY_mn[j])
-    log(pred.Traffic_DOY_mn[j]) <- BETA0.Traffic_DOY_mn +
-      BETA.TrailTotm.Traffic_DOY_mn * X.beta[ind.DOY_Speed[j], ind.TrailTotm] +
-      BETA.RoadTotm.Traffic_DOY_mn * X.beta[ind.DOY_Speed[j], ind.RoadTotm] +
-      BETA.Prp_MotRestricted.Traffic_DOY_mn * X.beta[ind.DOY_Speed[j], ind.Prp_MotRestricted] +
-      BETA.Prp_HorseRestricted.Traffic_DOY_mn * X.beta[ind.DOY_Speed[j], ind.Prp_HorseRestricted]
-    rate.Traffic_DOY_mn[j] <- shape.Traffic_DOY_mn / pred.Traffic_DOY_mn[j]
-    #_____ GOF _____#
-    LLobs.Traffic_DOY_mn[j] <- log((pow(rate.Traffic_DOY_mn[j], shape.Traffic_DOY_mn) *
-      Traffic_DOY_mn[j] * exp(-1 * rate.Traffic_DOY_mn[j] * Traffic_DOY_mn[j]))) -
-      loggam(shape.Traffic_DOY_mn)
-    X.sim.Traffic_DOY_mn[j] ~ dgamma(shape.Traffic_DOY_mn, rate.Traffic_DOY_mn[j])
-    LLsim.Traffic_DOY_mn[j] <- log((pow(rate.Traffic_DOY_mn[j], shape.Traffic_DOY_mn) *
-      X.sim.Traffic_DOY_mn[j] * exp(-1 * rate.Traffic_DOY_mn[j] * X.sim.Traffic_DOY_mn[j]))) -
-      loggam(shape.Traffic_DOY_mn)
-    #_______________#
-
+  for(j in 1:ngrdyrs.Speed) {
     ## Traffic speed where humans are present ##
     Speed[j] ~ dgamma(shape.Speed, rate.Speed[j])
     log(pred.Speed[j]) <- BETA0.Speed +
-      BETA.TrailTotm.Speed * X.beta[ind.DOY_Speed[j], ind.TrailTotm] +
-      BETA.Prp_MotRestricted.Speed * X.beta[ind.DOY_Speed[j], ind.Prp_MotRestricted] +
-      BETA.Prp_HorseRestricted.Speed * X.beta[ind.DOY_Speed[j], ind.Prp_HorseRestricted] +
-      BETA.RoadTotm.Speed * X.beta[ind.DOY_Speed[j], ind.RoadTotm]
+      BETA.TrailTotm.Speed * X.beta[ind.Speed[j], ind.TrailTotm] +
+      BETA.Prp_MotRestricted.Speed * X.beta[ind.Speed[j], ind.Prp_MotRestricted] +
+      BETA.Prp_HorseRestricted.Speed * X.beta[ind.Speed[j], ind.Prp_HorseRestricted] +
+      BETA.RoadTotm.Speed * X.beta[ind.Speed[j], ind.RoadTotm]
     rate.Speed[j] <- shape.Speed / pred.Speed[j]
     #_____ GOF _____#
     LLobs.Speed[j] <- log((pow(rate.Speed[j], shape.Speed) *
@@ -241,14 +191,6 @@ model <<- nimbleCode({
   dev.obs.Traffic <- -2 * sum(LLobs.Traffic[1:ngrdyrs.hpresent])
   dev.sim.Traffic <- -2 * sum(LLsim.Traffic[1:ngrdyrs.hpresent])
   test.Traffic <- step(dev.sim.Traffic - dev.obs.Traffic)
-  
-  dev.obs.TOD_mean <- -2 * sum(LLobs.TOD_mean[1:ngrdyrs.hpresent])
-  dev.sim.TOD_mean <- -2 * sum(LLsim.TOD_mean[1:ngrdyrs.hpresent])
-  test.TOD_mean <- step(dev.sim.TOD_mean - dev.obs.TOD_mean)
-  
-  dev.obs.Traffic_DOY_mn <- -2 * sum(LLobs.Traffic_DOY_mn[1:ngrdyrs.DOY_Speed])
-  dev.sim.Traffic_DOY_mn <- -2 * sum(LLsim.Traffic_DOY_mn[1:ngrdyrs.DOY_Speed])
-  test.Traffic_DOY_mn <- step(dev.sim.Traffic_DOY_mn - dev.obs.Traffic_DOY_mn)
   
   dev.obs.Speed <- -2 * sum(LLobs.Speed[1:ngrdyrs.DOY_Speed])
   dev.sim.Speed <- -2 * sum(LLsim.Speed[1:ngrdyrs.DOY_Speed])

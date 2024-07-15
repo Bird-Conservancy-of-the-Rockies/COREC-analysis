@@ -67,7 +67,7 @@ X.beta <- apply(X.beta, 2, function(x) (x - mean(x, na.rm = T))/ sd(x, na.rm = T
 X.beta[which(is.na(X.beta))] <- 0
 beta.vars.quad <- c(Mangmt.vars.quad, Human.vars.quad, Hab.vars.quad)
 if(any(beta.vars.quad)) {
-  X.beta2 <- X.beta[,which(beta.vars.quad)] ^ 2
+  X.beta2 <- as.matrix(X.beta[,which(beta.vars.quad)] ^ 2)
   dimnames(X.beta2)[[2]] <- str_c(beta.vars[which(beta.vars.quad)], "2")
   X.beta <- cbind(X.beta, X.beta2)
   rm(X.beta2)
@@ -75,9 +75,9 @@ if(any(beta.vars.quad)) {
 n.Xbeta <- dim(X.beta)[2]
 
 # constant.nams.path <- c("ngrdyrs", "ngrdyrs.hpresent",
-#                         "ngrdyrs.DOY_Speed",
+#                         "ngrdyrs.Speed",
 #                         
-#                         "ind.hpresent", "ind.DOY_Speed",
+#                         "ind.hpresent", "ind.Speed",
 #                         
 #                         "ind.HumanPresence", "ind.LogTrafficNoZeros", "ind.TOD_mean",
 #                         "ind.Traffic_DOY_mn", "ind.Speed",
@@ -88,8 +88,8 @@ if(str_detect(mod.nam, "path")) {
   ngrdyrs.hpresent <- sum(CovIndMat[, "HumanPresence"] == 1)
   ind.hpresent <- which(CovIndMat[, "HumanPresence"] == 1)
   
-  ngrdyrs.DOY_Speed <- sum(!is.na(CovIndMat[, "Traffic_DOY_mn"]) & !is.na(CovIndMat[, "Speed"]))
-  ind.DOY_Speed <- which(!is.na(CovIndMat[, "Traffic_DOY_mn"]) & !is.na(CovIndMat[, "Speed"]))
+  ngrdyrs.Speed <- sum(!is.na(CovIndMat[, "Traffic_DOY_mn"]) & !is.na(CovIndMat[, "Speed"]))
+  ind.Speed <- which(!is.na(CovIndMat[, "Traffic_DOY_mn"]) & !is.na(CovIndMat[, "Speed"]))
   
   for(i in 1:length(Human.vars)) assign(str_c("ind.", Human.vars[i]),
                                         which(dimnames(X.beta.raw)[[2]] == Human.vars[i]))
@@ -97,7 +97,5 @@ if(str_detect(mod.nam, "path")) {
                                          which(dimnames(X.beta)[[2]] == Mangmt.vars[i]))
   HumanPresence <- X.beta.raw[, ind.HumanPresence]
   Traffic <- exp(X.beta.raw[ind.hpresent, ind.LogTrafficNoZeros])
-  TOD_mean <- X.beta.raw[ind.hpresent, ind.TOD_mean]
-  Traffic_DOY_mn <- X.beta.raw[ind.DOY_Speed, ind.Traffic_DOY_mn]
-  Speed <- X.beta.raw[ind.DOY_Speed, ind.Speed]
+  Speed <- X.beta.raw[ind.Speed, ind.Speed]
 }

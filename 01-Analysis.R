@@ -4,8 +4,8 @@ library(tidyr)
 library(dplyr)
 library(FunctionsBCR)
 
-#setwd("~/COREC")
-setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
+setwd("~/COREC")
+#setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
@@ -22,17 +22,16 @@ load("Data_compiled.RData")
 nspp <- length(Spp)
 
 # MCMC values
-nc <- 2 #3 # number of chains
+nc <- 3 # number of chains
 nb <- 0.3 # Proportion of chain to discard as burn in
-ni <- 3000 #15000 # number of iterations
-nt <- 1 #100 # thinning
+ni <- 15000 # number of iterations
+nt <- 100 # thinning
 #_________________________#
 
 # Data objects to send to JAGS
 data.nams.comm <- c("n", "dclass", "tint",
                     "X.beta", "X.pp", "X.pa")
-data.nams.paths <- c("HumanPresence", "Traffic", "TOD_mean",
-                     "Traffic_DOY_mn", "Speed", "X.beta")
+data.nams.paths <- c("HumanPresence", "Traffic", "Speed", "X.beta")
 
 constant.nams.comm <- c("nspp", "ngrdyrs",
                         "yearInd", "nyear",
@@ -42,9 +41,9 @@ constant.nams.comm <- c("nspp", "ngrdyrs",
                         "n.Xpa", "n.Xpp", "n.Xbeta",
                         "det.ind", "spp.ind", "nDet")
 constant.nams.path <- c("ngrdyrs", "ngrdyrs.hpresent",
-                        "ngrdyrs.DOY_Speed",
+                        "ngrdyrs.Speed",
                         
-                        "ind.hpresent", "ind.DOY_Speed",
+                        "ind.hpresent", "ind.Speed",
                         
                         "ind.TrailTotm", "ind.RoadTotm",
                         "ind.Prp_MotRestricted", "ind.Prp_HorseRestricted")
