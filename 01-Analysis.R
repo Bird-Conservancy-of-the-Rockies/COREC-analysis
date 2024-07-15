@@ -4,15 +4,15 @@ library(tidyr)
 library(dplyr)
 library(FunctionsBCR)
 
-setwd("~/COREC")
-#setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
+#setwd("~/COREC")
+setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
 #GOF <- FALSE # Set to true to include and monitor goodness of fit metrics (not sure if/how I'll do this.)
-mod.nam <- "path" # Options: "community", "interm_paths", "path
+mod.nam <- "interm_paths" # Options: "community", "interm_paths", "path
 model.file <- str_c("model_", mod.nam, ".nimble")
-parallel.process <- T # Set to true if running nimble on analysis server (i.e., not Windows)
+parallel.process <- F # Set to true if running nimble on analysis server (i.e., not Windows)
 max.samples.saved <- 1000 # Maximum number of posterior samples to save.
 par.ignore.Rht <- c() # Parameters to ignore for calculating Rhat and neff.
 #source(str_c(scripts.loc, "RunNimbleParallel_", data.set, ".R"))
@@ -22,10 +22,10 @@ load("Data_compiled.RData")
 nspp <- length(Spp)
 
 # MCMC values
-nc <- 3 # number of chains
-nb <- 0.3 # 5000 Proportion of chain to discard as burn in
-ni <- 15000 # number of iterations
-nt <- 100 # thinning
+nc <- 2 #3 # number of chains
+nb <- 0.3 # Proportion of chain to discard as burn in
+ni <- 3000 #15000 # number of iterations
+nt <- 1 #100 # thinning
 #_________________________#
 
 # Data objects to send to JAGS

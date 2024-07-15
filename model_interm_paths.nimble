@@ -1,10 +1,10 @@
-#nimLogDgamma <- nimbleFunction(
-# run = function(x = double(0), shape = double(0), scale = double(0)) {
-#    ans <- log(dgamma(x, shape = shape, scale = scale))
-#    return(ans)
-#    returnType(double(0))
-#  })
-#CnimLogDgamma <- compileNimble(nimLogDgamma)
+logdens.gamma <- nimbleFunction(
+    run = function(x = double(), a = double(), b = double()) {
+        lp <- dgamma(x, a, b, log = TRUE)
+        returnType(double())
+        return(lp)
+    }
+)
 
 model <<- nimbleCode({
   for(j in 1:ngrdyrs) {
@@ -34,17 +34,9 @@ model <<- nimbleCode({
       BETA.Prp_HorseRestricted.Traffic * X.beta[ind.hpresent[j], ind.Prp_HorseRestricted]
     rate.Traffic[j] <- shape.Traffic / pred.Traffic[j]
     #_____ GOF _____#
-    #LLobs.Traffic[j] <- CnimLogDgamma(Traffic[j],
-    #  shape.Traffic, shape.Traffic / pred.Traffic[j])
-    LLobs.Traffic[j] <- log((pow(rate.Traffic[j], shape.Traffic) *
-      Traffic[j] * exp(-1 * rate.Traffic[j] * Traffic[j]))) -
-      loggam(shape.Traffic)
+    LLobs.Traffic[j] <- logdens.gamma(Traffic[j], shape.Traffic, rate.Traffic[j])
     X.sim.Traffic[j] ~ dgamma(shape.Traffic, rate.Traffic[j])
-    #LLsim.Traffic[j] <- CnimLogDgamma(X.sim.Traffic[j],
-    #  shape.Traffic, shape.Traffic / pred.Traffic[j])
-    LLsim.Traffic[j] <- log((pow(rate.Traffic[j], shape.Traffic) *
-      X.sim.Traffic[j] * exp(-1 * rate.Traffic[j] * X.sim.Traffic[j]))) -
-      loggam(shape.Traffic)
+    LLsim.Traffic[j] <- logdens.gamma(X.sim.Traffic[j], shape.Traffic, rate.Traffic[j])
     #_______________#
     
     ## Traffic diel timing where humans are present ##
@@ -56,33 +48,27 @@ model <<- nimbleCode({
       BETA.Prp_HorseRestricted.TOD_mean * X.beta[ind.hpresent[j], ind.Prp_HorseRestricted]
     rate.TOD_mean[j] <- shape.TOD_mean / pred.TOD_mean[j]
     #_____ GOF _____#
-    LLobs.TOD_mean[j] <- log((pow(rate.TOD_mean[j], shape.TOD_mean) *
-      TOD_mean[j] * exp(-1 * rate.TOD_mean[j] * TOD_mean[j]))) -
-      loggam(shape.TOD_mean)
+    LLobs.TOD_mean[j] <- logdens.gamma(TOD_mean[j], shape.TOD_mean, rate.TOD_mean[j])
     X.sim.TOD_mean[j] ~ dgamma(shape.TOD_mean, rate.TOD_mean[j])
-    LLsim.TOD_mean[j] <- log((pow(rate.TOD_mean[j], shape.TOD_mean) *
-      X.sim.TOD_mean[j] * exp(-1 * rate.TOD_mean[j] * X.sim.TOD_mean[j]))) -
-      loggam(shape.TOD_mean)
+    LLsim.TOD_mean[j] <- logdens.gamma(X.sim.TOD_mean[j], shape.TOD_mean, rate.TOD_mean[j])
     #_______________#
   }
   
   for(j in 1:ngrdyrs.DOY_Speed) {
     ## Traffic seasonal timing where humans are present ##
+    X.latent.Traffic_DOY_mn[j] ~ dbern(X.latent.prob)
     Traffic_DOY_mn[j] ~ dgamma(shape.Traffic_DOY_mn, rate.Traffic_DOY_mn[j])
     log(pred.Traffic_DOY_mn[j]) <- BETA0.Traffic_DOY_mn +
       BETA.TrailTotm.Traffic_DOY_mn * X.beta[ind.DOY_Speed[j], ind.TrailTotm] +
       BETA.RoadTotm.Traffic_DOY_mn * X.beta[ind.DOY_Speed[j], ind.RoadTotm] +
       BETA.Prp_MotRestricted.Traffic_DOY_mn * X.beta[ind.DOY_Speed[j], ind.Prp_MotRestricted] +
-      BETA.Prp_HorseRestricted.Traffic_DOY_mn * X.beta[ind.DOY_Speed[j], ind.Prp_HorseRestricted]
+      BETA.Prp_HorseRestricted.Traffic_DOY_mn * X.beta[ind.DOY_Speed[j], ind.Prp_HorseRestricted] +
+      BETA.latent.Traffic_DOY_mn * X.latent.Traffic_DOY_mn[j]
     rate.Traffic_DOY_mn[j] <- shape.Traffic_DOY_mn / pred.Traffic_DOY_mn[j]
     #_____ GOF _____#
-    LLobs.Traffic_DOY_mn[j] <- log((pow(rate.Traffic_DOY_mn[j], shape.Traffic_DOY_mn) *
-      Traffic_DOY_mn[j] * exp(-1 * rate.Traffic_DOY_mn[j] * Traffic_DOY_mn[j]))) -
-      loggam(shape.Traffic_DOY_mn)
+    LLobs.Traffic_DOY_mn[j] <- logdens.gamma(Traffic_DOY_mn[j], shape.Traffic_DOY_mn, rate.Traffic_DOY_mn[j])
     X.sim.Traffic_DOY_mn[j] ~ dgamma(shape.Traffic_DOY_mn, rate.Traffic_DOY_mn[j])
-    LLsim.Traffic_DOY_mn[j] <- log((pow(rate.Traffic_DOY_mn[j], shape.Traffic_DOY_mn) *
-      X.sim.Traffic_DOY_mn[j] * exp(-1 * rate.Traffic_DOY_mn[j] * X.sim.Traffic_DOY_mn[j]))) -
-      loggam(shape.Traffic_DOY_mn)
+    LLsim.Traffic_DOY_mn[j] <- logdens.gamma(X.sim.TOD_mean[j], shape.Traffic_DOY_mn, rate.Traffic_DOY_mn[j])
     #_______________#
 
     ## Traffic speed where humans are present ##
@@ -94,13 +80,9 @@ model <<- nimbleCode({
       BETA.RoadTotm.Speed * X.beta[ind.DOY_Speed[j], ind.RoadTotm]
     rate.Speed[j] <- shape.Speed / pred.Speed[j]
     #_____ GOF _____#
-    LLobs.Speed[j] <- log((pow(rate.Speed[j], shape.Speed) *
-      Speed[j] * exp(-1 * rate.Speed[j] * Speed[j]))) -
-      loggam(shape.Speed)
+    LLobs.Speed[j] <- logdens.gamma(Speed[j], shape.Speed, rate.Speed[j])
     X.sim.Speed[j] ~ dgamma(shape.Speed, rate.Speed[j])
-    LLsim.Speed[j] <- log((pow(rate.Speed[j], shape.Speed) *
-      X.sim.Speed[j] * exp(-1 * rate.Speed[j] * X.sim.Speed[j]))) -
-      loggam(shape.Speed)
+    LLsim.Speed[j] <- logdens.gamma(X.sim.Speed[j], shape.Speed, rate.Speed[j])
     #_______________#
   }
 
@@ -130,7 +112,9 @@ model <<- nimbleCode({
   BETA.RoadTotm.Traffic_DOY_mn ~ dnorm(0, 0.66667)
   BETA.Prp_MotRestricted.Traffic_DOY_mn ~ dnorm(0, 0.66667)
   BETA.Prp_HorseRestricted.Traffic_DOY_mn ~ dnorm(0, 0.66667)
+  BETA.latent.Traffic_DOY_mn ~ T(dnorm(0, 0.66667), 0, )
   shape.Traffic_DOY_mn ~ dgamma(1, 0.1)
+  X.latent.prob ~ dunif(0, 1)
 
   BETA0.Speed ~ dnorm(0, 0.66667)
   BETA.TrailTotm.Speed ~ dnorm(0, 0.66667)
@@ -147,6 +131,10 @@ model <<- nimbleCode({
   dev.obs.Traffic <- -2 * sum(LLobs.Traffic[1:ngrdyrs.hpresent])
   dev.sim.Traffic <- -2 * sum(LLsim.Traffic[1:ngrdyrs.hpresent])
   test.Traffic <- step(dev.sim.Traffic - dev.obs.Traffic)
+  
+  #dev.obs.Traffic_manual <- -2 * sum(LLobs.Traffic_manual[1:ngrdyrs.hpresent])
+  #dev.sim.Traffic_manual <- -2 * sum(LLsim.Traffic_manual[1:ngrdyrs.hpresent])
+  #test.Traffic_manual <- step(dev.sim.Traffic_manual - dev.obs.Traffic_manual)
   
   dev.obs.TOD_mean <- -2 * sum(LLobs.TOD_mean[1:ngrdyrs.hpresent])
   dev.sim.TOD_mean <- -2 * sum(LLsim.TOD_mean[1:ngrdyrs.hpresent])

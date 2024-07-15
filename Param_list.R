@@ -46,7 +46,10 @@ parameters.path <- c("BETA0.HumanPresence", "BETA.TrailTotm.HumanPresence",
                      "shape.Speed",
                      
                      "test.HumanPresence", "test.Traffic", "test.TOD_mean",
-                     "test.Traffic_DOY_mn", "test.Speed")
+                     "test.Traffic_DOY_mn", "test.Speed",
+                     
+                     "X.sim.Traffic_DOY_mn", "BETA.latent.Traffic_DOY_mn",
+                     "X1.latent.prob", "X2.latent.prob")
 
 if(mod.nam == "community") {
   parameters <- parameters.bird

@@ -16,6 +16,10 @@ source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
 #________________________#
 
+###################################
+# Bird community model parameters #
+###################################
+
 params <- c("N0", str_c("beta.", dimnames(X.beta)[[2]]),
             "a0", str_c("zeta.", dimnames(X.pp)[[2]]),
             "pa0", str_c("theta.", dimnames(X.pa)[[2]]))
@@ -58,6 +62,28 @@ for(p in params) {
 }
 
 write.csv(t(out), str_c("Parameter_est.csv"), row.names = T)
+
+#####################################
+# Management human model parameters #
+#####################################
+
+path.parms <- mod$summary$Parameter[which(str_detect(mod$summary$Parameter, "BETA"))]
+path.intercepts <- path.parms[which(str_detect(path.parms, "BETA0"))]
+out.tab <- data.frame(Parameter = path.parms,
+                      Estimate95 = "",
+                      Estimate70 = "")
+for(p in 1:length(path.parms)) {
+  parm <- path.parms[p]
+  if(parm %in% path.intercepts) {
+    out.tab$Estimate95[p] <- FunctionsBCR::BCI(mod$mcmcOutput[, parm], flag.sig = FALSE)
+    out.tab$Estimate70[p] <- FunctionsBCR::BCI(mod$mcmcOutput[, parm], BCIpercent = 70, flag.sig = FALSE)
+  } else {
+    out.tab$Estimate95[p] <- FunctionsBCR::BCI(mod$mcmcOutput[, parm], flag.sig = TRUE)
+    out.tab$Estimate70[p] <- FunctionsBCR::BCI(mod$mcmcOutput[, parm], BCIpercent = 70, flag.sig = TRUE)
+  }
+}
+
+write.csv(out.tab, "Path_estimates.csv", row.names = FALSE)
 
 #################################################################
 # Summarize species results for preliminary report (June, 2024) #

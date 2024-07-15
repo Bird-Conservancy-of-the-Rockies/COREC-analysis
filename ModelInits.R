@@ -34,6 +34,9 @@ inits.path <- list(BETA0.HumanPresence = 0, BETA.TrailTotm.HumanPresence = 0,
                    BETA.RoadTotm.Traffic_DOY_mn = 0, BETA.Prp_MotRestricted.Traffic_DOY_mn = 0,
                    BETA.Prp_HorseRestricted.Traffic_DOY_mn = 0, shape.Traffic_DOY_mn = 1,
                    
+                   BETA.latent.Traffic_DOY_mn = 0.1, X.latent.prob = 0.5,
+                   X.latent.Traffic_DOY_mn = rep(0, ngrdyrs.DOY_Speed),
+                   
                    BETA0.Speed = 0, BETA.TrailTotm.Speed = 0, BETA.RoadTotm.Speed = 0,
                    BETA.Prp_MotRestricted.Speed = 0, BETA.Prp_HorseRestricted.Speed = 0,
                    shape.Speed = 1)
