@@ -12,7 +12,7 @@ git.repo <- "COREC-analysis/"
 #GOF <- FALSE # Set to true to include and monitor goodness of fit metrics (not sure if/how I'll do this.)
 mod.nam <- "path" # Options: "community", "interm_paths", "path
 model.file <- str_c("model_", mod.nam, ".nimble")
-parallel.process <- F # Set to true if running nimble on analysis server (i.e., not Windows)
+parallel.process <- T # Set to true if running nimble on analysis server (i.e., not Windows)
 max.samples.saved <- 1000 # Maximum number of posterior samples to save.
 par.ignore.Rht <- c() # Parameters to ignore for calculating Rhat and neff.
 #source(str_c(scripts.loc, "RunNimbleParallel_", data.set, ".R"))
