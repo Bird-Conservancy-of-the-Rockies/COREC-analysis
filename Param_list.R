@@ -33,23 +33,11 @@ parameters.path <- c("BETA0.HumanPresence", "BETA.TrailTotm.HumanPresence",
                      "BETA.Prp_MotRestricted.Traffic", "BETA.Prp_HorseRestricted.Traffic",
                      "shape.Traffic",
                      
-                     "BETA0.TOD_mean", "BETA.TrailTotm.TOD_mean", "BETA.RoadTotm.TOD_mean",
-                     "BETA.Prp_MotRestricted.TOD_mean", "BETA.Prp_HorseRestricted.TOD_mean",
-                     "shape.TOD_mean",
-                     
-                     "BETA0.Traffic_DOY_mn", "BETA.TrailTotm.Traffic_DOY_mn",
-                     "BETA.RoadTotm.Traffic_DOY_mn", "BETA.Prp_MotRestricted.Traffic_DOY_mn",
-                     "BETA.Prp_HorseRestricted.Traffic_DOY_mn", "shape.Traffic_DOY_mn",
-                     
                      "BETA0.Speed", "BETA.TrailTotm.Speed", "BETA.RoadTotm.Speed",
                      "BETA.Prp_MotRestricted.Speed", "BETA.Prp_HorseRestricted.Speed",
                      "shape.Speed",
                      
-                     "test.HumanPresence", "test.Traffic", "test.TOD_mean",
-                     "test.Traffic_DOY_mn", "test.Speed",
-                     
-                     "X.sim.Traffic_DOY_mn", "BETA.latent.Traffic_DOY_mn",
-                     "X1.latent.prob", "X2.latent.prob")
+                     "test.HumanPresence", "test.Traffic", "test.Speed")
 
 if(mod.nam == "community") {
   parameters <- parameters.bird
