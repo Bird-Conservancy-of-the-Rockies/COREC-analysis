@@ -167,10 +167,7 @@ model <<- nimbleCode({
     ## Traffic speed where humans are present ##
     Speed[j] ~ dgamma(shape.Speed, rate.Speed[j])
     log(pred.Speed[j]) <- BETA0.Speed +
-      BETA.TrailTotm.Speed * X.beta[ind.SpeedPresent[j], ind.TrailTotm] +
-      BETA.Prp_MotRestricted.Speed * X.beta[ind.SpeedPresent[j], ind.Prp_MotRestricted] +
-      BETA.Prp_HorseRestricted.Speed * X.beta[ind.SpeedPresent[j], ind.Prp_HorseRestricted] +
-      BETA.RoadTotm.Speed * X.beta[ind.SpeedPresent[j], ind.RoadTotm]
+      BETA.Prp_MotRestricted.Speed * X.beta[ind.SpeedPresent[j], ind.Prp_MotRestricted]
     rate.Speed[j] <- shape.Speed / pred.Speed[j]
     #_____ GOF _____#
     LLobs.Speed[j] <- log((pow(rate.Speed[j], shape.Speed) *
