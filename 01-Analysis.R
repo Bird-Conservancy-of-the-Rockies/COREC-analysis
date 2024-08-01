@@ -23,7 +23,7 @@ nspp <- length(Spp)
 
 # MCMC values
 nc <- 3 # number of chains
-nb <- 0.3 # Proportion of chain to discard as burn in
+nb <- 10000 # Proportion of chain to discard as burn in
 ni <- 15000 # number of iterations
 nt <- 100 # thinning
 #_________________________#
