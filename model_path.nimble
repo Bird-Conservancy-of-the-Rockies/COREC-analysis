@@ -120,10 +120,7 @@ model <<- nimbleCode({
   shape.Traffic ~ dgamma(1, 1)
 
   BETA0.Speed ~ dnorm(0, 0.66667)
-  BETA.TrailTotm.Speed ~ dnorm(0, 0.66667)
-  BETA.RoadTotm.Speed ~ dnorm(0, 0.66667)
   BETA.Prp_MotRestricted.Speed ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.Speed ~ dnorm(0, 0.66667)
   shape.Speed ~ dgamma(1, 0.1)
   
   for(j in 1:ngrdyrs) {
