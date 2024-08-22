@@ -35,6 +35,7 @@ parameters.path <- c("BETA0.HumanPresence", "BETA.TrailTotm.HumanPresence",
                      
                      "BETA0.Speed", "BETA.Prp_MotRestricted.Speed",
                      "shape.Speed",
+                     # "BETA.TrailTotm.Speed", "BETA.RoadTotm.Speed", "BETA.Prp_HorseRestricted.Speed", # Dropped these after reviewing initial estimates
                      
                      "test.HumanPresence", "test.Traffic", "test.Speed")
 
