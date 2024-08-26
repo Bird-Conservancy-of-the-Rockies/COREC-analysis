@@ -8,7 +8,7 @@ library(FunctionsBCR)
 theme_set(theme_bw())
 
 setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
-load(str_c("Data_compiled.RData"))
+load(str_c("data/Data_compiled.RData"))
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"

@@ -6,11 +6,12 @@ library(GetDataBCR)
 
 #setwd("~/COREC")
 setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
-load("Data_compiled.RData")
+load("data/Data_compiled.RData")
 
 Spp_list <- Spp_list %>%
   left_join(BirdData(select.cols = c("BirdCode", "ScientificName"), group_by = TRUE),
             by = "BirdCode") %>%
+  rename(Sum_counts = Detections) %>%
   select(BirdCode, Species, ScientificName, Sum_counts) %>%
   mutate(Hab_specialist = as.logical(NA))#,
          #Migratory = as.logical(NA),
@@ -26,8 +27,8 @@ dat_AVONET <- read.csv("C:/Users/quresh.latif/files/data/AVONET/AVONET2_Ebird.cs
                        header = TRUE, stringsAsFactors = FALSE)
 AVONET_fields <- dat_AVONET %>%
   mutate(Migratory = Migration %in% c(2, 3),
-         HumanCommensal = Habitat == "human modified",
-         Insectivore = Trophic.Niche == "insectivore") %>%
+         HumanCommensal = Habitat == "Human Modified",
+         Insectivore = Trophic.Niche == "Invertivore") %>%
   select(Species2, Migratory, Mass, HumanCommensal, Insectivore)
 Spp_list <- Spp_list %>%
   left_join(AVONET_fields, by = c("ScientificName" = "Species2"))
@@ -77,4 +78,4 @@ Spp_list <- Spp_list %>%
   mutate(SGCN = Species %in% SGCN_spp$Common_Name |
            ScientificName %in% SGCN_spp$Species)
 
-write.csv(Spp_list, "Species_list.csv", row.names = FALSE)
+write.csv(Spp_list, "data/Species_list_assigned.csv", row.names = FALSE)

@@ -6,7 +6,7 @@ library(ggplot2)
 library(cowplot)
 
 setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
-load("Data_compiled.RData")
+load("data/Data_compiled.RData")
 
 #__________ Script inputs _____________#
 mod.nam <- "path"
@@ -24,8 +24,8 @@ source(str_c(git.repo, "Path_analysis_source.R"))
 # Plot total effects #
 ######################
 
-Spp_results <- R.utils::loadObject("Spp_results")
-tab.effect.total <- read.csv("Spp_total_management_effects.csv", header = TRUE, stringsAsFactors = FALSE)
+Spp_results <- R.utils::loadObject("data/Spp_results")
+tab.effect.total <- read.csv("data/Spp_total_management_effects.csv", header = TRUE, stringsAsFactors = FALSE)
 dat.plot <- tab.effect.total %>% filter(Spp %in% Spp_results) %>%
   mutate(index = rev(1:n()))
 

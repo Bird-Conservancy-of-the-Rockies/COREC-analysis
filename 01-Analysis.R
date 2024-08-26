@@ -18,7 +18,7 @@ par.ignore.Rht <- c() # Parameters to ignore for calculating Rhat and neff.
 #source(str_c(scripts.loc, "RunNimbleParallel_", data.set, ".R"))
 #_________________________#
 
-load("Data_compiled.RData")
+load("data/Data_compiled.RData")
 nspp <- length(Spp)
 
 # MCMC values

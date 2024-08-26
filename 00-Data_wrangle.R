@@ -7,7 +7,7 @@ setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 
 #_______ Script inputs _______#
 years <- 2021:2023
-Spp_list <- read.csv("Species_list.csv", header = TRUE, stringsAsFactors = FALSE)
+Spp_list <- read.csv("data/Species_list.csv", header = TRUE, stringsAsFactors = FALSE)
 dat_human <- read.csv("data/HumanTraffic_covariates.csv", header = TRUE, stringsAsFactors = FALSE)
 dat_trails <- read.table("data/COrecGridsTrailDensity.txt", header = TRUE, stringsAsFactors = FALSE, sep = "\t") %>%
   rename(TransectNum = TransNum) %>%
@@ -54,7 +54,7 @@ detections <- BirdData_IMBCR(select.cols = c('TransectNum',
                                        'CL_Count'),
                        Year.filter = years,
                        TransectNum.filter = grid.list,
-                       BirdCode.filter = Spp_list$BirdCode)
+                       BirdCode.filter = Spp)
 
 # Consolidate clusters #
 # detections %>% filter(!is.na(CL_ID)) %>% # Check within-cluster range of time periods
@@ -261,4 +261,4 @@ CovIndMat <- data.frame(Grid_year = gridXyears.list, stringsAsFactors = F) %>%
   data.matrix
 
 ## Clean & save workspace ##
-save.image("Data_compiled.RData")
+save.image("data/Data_compiled.RData")

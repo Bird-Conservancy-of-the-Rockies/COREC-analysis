@@ -6,13 +6,8 @@ setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 
 #_______ Script inputs _______#
 years <- 2021:2023
-# List grid cell IDs
-file_list <- list.files("data/AllDataRDS_19April2024") %>%
-  (function(x) x[which(str_detect(x, "ResidencyTime"))])
-dat <- readRDS(str_c("data/AllDataRDS_19April2024/", file_list[1]))
-for(i in 2:length(file_list)) dat <- dat %>% bind_rows(readRDS(str_c("data/AllDataRDS_19April2024/", file_list[i])))
-grid.list <- dat %>% pull(grid_transect) %>% unique()
-rm(dat)
+dat_human <- read.csv("data/HumanTraffic_covariates.csv", header = TRUE, stringsAsFactors = FALSE)
+grid.list <- sort(unique(dat_human$TransectNum))
 #_____________________________#
 
 grab <- BirdData_IMBCR(select.cols = c('BirdCode',
@@ -21,8 +16,14 @@ grab <- BirdData_IMBCR(select.cols = c('BirdCode',
                        Year.filter = years,
                        TransectNum.filter = grid.list) %>%
   filter(!str_sub(BirdCode, 1, 2) == "UN")
-grab %>% dplyr::group_by(BirdCode, Species) %>%
+spp.exclude <- read.csv("data/Species_list0.csv", header = TRUE, stringsAsFactors = FALSE) %>%
+  filter(Exclude == 1) %>%
+  pull(BirdCode)
+# 'Species_list0.csv' was generated with an initial version of this script.
+  # Species listed in that preliminary file were visually inspected and marked for exclusion.
+grab %>% filter(!BirdCode %in% spp.exclude) %>%
+  dplyr::group_by(BirdCode, Species) %>%
   summarise(Detections = sum(CL_Count)) %>%
-  write.csv(str_c("Species_list.csv"), row.names = F)
+  write.csv(str_c("data/Species_list.csv"), row.names = F)
 
 # Reviewed preliminary list, added exclude column, and renamed to 'Species_list0.csv'.

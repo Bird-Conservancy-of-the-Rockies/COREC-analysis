@@ -6,7 +6,7 @@ library(FunctionsBCR)
 theme_set(theme_bw())
 
 setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
-load(str_c("Data_compiled.RData"))
+load(str_c("data/Data_compiled.RData"))
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
@@ -81,5 +81,5 @@ spp.relations <- spp.relations %>%
 tab.effect.total <- tab.effect.total %>%
   filter(Spp %in% spp.relations)
 
-write.csv(tab.effect.total, "Spp_total_management_effects.csv", row.names = FALSE)
-R.utils::saveObject(spp.relations, "Spp_results")
+write.csv(tab.effect.total, "data/Spp_total_management_effects.csv", row.names = FALSE)
+R.utils::saveObject(spp.relations, "data/Spp_results")
