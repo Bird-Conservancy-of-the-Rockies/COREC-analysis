@@ -108,15 +108,13 @@ model <<- nimbleCode({
   #~~~~~~~~~~ Prior distributions ~~~~~~~~~~~~~#
   BETA0.HumanPresence ~ dnorm(0, 0.66667)
   BETA.TrailTotm.HumanPresence ~ dnorm(0, 0.66667)
-  BETA.Prp_MotRestricted.HumanPresence ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.HumanPresence ~ dnorm(0, 0.66667)
   BETA.RoadTotm.HumanPresence ~ dnorm(0, 0.66667)
+  BETA.Prp_MotRestricted.HumanPresence ~ dnorm(0, 0.66667)
 
   BETA0.Traffic ~ dnorm(0, 0.66667)
   BETA.TrailTotm.Traffic ~ dnorm(0, 0.66667)
   BETA.RoadTotm.Traffic ~ dnorm(0, 0.66667)
   BETA.Prp_MotRestricted.Traffic ~ dnorm(0, 0.66667)
-  BETA.Prp_HorseRestricted.Traffic ~ dnorm(0, 0.66667)
   shape.Traffic ~ dgamma(1, 1)
 
   BETA0.Speed ~ dnorm(0, 0.66667)
@@ -129,8 +127,7 @@ model <<- nimbleCode({
     logit(pred.HumanPresence[j]) <- BETA0.HumanPresence +
       BETA.TrailTotm.HumanPresence * X.beta[j, ind.TrailTotm] +
       BETA.RoadTotm.HumanPresence * X.beta[j, ind.RoadTotm] +
-      BETA.Prp_MotRestricted.HumanPresence * X.beta[j, ind.Prp_MotRestricted] +
-      BETA.Prp_HorseRestricted.HumanPresence * X.beta[j, ind.Prp_HorseRestricted]
+      BETA.Prp_MotRestricted.HumanPresence * X.beta[j, ind.Prp_MotRestricted]
     #_____ GOF _____#
     LLobs.HumanPresence[j] <- (HumanPresence[j] * pred.HumanPresence[j]) +
       ((1 - HumanPresence[j]) * (1 - pred.HumanPresence[j]))
@@ -146,8 +143,7 @@ model <<- nimbleCode({
     log(pred.Traffic[j]) <- BETA0.Traffic +
       BETA.TrailTotm.Traffic * X.beta[ind.hpresent[j], ind.TrailTotm] +
       BETA.RoadTotm.Traffic * X.beta[ind.hpresent[j], ind.RoadTotm] +
-      BETA.Prp_MotRestricted.Traffic * X.beta[ind.hpresent[j], ind.Prp_MotRestricted] +
-      BETA.Prp_HorseRestricted.Traffic * X.beta[ind.hpresent[j], ind.Prp_HorseRestricted]
+      BETA.Prp_MotRestricted.Traffic * X.beta[ind.hpresent[j], ind.Prp_MotRestricted]
     rate.Traffic[j] <- shape.Traffic / pred.Traffic[j]
     #_____ GOF _____#
     LLobs.Traffic[j] <- log((pow(rate.Traffic[j], shape.Traffic) *

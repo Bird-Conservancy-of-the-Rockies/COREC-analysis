@@ -1,6 +1,6 @@
 # List covariates #
-Mangmt.vars <- c("TrailTotm", "RoadTotm", "Prp_MotRestricted", "Prp_HorseRestricted")
-Mangmt.vars.quad <- c(F, F, F, F)
+Mangmt.vars <- c("TrailTotm", "RoadTotm", "Prp_MotRestricted")
+Mangmt.vars.quad <- c(F, F, F)
 Human.vars <- c("HumanPresence", "LogTrafficNoZeros", "Speed")
 Human.vars.quad <- c(F, F, T)
 Hab.vars <- c("Shrubland", "ConiferForest", "Aspen", "OakWoodland", # "PinyonJuniper" dropped to reduce multicollinearity and improve convergence
@@ -26,17 +26,14 @@ parameters.bird <- c("zeta0.mu", "zeta0.sd", "zeta0", "b.mu", "b.sd", "b",
                 "dev.beta0", "beta0.sd.yr")
 
 parameters.path <- c("BETA0.HumanPresence", "BETA.TrailTotm.HumanPresence",
-                     "BETA.Prp_MotRestricted.HumanPresence", "BETA.Prp_HorseRestricted.HumanPresence",
-                     "BETA.RoadTotm.HumanPresence",
+                     "BETA.Prp_MotRestricted.HumanPresence", "BETA.RoadTotm.HumanPresence",
                      
                      "BETA0.Traffic", "BETA.TrailTotm.Traffic", "BETA.RoadTotm.Traffic",
-                     "BETA.Prp_MotRestricted.Traffic", "BETA.Prp_HorseRestricted.Traffic",
-                     "shape.Traffic",
+                     "BETA.Prp_MotRestricted.Traffic", "shape.Traffic",
                      
                      "BETA0.Speed", "BETA.Prp_MotRestricted.Speed",
                      "shape.Speed",
-                     # "BETA.TrailTotm.Speed", "BETA.RoadTotm.Speed", "BETA.Prp_HorseRestricted.Speed", # Dropped these after reviewing initial estimates
-                     
+
                      "test.HumanPresence", "test.Traffic", "test.Speed")
 
 if(mod.nam == "community") {
