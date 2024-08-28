@@ -62,3 +62,9 @@ plot_community_effects <- function(dat, min.y, max.y, pnam, vnam) {
     guides(color = "none")
   return(p)
 }
+
+HillShannon <- function(N) {
+  p <- N / sum(N)
+  D <- exp(-1*sum(p * log(p)))
+  return(D)
+}

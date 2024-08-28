@@ -15,6 +15,7 @@ mod <- R.utils::loadObject(str_c("mod_", mod.nam))
 nsims <- dim(mod$mcmcOutput)[1]
 source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
+source(str_c(git.repo, "Functions_source.R"))
 #______________________________________#
 
 ## Stratum covariate values ##
@@ -28,12 +29,11 @@ tab.effect.total <- read.csv("data/Spp_total_management_effects.csv", header = T
 spp.mech <- tab.effect.total$Spp
 cols <- c("Trail.total", "Trail.p", "Trail.pctExplained", "Trail.pexp.p",
           "OHV.total", "OHV.p", "OHV.pctExplained", "OHV.pexp.p",
-          "Horse.total", "Horse.p", "Horse.pctExplained", "Horse.pexp.p",
           "Road.total", "Road.p", "Road.pctExplained", "Road.pexp.p")
 out <- matrix("", nrow = length(spp.mech), ncol = length(cols),
               dimnames = list(spp.mech, cols))
 
-# Total effects #
+## Total effects ##
 out[, "Trail.total"] <- str_c(round(tab.effect.total$HighTrail.md, digits = 2),
                                  " (", round(tab.effect.total$HighTrail.lo, digits = 2), ", ",
                                  round(tab.effect.total$HighTrail.hi, digits = 2), ")")
@@ -49,71 +49,39 @@ out[, "OHV.total"] <- str_c(round(tab.effect.total$NoOHV.md, digits = 2),
                                  round(tab.effect.total$NoOHV.hi, digits = 2), ")")
 out[, "OHV.p"] <- (log(N.pred[,,"HighTrail_noOHV"] / N.pred[,,"HighTrail_norest"]) %>%
                        apply(2, function(x) sum(x > 0) / length(x)))[spp.mech] %>% round(digits = 2)
-out[, "Horse.total"] <- str_c(round(tab.effect.total$NoHorse.md, digits = 2),
-                                 " (", round(tab.effect.total$NoHorse.lo, digits = 2), ", ",
-                                 round(tab.effect.total$NoHorse.hi, digits = 2), ")")
-out[, "Horse.p"] <- (log(N.pred[,,"HighTrail_noHorse"] / N.pred[,,"HighTrail_norest"]) %>%
-                       apply(2, function(x) sum(x > 0) / length(x)))[spp.mech] %>% round(digits = 2)
 
-# Percent of total effects explained #
-spp.ind <- which(Spp %in% spp.mech)
-names(spp.ind) <- Spp[which(Spp %in% spp.mech)]
-spp.ind <- spp.ind[spp.mech]
-beta1 <- mod$mcmcOutput$betaVec[,spp.ind,]
-
-N.pred.calc <- function(X.pred) {
-  N.pred <- matrix(NA, nrow = nsim, ncol = length(spp.ind))
-  for(i in 1:length(spp.ind)) {
-    beta0 <- mod$mcmcOutput$beta0[,spp.ind[i]]
-    beta1 <- mod$mcmcOutput$betaVec[,spp.ind[i],]
-    N.pred[,i] <- exp(beta0 + apply(beta1 * X.pred, 1, sum))
-  }
-  return(N.pred)
-}
-
+## Percent of total effects explained ##
   # Trail density
-effect.tot <- log(N.pred[,spp.ind,"HighTrail_norest"] / N.pred[,spp.ind,"Baseline"])
-X.pred.alt <- X.pred.hitrail_norest
+effect.tot <- log(N.pred[, spp.mech, "HighTrail_norest"] / N.pred[, spp.mech, "Baseline"])
+X.pred.alt <- X.pred[["HighTrail_norest"]]
 X.pred.alt[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")] <-
-  X.pred.baseline[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
-N.pred.alt <- N.pred.calc(X.pred.alt)
-effect.expl <- log(N.pred[,spp.ind,"HighTrail_norest"] / N.pred.alt)
+  X.pred[["Baseline"]][, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
+N.pred.alt <- N.pred.calc(X.pred.alt, spp.mech)
+effect.expl <- log(N.pred[, spp.mech, "HighTrail_norest"] / N.pred.alt)
 pct.explained <- (effect.expl / effect.tot) * 100
 out[, "Trail.pctExplained"] <- pct.explained %>%
   apply(2, function(x) FunctionsBCR::BCI(x, ndig = 0, BCIpercent = 80, flag.sig = TRUE))
 out[, "Trail.pexp.p"] <- apply(pct.explained, 2, function(x) round(sum(x > 0) / length(x), digits = 2))
 
   # OHV Restriction
-effect.tot <- log(N.pred[,spp.ind, "HighTrail_noOHV"] / N.pred[,spp.ind,"HighTrail_norest"])
-X.pred.alt <- X.pred.hitrail_noOHV
+effect.tot <- log(N.pred[, spp.mech, "HighTrail_noOHV"] / N.pred[, spp.mech, "HighTrail_norest"])
+X.pred.alt <- X.pred[["HighTrail_noOHV"]]
 X.pred.alt[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")] <-
-  X.pred.hitrail_norest[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
-N.pred.alt <- N.pred.calc(X.pred.alt)
-effect.expl <- log(N.pred[,spp.ind, "HighTrail_noOHV"] / N.pred.alt)
+  X.pred[["HighTrail_norest"]][, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
+N.pred.alt <- N.pred.calc(X.pred.alt, spp.mech)
+effect.expl <- log(N.pred[, spp.mech, "HighTrail_noOHV"] / N.pred.alt)
 pct.explained <- (effect.expl / effect.tot) * 100
 out[, "OHV.pctExplained"] <- pct.explained %>%
   apply(2, function(x) FunctionsBCR::BCI(x, ndig = 0, BCIpercent = 80, flag.sig = TRUE))
 out[, "OHV.pexp.p"] <- apply(pct.explained, 2, function(x) round(sum(x > 0) / length(x), digits = 2))
 
-# Horse Restriction
-effect.tot <- log(N.pred[,spp.ind, "HighTrail_noHorse"] / N.pred[,spp.ind,"HighTrail_norest"])
-X.pred.alt <- X.pred.hitrail_noHorse
-X.pred.alt[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")] <-
-  X.pred.hitrail_norest[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
-N.pred.alt <- N.pred.calc(X.pred.alt)
-effect.expl <- log(N.pred[,spp.ind, "HighTrail_noHorse"] / N.pred.alt)
-pct.explained <- (effect.expl / effect.tot) * 100
-out[, "Horse.pctExplained"] <- pct.explained %>%
-  apply(2, function(x) FunctionsBCR::BCI(x, ndig = 0, BCIpercent = 80, flag.sig = TRUE))
-out[, "Horse.pexp.p"] <- apply(pct.explained, 2, function(x) round(sum(x > 0) / length(x), digits = 2))
-
 # Road density
-effect.tot <- log(N.pred[,spp.ind,"HighRoad"] / N.pred[,spp.ind,"Baseline"])
-X.pred.alt <- X.pred.hiroad
+effect.tot <- log(N.pred[, spp.mech, "HighRoad"] / N.pred[, spp.mech, "Baseline"])
+X.pred.alt <- X.pred[["HighRoad"]]
 X.pred.alt[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")] <-
-  X.pred.baseline[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
-N.pred.alt <- N.pred.calc(X.pred.alt)
-effect.expl <- log(N.pred[,spp.ind,"HighRoad"] / N.pred.alt)
+  X.pred[["Baseline"]][, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
+N.pred.alt <- N.pred.calc(X.pred.alt, spp.mech)
+effect.expl <- log(N.pred[, spp.mech, "HighRoad"] / N.pred.alt)
 pct.explained <- (effect.expl / effect.tot) * 100
 out[, "Road.pctExplained"] <- pct.explained %>%
   apply(2, function(x) FunctionsBCR::BCI(x, ndig = 0, BCIpercent = 80, flag.sig = TRUE))
@@ -144,34 +112,25 @@ groups <- list(
 
 cols <- c("Trail.total", "Trail.p", "Trail.pctExplained", "Trail.pexp.p",
           "OHV.total", "OHV.p", "OHV.pctExplained", "OHV.pexp.p",
-          "Horse.total", "Horse.p", "Horse.pctExplained", "Horse.pexp.p",
           "Road.total", "Road.p", "Road.pctExplained", "Road.pexp.p")
 out <- matrix("", nrow = length(groups), ncol = length(cols),
               dimnames = list(names(groups), cols))
 
-beta1 <- mod$mcmcOutput$betaVec
-
-HillShannon <- function(N) {
-  p <- N / sum(N)
-  D <- exp(-1*sum(p * log(p)))
-  return(D)
-}
-
 for(g in names(groups)) {
-  spp.ind <- which(Spp %in% groups[[g]])
+  spp <- groups[[g]]
   
   # Trail density
-  D.treatment <- N.pred[, spp.ind, "HighTrail_norest"] %>%
+  D.treatment <- N.pred[, spp, "HighTrail_norest"] %>%
     apply(1, HillShannon)
-  D.reference <- N.pred[, spp.ind, "Baseline"] %>%
+  D.reference <- N.pred[, spp, "Baseline"] %>%
     apply(1, HillShannon)
   effect.tot <- log(D.treatment / D.reference)
   out[g, "Trail.total"] <- FunctionsBCR::BCI(effect.tot, BCIpercent = 80, ndig = 2, flag.sig = TRUE)
   out[g, "Trail.p"] <- round(sum(effect.tot > 0) / nsim, digits = 2)
-  X.pred.alt <- X.pred.hitrail_norest
+  X.pred.alt <- X.pred[["HighTrail_norest"]]
   X.pred.alt[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")] <-
-    X.pred.baseline[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
-  N.pred.alt <- N.pred.calc(X.pred.alt)
+    X.pred[["Baseline"]][, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
+  N.pred.alt <- N.pred.calc(X.pred.alt, spp)
   D.alt <- N.pred.alt %>% apply(1, HillShannon)
   effect.expl <- log(D.treatment / D.alt)
   pct.explained <- (effect.expl / effect.tot) * 100
@@ -179,47 +138,31 @@ for(g in names(groups)) {
   out[g, "Trail.pexp.p"] <- round(sum(pct.explained > 0) / length(pct.explained), digits = 2)
   
   # OHV Restriction
-  D.treatment <- N.pred[, spp.ind, "HighTrail_noOHV"] %>% apply(1, HillShannon)
-  D.reference <- N.pred[, spp.ind, "HighTrail_norest"] %>% apply(1, HillShannon)
+  D.treatment <- N.pred[, spp, "HighTrail_noOHV"] %>% apply(1, HillShannon)
+  D.reference <- N.pred[, spp, "HighTrail_norest"] %>% apply(1, HillShannon)
   effect.tot <- log(D.treatment / D.reference)
   out[g, "OHV.total"] <- FunctionsBCR::BCI(effect.tot, BCIpercent = 80, ndig = 2, flag.sig = TRUE)
   out[g, "OHV.p"] <- round(sum(effect.tot > 0) / nsim, digits = 2)
-  X.pred.alt <- X.pred.hitrail_noOHV
+  X.pred.alt <- X.pred[["HighTrail_noOHV"]]
   X.pred.alt[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")] <-
-    X.pred.hitrail_norest[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
-  N.pred.alt <- N.pred.calc(X.pred.alt)
+    X.pred[["HighTrail_norest"]][, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
+  N.pred.alt <- N.pred.calc(X.pred.alt, spp)
   D.alt <- N.pred.alt %>% apply(1, HillShannon)
   effect.expl <- log(D.treatment / D.alt)
   pct.explained <- (effect.expl / effect.tot) * 100
   out[g, "OHV.pctExplained"] <- FunctionsBCR::BCI(pct.explained, ndig = 0, BCIpercent = 80, flag.sig = TRUE)
   out[g, "OHV.pexp.p"] <- round(sum(pct.explained > 0) / length(pct.explained), digits = 2)
   
-  # Horse Restriction
-  D.treatment <- N.pred[, spp.ind, "HighTrail_noHorse"] %>% apply(1, HillShannon)
-  D.reference <- N.pred[, spp.ind, "HighTrail_norest"] %>% apply(1, HillShannon)
-  effect.tot <- log(D.treatment / D.reference)
-  out[g, "Horse.total"] <- FunctionsBCR::BCI(effect.tot, BCIpercent = 80, ndig = 2, flag.sig = TRUE)
-  out[g, "Horse.p"] <- round(sum(effect.tot > 0) / nsim, digits = 2)
-  X.pred.alt <- X.pred.hitrail_noHorse
-  X.pred.alt[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")] <-
-    X.pred.hitrail_norest[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
-  N.pred.alt <- N.pred.calc(X.pred.alt)
-  D.alt <- N.pred.alt %>% apply(1, HillShannon)
-  effect.expl <- log(D.treatment / D.alt)
-  pct.explained <- (effect.expl / effect.tot) * 100
-  out[g, "Horse.pctExplained"] <- FunctionsBCR::BCI(pct.explained, ndig = 0, BCIpercent = 80, flag.sig = TRUE)
-  out[g, "Horse.pexp.p"] <- round(sum(pct.explained > 0) / length(pct.explained), digits = 2)
-  
   # Road density
-  D.treatment <- N.pred[, spp.ind, "HighRoad"] %>% apply(1, HillShannon)
-  D.reference <- N.pred[, spp.ind, "Baseline"] %>% apply(1, HillShannon)
+  D.treatment <- N.pred[, spp, "HighRoad"] %>% apply(1, HillShannon)
+  D.reference <- N.pred[, spp, "Baseline"] %>% apply(1, HillShannon)
   effect.tot <- log(D.treatment / D.reference)
   out[g, "Road.total"] <- FunctionsBCR::BCI(effect.tot, BCIpercent = 80, ndig = 2, flag.sig = TRUE)
   out[g, "Road.p"] <- round(sum(effect.tot > 0) / nsim, digits = 2)
-  X.pred.alt <- X.pred.hiroad
+  X.pred.alt <- X.pred[["HighRoad"]]
   X.pred.alt[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")] <-
-    X.pred.baseline[, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
-  N.pred.alt <- N.pred.calc(X.pred.alt)
+    X.pred[["Baseline"]][, c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2")]
+  N.pred.alt <- N.pred.calc(X.pred.alt, spp)
   D.alt <- N.pred.alt %>% apply(1, HillShannon)
   effect.expl <- log(D.treatment / D.alt)
   pct.explained <- (effect.expl / effect.tot) * 100

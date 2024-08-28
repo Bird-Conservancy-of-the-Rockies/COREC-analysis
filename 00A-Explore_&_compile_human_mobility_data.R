@@ -35,6 +35,7 @@ file_list <- list.files("data/AllDataRDS_19April2024") %>%
 dat_MoveRates <- readRDS(str_c("data/AllDataRDS_19April2024/", file_list[1]))
 for(i in 2:length(file_list)) dat_MoveRates <- dat_MoveRates %>%
   bind_rows(readRDS(str_c("data/AllDataRDS_19April2024/", file_list[i])))
+dat_MoveRates <- dat_MoveRates %>% filter(speed_mi_per_hr_orig != 0) # Zero-speed records do not represent movement, and so are deemed uninformative.
 
 # Samples #
 dat_samples <- SampleUnits("TransectNum", TransectNum.filter = grid.list, Year.filter = years)

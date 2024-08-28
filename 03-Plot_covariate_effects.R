@@ -45,13 +45,12 @@ for(cov in covs) {
 
 # Management effects #
 p <- ggdraw() + 
-  draw_plot(p_TrailTotm,           x = 0.05,   y = 0, width = 0.2375, height = 1) +
-  draw_plot(p_RoadTotm,            x = 0.2875, y = 0, width = 0.2375, height = 1) +
-  draw_plot(p_Prp_HorseRestricted, x = 0.5250, y = 0, width = 0.2375, height = 1) +
-  draw_plot(p_Prp_MotRestricted,   x = 0.7625, y = 0, width = 0.2375, height = 1) +
-  draw_plot_label("Species", x = 0, y = 0.5, size = 40, angle = 90, hjust = 0)
+  draw_plot(p_TrailTotm,           x = 0.05,      y = 0, width = 0.3166667, height = 1) +
+  draw_plot(p_RoadTotm,            x = 0.3666667, y = 0, width = 0.3166667, height = 1) +
+  draw_plot(p_Prp_MotRestricted,   x = 0.6833333, y = 0, width = 0.3166667, height = 1) +
+  draw_plot_label("Species", x = 0, y = 0.5, size = 40, angle = 90, hjust = 0.5)
 
-save_plot("Figure_Managmt_cov_effects.jpg", p, ncol = 3, nrow = 7, dpi = 300)
+save_plot("Figure_Managmt_cov_effects.jpg", p, ncol = 2, nrow = 6.5, dpi = 300)
 
 # Human mobility #
 p <- ggdraw() + 
@@ -61,7 +60,7 @@ p <- ggdraw() +
   draw_plot(p_Speed2,            x = 0.7625, y = 0, width = 0.2375, height = 1) +
   draw_plot_label("Species", x = 0, y = 0.5, size = 40, angle = 90, hjust = 0)
 
-save_plot("Figure_Human_cov_effects.jpg", p, ncol = 3, nrow = 7, dpi = 300)
+save_plot("Figure_Human_cov_effects.jpg", p, ncol = 3, nrow = 6.5, dpi = 300)
 
 # Habitat #
 p <- ggdraw() +
@@ -74,4 +73,4 @@ p <- ggdraw() +
   draw_plot(p_Alpine,          x = 0.8642857, y = 0, width = 0.1357143, height = 1) +
   draw_plot_label("Species", x = 0, y = 0.5, size = 40, angle = 90, hjust = 0)
 
-save_plot("Figure_Habitat_cov_effects.jpg", p, ncol = 5, nrow = 7, dpi = 300)
+save_plot("Figure_Habitat_cov_effects.jpg", p, ncol = 5, nrow = 6.5, dpi = 300)

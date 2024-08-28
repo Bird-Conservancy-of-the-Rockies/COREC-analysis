@@ -25,7 +25,8 @@ inits.path <- list(BETA0.HumanPresence = 0, BETA.TrailTotm.HumanPresence = 0,
                    BETA.RoadTotm.Traffic = 0, BETA.Prp_MotRestricted.Traffic = 0,
                    shape.Traffic =1,
                    
-                   BETA0.Speed = 0, BETA.Prp_MotRestricted.Speed = 0,
+                   BETA0.Speed = 0, BETA.TrailTotm.Speed = 0,
+                   BETA.RoadTotm.Speed = 0, BETA.Prp_MotRestricted.Speed = 0,
                    shape.Speed = 1)
 
 if(mod.nam == "interm_paths") {

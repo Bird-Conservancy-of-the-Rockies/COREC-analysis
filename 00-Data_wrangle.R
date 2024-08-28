@@ -250,6 +250,8 @@ covariates <- covariates %>%
          HumanPresence = ifelse(HumanTraffic > 0, 1, 0),
          LogTrafficNoZeros = ifelse(HumanTraffic == 0, NA, log(HumanTraffic)),
          LogTraffic = log(HumanTraffic + 0.1),
+         Prp_MotRestricted = ifelse(TrailTotm == 0, NA, Prp_MotRestricted),
+         Prp_HorseRestricted = ifelse(TrailTotm == 0, NA, Prp_HorseRestricted),
          GrdYrInd = Grid_year %>% as.factor %>% as.integer,
          GridInd = TransectNum %>% as.factor %>% as.integer,
          YearInd = Year %>% as.factor %>% as.integer) %>%

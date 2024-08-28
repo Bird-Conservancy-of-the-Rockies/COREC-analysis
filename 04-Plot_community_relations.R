@@ -17,9 +17,8 @@ mod <- R.utils::loadObject(str_c("mod_", mod.nam))
 nsims <- dim(mod$mcmcOutput)[1]
 source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
-#______________________________________#
-
 source(str_c(git.repo, "Functions_source.R"))
+#______________________________________#
 
 #########################
 # Define species groups #
@@ -39,53 +38,11 @@ groups <- list(
 ################################
 # Tabulate values for plotting #
 ################################
-#***Takes a long time, so caching tables. No need to run this unless there's been an update to the analysis.
-
-N.pred.calc <- function(X.pred, cov.ind) {
-  N.pred <- matrix(NA, nrow = nsims, ncol = length(spp.ind))
-  for(i in 1:length(spp.ind)) {
-    beta0 <- mod$mcmcOutput$beta0[, spp.ind[i]]
-    beta1 <- mod$mcmcOutput$betaVec[, spp.ind[i], cov.ind]
-    N.pred[,i] <- exp(beta0 + apply(beta1 * X.pred, 1, sum))
-  }
-  return(N.pred)
-}
-
-HillShannon <- function(N) {
-  p <- N / sum(N)
-  D <- exp(-1*sum(p * log(p)))
-  return(D)
-}
-
-# Get scaling factors for all covariates #
-cov.mn <- (covariates %>% select(TrailTotm:Prp_HorseRestricted, HumanPresence, LogTrafficNoZeros,
-                                 Speed, Shrubland, ConiferForest:Alpine) %>%
-             summarise_all(function(x) mean(x, na.rm = TRUE)) %>% data.matrix)[1,]
-cov.sd <- (covariates %>% select(TrailTotm:Prp_HorseRestricted, HumanPresence, LogTrafficNoZeros,
-                                 Speed, Shrubland, ConiferForest:Alpine) %>%
-             summarise_all(function(x) sd(x, na.rm = TRUE)) %>% data.matrix)[1,]
+series <- TRUE # Turns on component of 'Path_analysis_source.R' that generates values to plot here.
+source(str_c(git.repo, "Path_analysis_source.R"))
 
 # Trail density #
-dat.plt = data.frame(TrailTotm = c(seq(min(X.beta[, "TrailTotm"]),
-                                       quantile(X.beta[, "TrailTotm"],
-                                                prob = 0.99, type = 8),
-                                       length.out = 20),
-                                   seq(min(X.beta[, "TrailTotm"]),
-                                       quantile(X.beta[, "TrailTotm"],
-                                                prob = 0.99, type = 8),
-                                       length.out = 20)[-1],
-                                   seq(min(X.beta[, "TrailTotm"]),
-                                       quantile(X.beta[, "TrailTotm"],
-                                                prob = 0.99, type = 8),
-                                       length.out = 20)[-1]),
-                     Prp_MotRestricted = c(rep(0, 20),
-                                           rep(max(X.beta[, "Prp_MotRestricted"]), 19),
-                                           rep(min(X.beta[, "Prp_MotRestricted"]), 19)),
-                     Prp_HorseRestricted = c(rep(0, 20), rep(min(X.beta[, "Prp_HorseRestricted"]), 19),
-                                             rep(max(X.beta[, "Prp_HorseRestricted"]), 19))) %>%
-  mutate(TrailDensity = TrailTotm * cov.sd["TrailTotm"] + cov.mn["TrailTotm"],
-         OHV = c(rep(NA, 20), rep("yes", 19), rep("no", 19)) %>% as.factor,
-         Horse = c(rep(NA, 20), rep("no", 19), rep("yes", 19)) %>% as.factor)
+dat.plt = data.frame(TrailDensity = x.trail * cov.sd["TrailTotm"] + cov.mn["TrailTotm"])
 
 cov.ind <- which(dimnames(X.beta)[[2]] %in% c("TrailTotm", "Prp_MotRestricted", "Prp_HorseRestricted"))
 for(g in names(groups)) {

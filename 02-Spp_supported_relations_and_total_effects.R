@@ -3,7 +3,6 @@ library(tidyr)
 library(dplyr)
 library(mcmcOutput)
 library(FunctionsBCR)
-theme_set(theme_bw())
 
 setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 load(str_c("data/Data_compiled.RData"))
@@ -40,7 +39,7 @@ tab.effect.total <- data.frame(Spp = Spp)
 
 ## Tabulate values to plot ##
 # Trail density #
-effect <- log(N.pred[,,"HighTrail_norest"] / N.pred[,,"Baseline"])
+effect <- log(N.pred[,,"HighTrail_avgOHV"] / N.pred[,,"Baseline"])
 tab.effect.total <- tab.effect.total %>%
   mutate(HighTrail.md = apply(effect, 2, median),
          HighTrail.lo = apply(effect, 2, function(x) quantile(x, prob = 0.1, type = 8)),
@@ -48,20 +47,12 @@ tab.effect.total <- tab.effect.total %>%
   mutate(HighTrail.supp = ifelse(HighTrail.hi < 0, "neg", ifelse(HighTrail.lo > 0, "pos", "none")))
 
 # OHV #
-effect <- log(N.pred[,,"HighTrail_noOHV"] / N.pred[,,"HighTrail_norest"])
+effect <- log(N.pred[,,"HighTrail_noOHV"] / N.pred[,,"HighTrail_maxOHV"])
 tab.effect.total <- tab.effect.total %>%
   mutate(NoOHV.md = apply(effect, 2, median),
          NoOHV.lo = apply(effect, 2, function(x) quantile(x, prob = 0.1, type = 8)),
          NoOHV.hi = apply(effect, 2, function(x) quantile(x, prob = 0.9, type = 8))) %>%
   mutate(NoOHV.supp = ifelse(NoOHV.hi < 0, "neg", ifelse(NoOHV.lo > 0, "pos", "none")))
-
-# Horse #
-effect <- log(N.pred[,,"HighTrail_noHorse"] / N.pred[,,"HighTrail_norest"])
-tab.effect.total <- tab.effect.total %>%
-  mutate(NoHorse.md = apply(effect, 2, median),
-         NoHorse.lo = apply(effect, 2, function(x) quantile(x, prob = 0.1, type = 8)),
-         NoHorse.hi = apply(effect, 2, function(x) quantile(x, prob = 0.9, type = 8))) %>%
-  mutate(NoHorse.supp = ifelse(NoHorse.hi < 0, "neg", ifelse(NoHorse.lo > 0, "pos", "none")))
 
 # Roads #
 effect <- log(N.pred[,,"HighRoad"] / N.pred[,,"Baseline"])
@@ -74,7 +65,7 @@ rm(effect)
 
 spp.relations <- spp.relations %>%
   c(tab.effect.total %>% filter(HighTrail.supp != "none" | NoOHV.supp != "none" |
-                                               NoHorse.supp != "none" | HighRoad.supp != "none") %>%
+                                               HighRoad.supp != "none") %>%
   pull(Spp)) %>%
   unique %>% sort
 

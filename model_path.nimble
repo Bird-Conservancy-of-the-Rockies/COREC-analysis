@@ -1,3 +1,11 @@
+logdens.gamma <- nimbleFunction(
+    run = function(x = double(), a = double(), b = double()) {
+        lp <- dgamma(x, a, b, log = TRUE)
+        returnType(double())
+        return(lp)
+    }
+)
+
 model <<- nimbleCode({
     ########################
     # Bird community model #
@@ -105,7 +113,7 @@ model <<- nimbleCode({
   # Path models #
   ###############
   
-  #~~~~~~~~~~ Prior distributions ~~~~~~~~~~~~~#
+  ### Prior distributions ###
   BETA0.HumanPresence ~ dnorm(0, 0.66667)
   BETA.TrailTotm.HumanPresence ~ dnorm(0, 0.66667)
   BETA.RoadTotm.HumanPresence ~ dnorm(0, 0.66667)
@@ -118,6 +126,8 @@ model <<- nimbleCode({
   shape.Traffic ~ dgamma(1, 1)
 
   BETA0.Speed ~ dnorm(0, 0.66667)
+  BETA.TrailTotm.Speed ~ dnorm(0, 0.66667)
+  BETA.RoadTotm.Speed ~ dnorm(0, 0.66667)
   BETA.Prp_MotRestricted.Speed ~ dnorm(0, 0.66667)
   shape.Speed ~ dgamma(1, 0.1)
   
@@ -146,13 +156,9 @@ model <<- nimbleCode({
       BETA.Prp_MotRestricted.Traffic * X.beta[ind.hpresent[j], ind.Prp_MotRestricted]
     rate.Traffic[j] <- shape.Traffic / pred.Traffic[j]
     #_____ GOF _____#
-    LLobs.Traffic[j] <- log((pow(rate.Traffic[j], shape.Traffic) *
-      Traffic[j] * exp(-1 * rate.Traffic[j] * Traffic[j]))) -
-      loggam(shape.Traffic)
+    LLobs.Traffic[j] <- logdens.gamma(Traffic[j], shape.Traffic, rate.Traffic[j])
     X.sim.Traffic[j] ~ dgamma(shape.Traffic, rate.Traffic[j])
-    LLsim.Traffic[j] <- log((pow(rate.Traffic[j], shape.Traffic) *
-      X.sim.Traffic[j] * exp(-1 * rate.Traffic[j] * X.sim.Traffic[j]))) -
-      loggam(shape.Traffic)
+    LLsim.Traffic[j] <- logdens.gamma(X.sim.Traffic[j], shape.Traffic, rate.Traffic[j])
     #_______________#
   }
   
@@ -160,19 +166,17 @@ model <<- nimbleCode({
     ## Traffic speed where humans are present ##
     Speed[j] ~ dgamma(shape.Speed, rate.Speed[j])
     log(pred.Speed[j]) <- BETA0.Speed +
+      BETA.TrailTotm.Speed * X.beta[ind.SpeedPresent[j], ind.TrailTotm] +
+      BETA.RoadTotm.Speed * X.beta[ind.SpeedPresent[j], ind.RoadTotm] +
       BETA.Prp_MotRestricted.Speed * X.beta[ind.SpeedPresent[j], ind.Prp_MotRestricted]
     rate.Speed[j] <- shape.Speed / pred.Speed[j]
     #_____ GOF _____#
-    LLobs.Speed[j] <- log((pow(rate.Speed[j], shape.Speed) *
-      Speed[j] * exp(-1 * rate.Speed[j] * Speed[j]))) -
-      loggam(shape.Speed)
+    LLobs.Speed[j] <- logdens.gamma(Speed[j], shape.Speed, rate.Speed[j])
     X.sim.Speed[j] ~ dgamma(shape.Speed, rate.Speed[j])
-    LLsim.Speed[j] <- log((pow(rate.Speed[j], shape.Speed) *
-      X.sim.Speed[j] * exp(-1 * rate.Speed[j] * X.sim.Speed[j]))) -
-      loggam(shape.Speed)
+    LLsim.Speed[j] <- logdens.gamma(X.sim.Speed[j], shape.Speed, rate.Speed[j])
     #_______________#
   }
-  
+
   #_______ GOF _______#
   dev.obs.HumanPresence <- -2 * sum(LLobs.HumanPresence[1:ngrdyrs])
   dev.sim.HumanPresence <- -2 * sum(LLsim.HumanPresence[1:ngrdyrs])

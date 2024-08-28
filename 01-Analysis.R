@@ -10,7 +10,7 @@ setwd("~/COREC")
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
 #GOF <- FALSE # Set to true to include and monitor goodness of fit metrics (not sure if/how I'll do this.)
-mod.nam <- "path" # Options: "community", "interm_paths", "path
+mod.nam <- "interm_paths" # Options: "community", "interm_paths", "path
 model.file <- str_c("model_", mod.nam, ".nimble")
 parallel.process <- T # Set to true if running nimble on analysis server (i.e., not Windows)
 max.samples.saved <- 1000 # Maximum number of posterior samples to save.
@@ -100,7 +100,7 @@ if(!parallel.process) {
                     WAIC = FALSE,
                     monitors = parameters)
   
-  mod <- coda::as.mcmc.list(lapply(out$samples, coda::as.mcmc)) # Not sure if this will work.
+  mod <- coda::as.mcmc.list(lapply(out$samples, coda::as.mcmc))
   library(mcmcOutput)
   #if(nc > 1) mod.raw <- coda::as.mcmc.list(lapply(out$samples, coda::mcmc))
   mod <- mcmcOutput(mod)
