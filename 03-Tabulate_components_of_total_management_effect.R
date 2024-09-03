@@ -16,6 +16,7 @@ nsims <- dim(mod$mcmcOutput)[1]
 source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
 source(str_c(git.repo, "Functions_source.R"))
+source(str_c(git.repo, "Cluster_sizes.R"))
 #______________________________________#
 
 ## Stratum covariate values ##

@@ -13,6 +13,7 @@ mod.nam <- "path"
 mod <- R.utils::loadObject(str_c("mod_", mod.nam))
 source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
+source(str_c(git.repo, "Cluster_sizes.R"))
 #________________________#
 
 nsamp <- dim(mod$mcmcOutput)[1]

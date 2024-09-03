@@ -55,7 +55,16 @@ N.pred.calc <- function(X.pred, spp) {
   for(i in 1:length(spp.ind)) {
     beta0 <- mod$mcmcOutput$beta0[,spp.ind[i]]
     beta1 <- mod$mcmcOutput$betaVec[,spp.ind[i],]
-    N.pred[,i] <- exp(beta0 + apply(beta1 * X.pred, 1, sum))
+    pred <- exp(beta0 + apply(beta1 * X.pred, 1, sum))
+    if(!is.na(cl_se[Spp[spp.ind[i]]])) { # Need to work on this. Simple mean and se is not working. Need to do glm I think.
+      cl <- rnorm(nsims, cl_mean[Spp[spp.ind[i]]], cl_se[Spp[spp.ind[i]]])
+      while(any(cl < 1)) cl[which(cl < 1)] <- rnorm(sum(cl < 1), cl_mean[Spp[spp.ind[i]]], cl_se[Spp[spp.ind[i]]]) # Truncate distribution at 1.
+      # cl_offset <- cl - 0.9999
+      # md <- glm(cl_offset ~ 1, family = "inverse")
+    } else {
+      cl <- rep(cl_mean[Spp[spp.ind[i]]], nsims)
+    }
+    N.pred[,i] <- pred * cl_mean[Spp[spp.ind[i]]] / area.circle[spp.ind[i]]
   }
   N.pred <- N.pred[,spp]
   return(N.pred)
@@ -103,13 +112,7 @@ dimnames(N.pred) <- list(NULL, Spp, Scenarios)
 for(scn in Scenarios) {
   N.pred[,,scn] <- N.pred.calc(X.pred[[scn]], Spp)
 }
-
-for(i in 1:length(Spp)) {
-  beta0 <- mod$mcmcOutput$beta0[,i]
-  beta1 <- mod$mcmcOutput$betaVec[,i,]
-  
-}
-rm(i, X.pred.baseline, X.pred.hitrail_avgOHV, X.pred.hitrail_maxOHV, X.pred.hitrail_noOHV, X.pred.hiroad)
+rm(X.pred.baseline, X.pred.hitrail_avgOHV, X.pred.hitrail_maxOHV, X.pred.hitrail_noOHV, X.pred.hiroad)
 
 ## Series for plotting full relationships ##
 if(!exists("series")) series <- FALSE
@@ -132,6 +135,8 @@ if(series) {
                   Prp_MotRestricted = 0)
     X.trail.series[,,i,"total"] <- X.trail.series[,,i,"unexplained"] <-
       CalcPredValues(X.trail.series[,,i,"total"], X.mangmt)
+    X.trail.series[,c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2"),i,"unexplained"] <-
+      X.trail.series[,c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2"),1,"unexplained"]
     N.trail.series[,,i,"total"] <- N.pred.calc(X.trail.series[,,i,"total"], Spp)
     X.trail.series[,c(Human.vars, "Speed2"),i,"unexplained"] <- 0
     N.trail.series[,,i,"unexplained"] <- N.pred.calc(X.trail.series[,,i,"unexplained"], Spp)
@@ -153,6 +158,8 @@ if(series) {
                   Prp_MotRestricted = 0)
     X.road.series[,,i,"total"] <- X.road.series[,,i,"unexplained"] <-
       CalcPredValues(X.road.series[,,i,"total"], X.mangmt)
+    X.road.series[,c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2"),i,"unexplained"] <-
+      X.road.series[,c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2"),1,"unexplained"]
     N.road.series[,,i,"total"] <- N.pred.calc(X.road.series[,,i,"total"], Spp)
     X.road.series[,c(Human.vars, "Speed2"),i,"unexplained"] <- 0
     N.road.series[,,i,"unexplained"] <- N.pred.calc(X.road.series[,,i,"unexplained"], Spp)
@@ -173,6 +180,8 @@ if(series) {
                   Prp_MotRestricted = x.OHV[i])
     X.OHV.series[,,i,"total"] <- X.OHV.series[,,i,"unexplained"] <-
       CalcPredValues(X.OHV.series[,,i,"total"], X.mangmt)
+    X.OHV.series[,c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2"),i,"unexplained"] <-
+      X.OHV.series[,c("HumanPresence", "LogTrafficNoZeros", "Speed", "Speed2"),1,"unexplained"]
     N.OHV.series[,,i,"total"] <- N.pred.calc(X.OHV.series[,,i,"total"], Spp)
     X.OHV.series[,c(Human.vars, "Speed2"),i,"unexplained"] <- 0
     N.OHV.series[,,i,"unexplained"] <- N.pred.calc(X.OHV.series[,,i,"unexplained"], Spp)

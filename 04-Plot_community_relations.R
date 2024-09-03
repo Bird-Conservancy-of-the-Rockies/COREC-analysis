@@ -12,12 +12,14 @@ load("data/Data_compiled.RData")
 
 #__________ Script inputs _____________#
 mod.nam <- "path"
+tab.plotting.values <- FALSE # Set to true if updating plotted values. Otherwise, will read from cached files.
 git.repo <- "COREC-analysis/"
 mod <- R.utils::loadObject(str_c("mod_", mod.nam))
 nsims <- dim(mod$mcmcOutput)[1]
 source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
 source(str_c(git.repo, "Functions_source.R"))
+source(str_c(git.repo, "Cluster_sizes.R"))
 #______________________________________#
 
 #########################
@@ -27,6 +29,7 @@ source(str_c(git.repo, "Functions_source.R"))
 spp_assignments <- read.csv("data/Species_list_assigned.csv", header = TRUE, stringsAsFactors = FALSE)
 groups <- list(
   community = Spp,
+  specialist = spp_assignments %>% filter(Hab_specialist) %>% pull(BirdCode),
   migratory = spp_assignments %>% filter(Migratory) %>% pull(BirdCode),
   large = spp_assignments %>% filter(Mass > median(Mass)) %>% pull(BirdCode),
   HumComm = spp_assignments %>% filter(HumanCommensal) %>% pull(BirdCode),
@@ -35,338 +38,192 @@ groups <- list(
   SGCN = spp_assignments %>% filter(SGCN) %>% pull(BirdCode)
 )
 
-################################
-# Tabulate values for plotting #
-################################
-series <- TRUE # Turns on component of 'Path_analysis_source.R' that generates values to plot here.
-source(str_c(git.repo, "Path_analysis_source.R"))
-
-# Trail density #
-dat.plt = data.frame(TrailDensity = x.trail * cov.sd["TrailTotm"] + cov.mn["TrailTotm"])
-
-cov.ind <- which(dimnames(X.beta)[[2]] %in% c("TrailTotm", "Prp_MotRestricted", "Prp_HorseRestricted"))
-for(g in names(groups)) {
-  spp.ind <- which(Spp %in% groups[[g]])
-  D <- matrix(NA, nrow = nsims, ncol = nrow(dat.plt))
-  for(i in 1:nrow(dat.plt)) {
-    X.pred <- dat.plt %>% select(TrailTotm, Prp_MotRestricted, Prp_HorseRestricted) %>%
-      slice(i) %>% data.matrix
-    X.pred <- matrix(rep(X.pred, nsims), nrow = length(cov.ind), ncol = nsims) %>% t()
-    N <- N.pred.calc(X.pred, cov.ind)
-    D[,i] <- apply(N, 1, HillShannon)
-  }
-  dat.plt$v.md <- apply(D, 2, median)
-  dat.plt$v.lo <- apply(D, 2, function(x) quantile(x, prob = 0.1, type = 8))
-  dat.plt$v.hi <- apply(D, 2, function(x) quantile(x, prob = 0.9, type = 8))
-  names(dat.plt)[which(names(dat.plt) %in% c("v.md", "v.lo", "v.hi"))] <-
-    str_c(g, c(".md", ".lo", ".hi"))
-}
-write.csv(dat.plt, "data/Dat_plot_community_trail_density.csv", row.names = FALSE)
-
-
 ##################
 # Generate plots #
 ##################
+if(tab.plotting.values) source(str_c(git.repo, "Tabulate_community_plotting_values.R"))
 
-## Trail density ##
-dat.plt <- read.csv("data/Dat_plot_community_trail_density.csv", header = TRUE, stringsAsFactors = FALSE)
+dat.plt.trail <- read.csv("data/Dat_plot_community_trail_density.csv", header = TRUE, stringsAsFactors = FALSE) %>%
+  filter(Series == "total") %>% select(-Series)
+dat.plt.road <- read.csv("data/Dat_plot_community_road_density.csv", header = TRUE, stringsAsFactors = FALSE) %>%
+  filter(Series == "total") %>% select(-Series)
+dat.plt.ohv <- read.csv("data/Dat_plot_community_OHV.csv", header = TRUE, stringsAsFactors = FALSE) %>%
+  filter(Series == "total") %>% select(-Series)
+dat.plt.traffic <- read.csv("data/Dat_plot_community_traffic.csv", header = TRUE, stringsAsFactors = FALSE)
+dat.plt.speed <- read.csv("data/Dat_plot_community_speed.csv", header = TRUE, stringsAsFactors = FALSE)
 
-# Community #
-p.trail.community <- ggplot(dat = dat.plt, aes(x = index, y = community.md)) +
-  geom_ribbon() +
-  geom_line()
+y.labs <- c("All species", "Habitat specialists", "Migratory species", "Large species", "Human commensals",
+            "Insectivores", "Ground species", "SGCN species")
+names(y.labs) <- names(groups)
 
+# Standard plots #
+v.stub <- c("trail", "road", "ohv", "speed")
+v.clabs <- c("TrailDensity", "RoadDensity", "OHVRestrict", "Speed")
+v.xlabs <- c("Trail density", "Road density", "Prp. trails no OHV", "Traffic speed")
+names(v.clabs) <- names(v.xlabs) <- v.stub
+for(g in names(groups)) {
+  ymax.str <- str_c("max(c(dat.plt.trail$", g, ".hi, dat.plt.road$", g, ".hi, dat.plt.ohv$", g,
+                    ".hi, dat.plt.traffic$", g, ".hi, dat.plt.speed$", g, ".hi))")
+  ymax <- eval(parse(text = ymax.str))
+  ymin.str <- str_c("min(c(dat.plt.trail$", g, ".lo, dat.plt.road$", g, ".lo, dat.plt.ohv$", g,
+                    ".lo, dat.plt.traffic$", g, ".lo, dat.plt.speed$", g, ".lo))")
+  ymin <- eval(parse(text = ymin.str))
+  y.marg <- (ymax - ymin) / 100
+  ymax <- ymax + y.marg
+  ymin <- ymin - y.marg
+  for(v in v.stub) {
+    p.str <- str_c(str_c("p", v, g, sep = "."),
+                   "<- ggplot(dat = dat.plt.", v,", aes(x = ", v.clabs[v],", y = ", g, ".md)) +",
+                   "geom_ribbon(aes(ymin = ", g, ".lo, ymax = ", g, ".hi), linewidth = 0.5, alpha = 0.3) +",
+                   "geom_line(linewidth = 1) +",
+                   "xlab('", v.xlabs[v], "') + ylab('", y.labs[g], "')+",
+                   "ylim(", ymin,", ", ymax, ")")
+    eval(parse(text = p.str))
+  }
+}
 
+# Traffic plots
+n.breaks <- 5
+x.breaks <- seq(min(dat.plt.traffic$LogTrafficVol), max(dat.plt.traffic$LogTrafficVol), length.out = n.breaks)
+x.labs.vals <- exp(x.breaks)
+ndig <- c(3, 2, 0, -2, -4)
+x.labs.vals <- as.character(round(x.labs.vals, digits = ndig))
+x.labs.vals[1] <- "0"
+dat.plt.HP0 <- (dat.plt.traffic %>% filter(HumanPresence == 0))
+dat.plt.HP1 <- (dat.plt.traffic %>% filter(HumanPresence == 1))
+for(g in names(groups)) {
+  ymax.str <- str_c("max(c(dat.plt.trail$", g, ".hi, dat.plt.road$", g, ".hi, dat.plt.ohv$", g,
+                    ".hi, dat.plt.traffic$", g, ".hi, dat.plt.speed$", g, ".hi))")
+  ymax <- eval(parse(text = ymax.str))
+  ymin.str <- str_c("min(c(dat.plt.trail$", g, ".lo, dat.plt.road$", g, ".lo, dat.plt.ohv$", g,
+                    ".lo, dat.plt.traffic$", g, ".lo, dat.plt.speed$", g, ".lo))")
+  ymin <- eval(parse(text = ymin.str))
+  y.marg <- (ymax - ymin) / 100
+  ymax <- ymax + y.marg
+  ymin <- ymin - y.marg
+  p.str <- str_c(str_c("p.traffic", g, sep = "."),
+                 "<- ggplot(dat = dat.plt.traffic, aes(x = LogTrafficVol, y = ", g, ".md)) +",
+                 "geom_ribbon(data = dat.plt.HP1, aes(x = LogTrafficVol, ymin = ", g,
+                 ".lo, ymax = ", g, ".hi), linewidth = 0.5, alpha = 0.3) +",
+                 "geom_line(data = dat.plt.HP1, aes(x = LogTrafficVol, y = ", g,
+                 ".md), linewidth = 1) +",
+                 "geom_errorbar(data = dat.plt.HP0, aes(x = LogTrafficVol,",
+                 "ymin = ", g, ".lo, ymax = ", g,".hi), size = 1) +",
+                 "geom_point(data = dat.plt.HP0, aes(x = LogTrafficVol, y = ", g,
+                 ".md), size = 3) +",
+                 "scale_x_continuous(breaks = x.breaks, labels = x.labs.vals)+",
+                 "xlab('Traffic volume') + ylab('", y.labs[g], "')+",
+                 "ylim(", ymin,", ", ymax, ")")
+  eval(parse(text = p.str))
+}
 
+p <- ggdraw() +
+  draw_plot(p.trail.community,     x = 0.05, y = 0.83125,   width = 0.19, height = 0.11875) +
+  draw_plot(p.road.community,      x = 0.24, y = 0.83125,   width = 0.19, height = 0.11875) +
+  draw_plot(p.ohv.community,       x = 0.43, y = 0.83125,   width = 0.19, height = 0.11875) +
+  draw_plot(p.traffic.community,   x = 0.62, y = 0.83125,   width = 0.19, height = 0.11875) +
+  draw_plot(p.speed.community,     x = 0.81, y = 0.83125,   width = 0.19, height = 0.11875) +
+  draw_plot(p.trail.specialist,    x = 0.05, y = 0.71250,   width = 0.19, height = 0.11875) +
+  draw_plot(p.road.specialist,     x = 0.24, y = 0.71250,   width = 0.19, height = 0.11875) +
+  draw_plot(p.ohv.specialist,      x = 0.43, y = 0.71250,   width = 0.19, height = 0.11875) +
+  draw_plot(p.traffic.specialist,  x = 0.62, y = 0.71250,   width = 0.19, height = 0.11875) +
+  draw_plot(p.speed.specialist,    x = 0.81, y = 0.71250,   width = 0.19, height = 0.11875) +
+  draw_plot(p.trail.migratory,     x = 0.05, y = 0.59375,   width = 0.19, height = 0.11875) +
+  draw_plot(p.road.migratory,      x = 0.24, y = 0.59375,   width = 0.19, height = 0.11875) +
+  draw_plot(p.ohv.migratory,       x = 0.43, y = 0.59375,   width = 0.19, height = 0.11875) +
+  draw_plot(p.traffic.migratory,   x = 0.62, y = 0.59375,   width = 0.19, height = 0.11875) +
+  draw_plot(p.speed.migratory,     x = 0.81, y = 0.59375,   width = 0.19, height = 0.11875) +
+  draw_plot(p.trail.large,         x = 0.05, y = 0.47500,   width = 0.19, height = 0.11875) +
+  draw_plot(p.road.large,          x = 0.24, y = 0.47500,   width = 0.19, height = 0.11875) +
+  draw_plot(p.ohv.large,           x = 0.43, y = 0.47500,   width = 0.19, height = 0.11875) +
+  draw_plot(p.traffic.large,       x = 0.62, y = 0.47500,   width = 0.19, height = 0.11875) +
+  draw_plot(p.speed.large,         x = 0.81, y = 0.47500,   width = 0.19, height = 0.11875) +
+  draw_plot(p.trail.HumComm,       x = 0.05, y = 0.35625,   width = 0.19, height = 0.11875) +
+  draw_plot(p.road.HumComm,        x = 0.24, y = 0.35625,   width = 0.19, height = 0.11875) +
+  draw_plot(p.ohv.HumComm,         x = 0.43, y = 0.35625,   width = 0.19, height = 0.11875) +
+  draw_plot(p.traffic.HumComm,     x = 0.62, y = 0.35625,   width = 0.19, height = 0.11875) +
+  draw_plot(p.speed.HumComm,       x = 0.81, y = 0.35625,   width = 0.19, height = 0.11875) +
+  draw_plot(p.trail.insectivore,   x = 0.05, y = 0.23750,   width = 0.19, height = 0.11875) +
+  draw_plot(p.road.insectivore,    x = 0.24, y = 0.23750,   width = 0.19, height = 0.11875) +
+  draw_plot(p.ohv.insectivore,     x = 0.43, y = 0.23750,   width = 0.19, height = 0.11875) +
+  draw_plot(p.traffic.insectivore, x = 0.62, y = 0.23750,   width = 0.19, height = 0.11875) +
+  draw_plot(p.speed.insectivore,   x = 0.81, y = 0.23750,   width = 0.19, height = 0.11875) +
+  draw_plot(p.trail.ground,        x = 0.05, y = 0.11875,   width = 0.19, height = 0.11875) +
+  draw_plot(p.road.ground,         x = 0.24, y = 0.11875,   width = 0.19, height = 0.11875) +
+  draw_plot(p.ohv.ground,          x = 0.43, y = 0.11875,   width = 0.19, height = 0.11875) +
+  draw_plot(p.traffic.ground,      x = 0.62, y = 0.11875,   width = 0.19, height = 0.11875) +
+  draw_plot(p.speed.ground,        x = 0.81, y = 0.11875,   width = 0.19, height = 0.11875) +
+  draw_plot(p.trail.SGCN,          x = 0.05, y = 0.00000,   width = 0.19, height = 0.11875) +
+  draw_plot(p.road.SGCN,           x = 0.24, y = 0.00000,   width = 0.19, height = 0.11875) +
+  draw_plot(p.ohv.SGCN,            x = 0.43, y = 0.00000,   width = 0.19, height = 0.11875) +
+  draw_plot(p.traffic.SGCN,        x = 0.62, y = 0.00000,   width = 0.19, height = 0.11875) +
+  draw_plot(p.speed.SGCN,          x = 0.81, y = 0.00000,   width = 0.19, height = 0.11875) +
+  draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
 
+save_plot("community_relations/Covariate_relations.jpg", p, ncol = 2, nrow = 3.5, dpi = 200)
 
+## Compare total and unexplained series ##
+dat.plt.trail <- read.csv("data/Dat_plot_community_trail_density.csv", header = TRUE, stringsAsFactors = FALSE) %>%
+  mutate(Series = Series %>% factor(levels = c("unexplained", "total")))
+dat.plt.road <- read.csv("data/Dat_plot_community_road_density.csv", header = TRUE, stringsAsFactors = FALSE) %>%
+  mutate(Series = Series %>% factor(levels = c("unexplained", "total")))
+dat.plt.ohv <- read.csv("data/Dat_plot_community_OHV.csv", header = TRUE, stringsAsFactors = FALSE) %>%
+  mutate(Series = Series %>% factor(levels = c("unexplained", "total")))
 
-#################
-# Trail density #
-#################
-min.y <- min(dat.plot.total$HighTrail.lo, dat.plot.explained$HighTrail.lo, dat.plot.unexplained.TrailTotm$beta.lo)
-max.y <- max(dat.plot.total$HighTrail.hi, dat.plot.explained$HighTrail.hi, dat.plot.unexplained.TrailTotm$beta.hi)
-breaks.y <- seq(min.y, max.y, length.out = 4)[-c(1, 4)] %>% round(digits = 1)
+v.stub <- c("trail", "road", "ohv")
+v.clabs <- c("TrailDensity", "RoadDensity", "OHVRestrict")
+v.xlabs <- c("Trail density", "Road density", "Prp. trails no OHV")
+names(v.clabs) <- names(v.xlabs) <- v.stub
+for(g in names(groups)) {
+  ymax.str <- str_c("max(c(dat.plt.trail$", g, ".hi, dat.plt.road$", g, ".hi, dat.plt.ohv$", g, ".hi))")
+  ymax <- eval(parse(text = ymax.str))
+  ymin.str <- str_c("min(c(dat.plt.trail$", g, ".lo, dat.plt.road$", g, ".lo, dat.plt.ohv$", g, ".lo))")
+  ymin <- eval(parse(text = ymin.str))
+  y.marg <- (ymax - ymin) / 100
+  ymax <- ymax + y.marg
+  ymin <- ymin - y.marg
+  for(v in v.stub) {
+    p.str <- str_c(str_c("p", v, g, sep = "."),
+                   "<- ggplot(dat = dat.plt.", v,", aes(x = ", v.clabs[v],", y = ", g, ".md)) +",
+                   "geom_ribbon(aes(ymin = ", g, ".lo, ymax = ", g, ".hi, linetype = Series, alpha = Series), linewidth = 0.5) +",
+                   "geom_line(aes(linetype = Series), linewidth = 1) +",
+                   "scale_linetype_manual(values = c('dashed', 'solid')) +",
+                   "scale_alpha_manual(values = c(0.1, 0.3)) +",
+                   "xlab('", v.xlabs[v], "') + ylab('", y.labs[g], "')")
+    if(g == "community" & v == "trail") {
+      p.str <- str_c(p.str, "+theme(legend.position = c(0.99,0.99), legend.justification = c(0.99,0.99))")
+    } else {
+      p.str <- str_c(p.str, "+guides(linetype = 'none', alpha = 'none')")
+    }
+    eval(parse(text = p.str))
+  }
+}
 
-p.trail.total <- ggplot(dat = dat.plot.total, aes(x = index, y = HighTrail.md)) +
-  geom_errorbar(aes(ymin = HighTrail.lo, ymax = HighTrail.hi, color = HighTrail.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = HighTrail.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.total$index, labels = dat.plot.total$Spp, expand=c(0, 1)) +
-  xlab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  ylab(NULL) +
-  #theme(axis.title.x=element_text(size=30)) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.text.y=element_text(size=15)) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  guides(color = "none") +
-  ggtitle("Total")
+p <- ggdraw() +
+  draw_plot(p.trail.community,   x = 0.0500000, y = 0.83125, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.road.community,    x = 0.3666667, y = 0.83125, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.ohv.community,     x = 0.6833333, y = 0.83125, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.trail.specialist,  x = 0.0500000, y = 0.71250, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.road.specialist,   x = 0.3666667, y = 0.71250, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.ohv.specialist,    x = 0.6833333, y = 0.71250, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.trail.migratory,   x = 0.0500000, y = 0.59375, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.road.migratory,    x = 0.3666667, y = 0.59375, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.ohv.migratory,     x = 0.6833333, y = 0.59375, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.trail.large,       x = 0.0500000, y = 0.47500, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.road.large,        x = 0.3666667, y = 0.47500, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.ohv.large,         x = 0.6833333, y = 0.47500, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.trail.HumComm,     x = 0.0500000, y = 0.35625, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.road.HumComm,      x = 0.3666667, y = 0.35625, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.ohv.HumComm,       x = 0.6833333, y = 0.35625, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.trail.insectivore, x = 0.0500000, y = 0.23750, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.road.insectivore,  x = 0.3666667, y = 0.23750, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.ohv.insectivore,   x = 0.6833333, y = 0.23750, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.trail.ground,      x = 0.0500000, y = 0.11875, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.road.ground,       x = 0.3666667, y = 0.11875, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.ohv.ground,        x = 0.6833333, y = 0.11875, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.trail.SGCN,        x = 0.0500000, y = 0.00000, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.road.SGCN,         x = 0.3666667, y = 0.00000, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.ohv.SGCN,          x = 0.6833333, y = 0.00000, width = 0.3166667, height = 0.11875) +
+  draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
 
-p.trail.explained <- ggplot(dat = dat.plot.explained, aes(x = index, y = HighTrail.md)) +
-  geom_errorbar(aes(ymin = HighTrail.lo, ymax = HighTrail.hi, color = HighTrail.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = HighTrail.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.explained$index, expand=c(0, 1)) +
-  xlab(NULL) + ylab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.title.y=element_blank()) +
-  theme(axis.text.y=element_blank()) +
-  theme(axis.ticks.y=element_blank()) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  theme(axis.ticks.length.y = unit(0, "pt")) +
-  guides(color = "none") +
-  ggtitle("Explained")
-
-p.trail.unexplained <- ggplot(dat = dat.plot.unexplained.TrailTotm, aes(x = index, y = beta.md)) +
-  geom_errorbar(aes(ymin = beta.lo, ymax = beta.hi, color = beta.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = beta.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.unexplained.TrailTotm$index, expand=c(0, 1)) +
-  xlab(NULL) + ylab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.title.y=element_blank()) +
-  theme(axis.text.y=element_blank()) +
-  theme(axis.ticks.y=element_blank()) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  theme(axis.ticks.length.y = unit(0, "pt")) +
-  guides(color = "none") +
-  ggtitle("Unexplained")
-
-p.trail <- ggdraw() + 
-  draw_plot(p.trail.total,       x = 0,    y = 0.05, width = 0.5,  height = 0.95) +
-  draw_plot(p.trail.explained,   x = 0.5,  y = 0.05, width = 0.25, height = 0.95) +
-  draw_plot(p.trail.unexplained, x = 0.75, y = 0.05, width = 0.25, height = 0.95) +
-  draw_plot_label("Trail density effect", x = 0.5, y = 0.03, size = 30, hjust = 0.5, vjust = 1)
-
-
-################
-# Road density #
-################
-min.y <- min(dat.plot.total$HighRoad.lo, dat.plot.explained$HighRoad.lo, dat.plot.unexplained.RoadTotm$beta.lo)
-max.y <- max(dat.plot.total$HighRoad.hi, dat.plot.explained$HighRoad.hi, dat.plot.unexplained.RoadTotm$beta.hi)
-breaks.y <- seq(min.y, max.y, length.out = 4)[-c(1, 4)] %>% round(digits = 1)
-
-p.road.total <- ggplot(dat = dat.plot.total, aes(x = index, y = HighRoad.md)) +
-  geom_errorbar(aes(ymin = HighRoad.lo, ymax = HighRoad.hi, color = HighRoad.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = HighRoad.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.total$index, labels = dat.plot.total$Spp, expand=c(0, 1)) +
-  xlab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  ylab(NULL) +
-  #theme(axis.title.x=element_text(size=30)) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.text.y=element_text(size=15)) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  guides(color = "none") +
-  ggtitle("Total")
-
-p.road.explained <- ggplot(dat = dat.plot.explained, aes(x = index, y = HighRoad.md)) +
-  geom_errorbar(aes(ymin = HighRoad.lo, ymax = HighRoad.hi, color = HighRoad.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = HighRoad.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.explained$index, expand=c(0, 1)) +
-  xlab(NULL) + ylab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.title.y=element_blank()) +
-  theme(axis.text.y=element_blank()) +
-  theme(axis.ticks.y=element_blank()) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  theme(axis.ticks.length.y = unit(0, "pt")) +
-  guides(color = "none") +
-  ggtitle("Explained")
-
-p.road.unexplained <- ggplot(dat = dat.plot.unexplained.RoadTotm, aes(x = index, y = beta.md)) +
-  geom_errorbar(aes(ymin = beta.lo, ymax = beta.hi, color = beta.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = beta.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.unexplained.RoadTotm$index, expand=c(0, 1)) +
-  xlab(NULL) + ylab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.title.y=element_blank()) +
-  theme(axis.text.y=element_blank()) +
-  theme(axis.ticks.y=element_blank()) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  theme(axis.ticks.length.y = unit(0, "pt")) +
-  guides(color = "none") +
-  ggtitle("Unexplained")
-
-p.road <- ggdraw() + 
-  draw_plot(p.road.total,       x = 0,    y = 0.05, width = 0.5,  height = 0.95) +
-  draw_plot(p.road.explained,   x = 0.5,  y = 0.05, width = 0.25, height = 0.95) +
-  draw_plot(p.road.unexplained, x = 0.75, y = 0.05, width = 0.25, height = 0.95) +
-  draw_plot_label("Road density effect", x = 0.5, y = 0.03, size = 30, hjust = 0.5, vjust = 1)
-
-###################
-# OHV Restriction #
-###################
-min.y <- min(dat.plot.total$NoOHV.lo, dat.plot.explained$NoOHV.lo, dat.plot.unexplained.Prp_MotRestricted$beta.lo)
-max.y <- max(dat.plot.total$NoOHV.hi, dat.plot.explained$NoOHV.hi, dat.plot.unexplained.Prp_MotRestricted$beta.hi)
-breaks.y <- seq(min.y, max.y, length.out = 4)[-c(1, 4)] %>% round(digits = 1)
-
-p.OHV.total <- ggplot(dat = dat.plot.total, aes(x = index, y = NoOHV.md)) +
-  geom_errorbar(aes(ymin = NoOHV.lo, ymax = NoOHV.hi, color = NoOHV.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = NoOHV.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.total$index, labels = dat.plot.total$Spp, expand=c(0, 1)) +
-  xlab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  ylab(NULL) +
-  #theme(axis.title.x=element_text(size=30)) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.text.y=element_text(size=15)) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  guides(color = "none") +
-  ggtitle("Total")
-
-p.OHV.explained <- ggplot(dat = dat.plot.explained, aes(x = index, y = NoOHV.md)) +
-  geom_errorbar(aes(ymin = NoOHV.lo, ymax = NoOHV.hi, color = NoOHV.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = NoOHV.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.explained$index, expand=c(0, 1)) +
-  xlab(NULL) + ylab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.title.y=element_blank()) +
-  theme(axis.text.y=element_blank()) +
-  theme(axis.ticks.y=element_blank()) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  theme(axis.ticks.length.y = unit(0, "pt")) +
-  guides(color = "none") +
-  ggtitle("Explained")
-
-p.OHV.unexplained <- ggplot(dat = dat.plot.unexplained.Prp_MotRestricted, aes(x = index, y = beta.md)) +
-  geom_errorbar(aes(ymin = beta.lo, ymax = beta.hi, color = beta.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = beta.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.unexplained.Prp_MotRestricted$index, expand=c(0, 1)) +
-  xlab(NULL) + ylab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.title.y=element_blank()) +
-  theme(axis.text.y=element_blank()) +
-  theme(axis.ticks.y=element_blank()) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  theme(axis.ticks.length.y = unit(0, "pt")) +
-  guides(color = "none") +
-  ggtitle("Unexplained")
-
-p.OHV <- ggdraw() + 
-  draw_plot(p.OHV.total,       x = 0,    y = 0.05, width = 0.5,  height = 0.95) +
-  draw_plot(p.OHV.explained,   x = 0.5,  y = 0.05, width = 0.25, height = 0.95) +
-  draw_plot(p.OHV.unexplained, x = 0.75, y = 0.05, width = 0.25, height = 0.95) +
-  draw_plot_label("OHV restriction effect", x = 0.5, y = 0.03, size = 30, hjust = 0.5, vjust = 1)
-
-#####################
-# Horse restriction #
-#####################
-min.y <- min(dat.plot.total$NoHorse.lo, dat.plot.explained$NoHorse.lo, dat.plot.unexplained.Prp_HorseRestricted$beta.lo)
-max.y <- max(dat.plot.total$NoHorse.hi, dat.plot.explained$NoHorse.hi, dat.plot.unexplained.Prp_HorseRestricted$beta.hi)
-breaks.y <- seq(min.y, max.y, length.out = 4)[-c(1, 4)] %>% round(digits = 1)
-
-p.horse.total <- ggplot(dat = dat.plot.total, aes(x = index, y = NoHorse.md)) +
-  geom_errorbar(aes(ymin = NoHorse.lo, ymax = NoHorse.hi, color = NoHorse.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = NoHorse.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.total$index, labels = dat.plot.total$Spp, expand=c(0, 1)) +
-  xlab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  ylab(NULL) +
-  #theme(axis.title.x=element_text(size=30)) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.text.y=element_text(size=15)) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  guides(color = "none") +
-  ggtitle("Total")
-
-p.horse.explained <- ggplot(dat = dat.plot.explained, aes(x = index, y = NoHorse.md)) +
-  geom_errorbar(aes(ymin = NoHorse.lo, ymax = NoHorse.hi, color = NoHorse.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = NoHorse.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.explained$index, expand=c(0, 1)) +
-  xlab(NULL) + ylab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.title.y=element_blank()) +
-  theme(axis.text.y=element_blank()) +
-  theme(axis.ticks.y=element_blank()) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  theme(axis.ticks.length.y = unit(0, "pt")) +
-  guides(color = "none") +
-  ggtitle("Explained")
-
-p.horse.unexplained <- ggplot(dat = dat.plot.unexplained.Prp_HorseRestricted, aes(x = index, y = beta.md)) +
-  geom_errorbar(aes(ymin = beta.lo, ymax = beta.hi, color = beta.supp),
-                linewidth = 1, width = 0) +
-  geom_point(size = 2.5, aes(color = beta.supp)) +
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = dat.plot.unexplained.Prp_HorseRestricted$index, expand=c(0, 1)) +
-  xlab(NULL) + ylab(NULL) +
-  scale_y_continuous(lim = c(min.y, max.y), breaks = breaks.y) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.title.y=element_blank()) +
-  theme(axis.text.y=element_blank()) +
-  theme(axis.ticks.y=element_blank()) +
-  theme(plot.margin = margin(0,0,0,0)) +
-  theme(axis.ticks.length.y = unit(0, "pt")) +
-  guides(color = "none") +
-  ggtitle("Unexplained")
-
-p.horse <- ggdraw() + 
-  draw_plot(p.horse.total,       x = 0,    y = 0.05, width = 0.5,  height = 0.95) +
-  draw_plot(p.horse.explained,   x = 0.5,  y = 0.05, width = 0.25, height = 0.95) +
-  draw_plot(p.horse.unexplained, x = 0.75, y = 0.05, width = 0.25, height = 0.95) +
-  draw_plot_label("Horse restriction effect", x = 0.5, y = 0.03, size = 30, hjust = 0.5, vjust = 1)
-
-#######################
-# Put it all together #
-#######################
-
-p <- ggdraw() + 
-  draw_plot(p.trail, x = 0.0300, y = 0, width = 0.24, height = 0.99) +
-  draw_plot(p.road,  x = 0.2725, y = 0, width = 0.24, height = 0.99) +
-  draw_plot(p.horse, x = 0.5150, y = 0, width = 0.24, height = 0.99) +
-  draw_plot(p.OHV,   x = 0.7575, y = 0, width = 0.24, height = 0.99) +
-  draw_plot_label("Species", x = 0, y = 0.5, size = 40, angle = 90, hjust = 0)
-
-save_plot("Figure_Management_effects.jpg", p, ncol = 5, nrow = 7, dpi = 300)
+save_plot("community_relations/Management_relations_series.jpg", p, ncol = 2.5, nrow = 5.5, dpi = 200)
