@@ -97,18 +97,20 @@ write.csv(out, "Pct_man_effects_explained_species.csv", row.names = T)
 ## Define groups ##
 spp_assignments <- read.csv("data/Species_list_assigned.csv", header = TRUE, stringsAsFactors = FALSE)
 groups <- list(
-  community = Spp,
-  specialist = spp_assignments %>% filter(Hab_specialist) %>% pull(BirdCode),
-  generalist = spp_assignments %>% filter(!Hab_specialist) %>% pull(BirdCode),
-  migratory = spp_assignments %>% filter(Migratory) %>% pull(BirdCode),
-  nonmigratory = spp_assignments %>% filter(!Migratory) %>% pull(BirdCode),
-  large = spp_assignments %>% filter(Mass > median(Mass)) %>% pull(BirdCode),
-  small = spp_assignments %>% filter(Mass < median(Mass)) %>% pull(BirdCode),
+  Community = Spp,
+  Specialist = spp_assignments %>% filter(Hab_specialist) %>% pull(BirdCode),
+  Generalist = spp_assignments %>% filter(!Hab_specialist) %>% pull(BirdCode),
+  Migratory = spp_assignments %>% filter(Migratory) %>% pull(BirdCode),
+  NonMigratory = spp_assignments %>% filter(!Migratory) %>% pull(BirdCode),
+  Large = spp_assignments %>% filter(Mass > median(Mass)) %>% pull(BirdCode),
+  Small = spp_assignments %>% filter(Mass < median(Mass)) %>% pull(BirdCode),
   HumComm = spp_assignments %>% filter(HumanCommensal) %>% pull(BirdCode),
   NonHumComm = spp_assignments %>% filter(!HumanCommensal) %>% pull(BirdCode),
-  insectivore = spp_assignments %>% filter(Insectivore) %>% pull(BirdCode),
+  Omnivore = spp_assignments %>% filter(Omnivore) %>% pull(BirdCode),
+  NonOmnivore = spp_assignments %>% filter(!Omnivore) %>% pull(BirdCode),
+  Insectivore = spp_assignments %>% filter(Insectivore) %>% pull(BirdCode),
   NonInsectivore = spp_assignments %>% filter(!Insectivore) %>% pull(BirdCode),
-  ground = spp_assignments %>% filter(Ground) %>% pull(BirdCode),
+  Ground = spp_assignments %>% filter(Ground) %>% pull(BirdCode),
   NonGround = spp_assignments %>% filter(!Ground) %>% pull(BirdCode),
   SGCN = spp_assignments %>% filter(SGCN) %>% pull(BirdCode)
 )

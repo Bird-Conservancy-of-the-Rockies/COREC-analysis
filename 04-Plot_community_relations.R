@@ -33,6 +33,7 @@ groups <- list(
   migratory = spp_assignments %>% filter(Migratory) %>% pull(BirdCode),
   large = spp_assignments %>% filter(Mass > median(Mass)) %>% pull(BirdCode),
   HumComm = spp_assignments %>% filter(HumanCommensal) %>% pull(BirdCode),
+  omnivore = spp_assignments %>% filter(Omnivore) %>% pull(BirdCode),
   insectivore = spp_assignments %>% filter(Insectivore) %>% pull(BirdCode),
   ground = spp_assignments %>% filter(Ground) %>% pull(BirdCode),
   SGCN = spp_assignments %>% filter(SGCN) %>% pull(BirdCode)
@@ -53,7 +54,7 @@ dat.plt.traffic <- read.csv("data/Dat_plot_community_traffic.csv", header = TRUE
 dat.plt.speed <- read.csv("data/Dat_plot_community_speed.csv", header = TRUE, stringsAsFactors = FALSE)
 
 y.labs <- c("All species", "Habitat specialists", "Migratory species", "Large species", "Human commensals",
-            "Insectivores", "Ground species", "SGCN species")
+            "Omnivores", "Insectivores", "Ground species", "SGCN species")
 names(y.labs) <- names(groups)
 
 # Standard plots #
@@ -118,49 +119,54 @@ for(g in names(groups)) {
 }
 
 p <- ggdraw() +
-  draw_plot(p.trail.community,     x = 0.05, y = 0.83125,   width = 0.19, height = 0.11875) +
-  draw_plot(p.road.community,      x = 0.24, y = 0.83125,   width = 0.19, height = 0.11875) +
-  draw_plot(p.ohv.community,       x = 0.43, y = 0.83125,   width = 0.19, height = 0.11875) +
-  draw_plot(p.traffic.community,   x = 0.62, y = 0.83125,   width = 0.19, height = 0.11875) +
-  draw_plot(p.speed.community,     x = 0.81, y = 0.83125,   width = 0.19, height = 0.11875) +
-  draw_plot(p.trail.specialist,    x = 0.05, y = 0.71250,   width = 0.19, height = 0.11875) +
-  draw_plot(p.road.specialist,     x = 0.24, y = 0.71250,   width = 0.19, height = 0.11875) +
-  draw_plot(p.ohv.specialist,      x = 0.43, y = 0.71250,   width = 0.19, height = 0.11875) +
-  draw_plot(p.traffic.specialist,  x = 0.62, y = 0.71250,   width = 0.19, height = 0.11875) +
-  draw_plot(p.speed.specialist,    x = 0.81, y = 0.71250,   width = 0.19, height = 0.11875) +
-  draw_plot(p.trail.migratory,     x = 0.05, y = 0.59375,   width = 0.19, height = 0.11875) +
-  draw_plot(p.road.migratory,      x = 0.24, y = 0.59375,   width = 0.19, height = 0.11875) +
-  draw_plot(p.ohv.migratory,       x = 0.43, y = 0.59375,   width = 0.19, height = 0.11875) +
-  draw_plot(p.traffic.migratory,   x = 0.62, y = 0.59375,   width = 0.19, height = 0.11875) +
-  draw_plot(p.speed.migratory,     x = 0.81, y = 0.59375,   width = 0.19, height = 0.11875) +
-  draw_plot(p.trail.large,         x = 0.05, y = 0.47500,   width = 0.19, height = 0.11875) +
-  draw_plot(p.road.large,          x = 0.24, y = 0.47500,   width = 0.19, height = 0.11875) +
-  draw_plot(p.ohv.large,           x = 0.43, y = 0.47500,   width = 0.19, height = 0.11875) +
-  draw_plot(p.traffic.large,       x = 0.62, y = 0.47500,   width = 0.19, height = 0.11875) +
-  draw_plot(p.speed.large,         x = 0.81, y = 0.47500,   width = 0.19, height = 0.11875) +
-  draw_plot(p.trail.HumComm,       x = 0.05, y = 0.35625,   width = 0.19, height = 0.11875) +
-  draw_plot(p.road.HumComm,        x = 0.24, y = 0.35625,   width = 0.19, height = 0.11875) +
-  draw_plot(p.ohv.HumComm,         x = 0.43, y = 0.35625,   width = 0.19, height = 0.11875) +
-  draw_plot(p.traffic.HumComm,     x = 0.62, y = 0.35625,   width = 0.19, height = 0.11875) +
-  draw_plot(p.speed.HumComm,       x = 0.81, y = 0.35625,   width = 0.19, height = 0.11875) +
-  draw_plot(p.trail.insectivore,   x = 0.05, y = 0.23750,   width = 0.19, height = 0.11875) +
-  draw_plot(p.road.insectivore,    x = 0.24, y = 0.23750,   width = 0.19, height = 0.11875) +
-  draw_plot(p.ohv.insectivore,     x = 0.43, y = 0.23750,   width = 0.19, height = 0.11875) +
-  draw_plot(p.traffic.insectivore, x = 0.62, y = 0.23750,   width = 0.19, height = 0.11875) +
-  draw_plot(p.speed.insectivore,   x = 0.81, y = 0.23750,   width = 0.19, height = 0.11875) +
-  draw_plot(p.trail.ground,        x = 0.05, y = 0.11875,   width = 0.19, height = 0.11875) +
-  draw_plot(p.road.ground,         x = 0.24, y = 0.11875,   width = 0.19, height = 0.11875) +
-  draw_plot(p.ohv.ground,          x = 0.43, y = 0.11875,   width = 0.19, height = 0.11875) +
-  draw_plot(p.traffic.ground,      x = 0.62, y = 0.11875,   width = 0.19, height = 0.11875) +
-  draw_plot(p.speed.ground,        x = 0.81, y = 0.11875,   width = 0.19, height = 0.11875) +
-  draw_plot(p.trail.SGCN,          x = 0.05, y = 0.00000,   width = 0.19, height = 0.11875) +
-  draw_plot(p.road.SGCN,           x = 0.24, y = 0.00000,   width = 0.19, height = 0.11875) +
-  draw_plot(p.ohv.SGCN,            x = 0.43, y = 0.00000,   width = 0.19, height = 0.11875) +
-  draw_plot(p.traffic.SGCN,        x = 0.62, y = 0.00000,   width = 0.19, height = 0.11875) +
-  draw_plot(p.speed.SGCN,          x = 0.81, y = 0.00000,   width = 0.19, height = 0.11875) +
+  draw_plot(p.trail.community,     x = 0.05, y = 0.84444,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.road.community,      x = 0.24, y = 0.84444,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.ohv.community,       x = 0.43, y = 0.84444,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.traffic.community,   x = 0.62, y = 0.84444,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.speed.community,     x = 0.81, y = 0.84444,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.trail.specialist,    x = 0.05, y = 0.73888,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.road.specialist,     x = 0.24, y = 0.73888,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.ohv.specialist,      x = 0.43, y = 0.73888,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.traffic.specialist,  x = 0.62, y = 0.73888,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.speed.specialist,    x = 0.81, y = 0.73888,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.trail.migratory,     x = 0.05, y = 0.63333,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.road.migratory,      x = 0.24, y = 0.63333,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.ohv.migratory,       x = 0.43, y = 0.63333,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.traffic.migratory,   x = 0.62, y = 0.63333,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.speed.migratory,     x = 0.81, y = 0.63333,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.trail.large,         x = 0.05, y = 0.52777,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.road.large,          x = 0.24, y = 0.52777,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.ohv.large,           x = 0.43, y = 0.52777,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.traffic.large,       x = 0.62, y = 0.52777,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.speed.large,         x = 0.81, y = 0.52777,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.trail.HumComm,       x = 0.05, y = 0.42222,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.road.HumComm,        x = 0.24, y = 0.42222,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.ohv.HumComm,         x = 0.43, y = 0.42222,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.traffic.HumComm,     x = 0.62, y = 0.42222,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.speed.HumComm,       x = 0.81, y = 0.42222,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.trail.omnivore,      x = 0.05, y = 0.31666,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.road.omnivore,       x = 0.24, y = 0.31666,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.ohv.omnivore,        x = 0.43, y = 0.31666,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.traffic.omnivore,    x = 0.62, y = 0.31666,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.speed.omnivore,      x = 0.81, y = 0.31666,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.trail.insectivore,   x = 0.05, y = 0.21111,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.road.insectivore,    x = 0.24, y = 0.21111,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.ohv.insectivore,     x = 0.43, y = 0.21111,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.traffic.insectivore, x = 0.62, y = 0.21111,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.speed.insectivore,   x = 0.81, y = 0.21111,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.trail.ground,        x = 0.05, y = 0.10556,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.road.ground,         x = 0.24, y = 0.10556,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.ohv.ground,          x = 0.43, y = 0.10556,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.traffic.ground,      x = 0.62, y = 0.10556,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.speed.ground,        x = 0.81, y = 0.10556,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.trail.SGCN,          x = 0.05, y = 0.00000,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.road.SGCN,           x = 0.24, y = 0.00000,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.ohv.SGCN,            x = 0.43, y = 0.00000,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.traffic.SGCN,        x = 0.62, y = 0.00000,   width = 0.19, height = 0.1055556) +
+  draw_plot(p.speed.SGCN,          x = 0.81, y = 0.00000,   width = 0.19, height = 0.1055556) +
   draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
 
-save_plot("community_relations/Covariate_relations.jpg", p, ncol = 2, nrow = 3.5, dpi = 200)
+save_plot("community_relations/Covariate_relations.jpg", p, ncol = 2, nrow = 4, dpi = 200)
 
 ## Compare total and unexplained series ##
 dat.plt.trail <- read.csv("data/Dat_plot_community_trail_density.csv", header = TRUE, stringsAsFactors = FALSE) %>%
@@ -200,30 +206,33 @@ for(g in names(groups)) {
 }
 
 p <- ggdraw() +
-  draw_plot(p.trail.community,   x = 0.0500000, y = 0.83125, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.road.community,    x = 0.3666667, y = 0.83125, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.ohv.community,     x = 0.6833333, y = 0.83125, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.trail.specialist,  x = 0.0500000, y = 0.71250, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.road.specialist,   x = 0.3666667, y = 0.71250, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.ohv.specialist,    x = 0.6833333, y = 0.71250, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.trail.migratory,   x = 0.0500000, y = 0.59375, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.road.migratory,    x = 0.3666667, y = 0.59375, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.ohv.migratory,     x = 0.6833333, y = 0.59375, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.trail.large,       x = 0.0500000, y = 0.47500, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.road.large,        x = 0.3666667, y = 0.47500, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.ohv.large,         x = 0.6833333, y = 0.47500, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.trail.HumComm,     x = 0.0500000, y = 0.35625, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.road.HumComm,      x = 0.3666667, y = 0.35625, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.ohv.HumComm,       x = 0.6833333, y = 0.35625, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.trail.insectivore, x = 0.0500000, y = 0.23750, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.road.insectivore,  x = 0.3666667, y = 0.23750, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.ohv.insectivore,   x = 0.6833333, y = 0.23750, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.trail.ground,      x = 0.0500000, y = 0.11875, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.road.ground,       x = 0.3666667, y = 0.11875, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.ohv.ground,        x = 0.6833333, y = 0.11875, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.trail.SGCN,        x = 0.0500000, y = 0.00000, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.road.SGCN,         x = 0.3666667, y = 0.00000, width = 0.3166667, height = 0.11875) +
-  draw_plot(p.ohv.SGCN,          x = 0.6833333, y = 0.00000, width = 0.3166667, height = 0.11875) +
+  draw_plot(p.trail.community,   x = 0.0500000, y = 0.84444, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.road.community,    x = 0.3666667, y = 0.84444, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.ohv.community,     x = 0.6833333, y = 0.84444, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.trail.specialist,  x = 0.0500000, y = 0.73888, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.road.specialist,   x = 0.3666667, y = 0.73888, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.ohv.specialist,    x = 0.6833333, y = 0.73888, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.trail.migratory,   x = 0.0500000, y = 0.63333, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.road.migratory,    x = 0.3666667, y = 0.63333, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.ohv.migratory,     x = 0.6833333, y = 0.63333, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.trail.large,       x = 0.0500000, y = 0.52777, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.road.large,        x = 0.3666667, y = 0.52777, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.ohv.large,         x = 0.6833333, y = 0.52777, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.trail.HumComm,     x = 0.0500000, y = 0.42222, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.road.HumComm,      x = 0.3666667, y = 0.42222, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.ohv.HumComm,       x = 0.6833333, y = 0.42222, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.trail.omnivore,    x = 0.0500000, y = 0.31666, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.road.omnivore,     x = 0.3666667, y = 0.31666, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.ohv.omnivore,      x = 0.6833333, y = 0.31666, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.trail.insectivore, x = 0.0500000, y = 0.21111, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.road.insectivore,  x = 0.3666667, y = 0.21111, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.ohv.insectivore,   x = 0.6833333, y = 0.21111, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.trail.ground,      x = 0.0500000, y = 0.105556, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.road.ground,       x = 0.3666667, y = 0.105556, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.ohv.ground,        x = 0.6833333, y = 0.105556, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.trail.SGCN,        x = 0.0500000, y = 0.00000, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.road.SGCN,         x = 0.3666667, y = 0.00000, width = 0.3166667, height = 0.105556) +
+  draw_plot(p.ohv.SGCN,          x = 0.6833333, y = 0.00000, width = 0.3166667, height = 0.105556) +
   draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
 
-save_plot("community_relations/Management_relations_series.jpg", p, ncol = 2.5, nrow = 5.5, dpi = 200)
+save_plot("community_relations/Management_relations_series.jpg", p, ncol = 2.5, nrow = 6, dpi = 200)

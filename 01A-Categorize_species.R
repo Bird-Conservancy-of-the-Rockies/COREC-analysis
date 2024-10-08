@@ -28,8 +28,9 @@ dat_AVONET <- read.csv("C:/Users/quresh.latif/files/data/AVONET/AVONET2_Ebird.cs
 AVONET_fields <- dat_AVONET %>%
   mutate(Migratory = Migration %in% c(2, 3),
          HumanCommensal = Habitat == "Human Modified",
+         Omnivore = Trophic.Level == "Omnivore",
          Insectivore = Trophic.Niche == "Invertivore") %>%
-  select(Species2, Migratory, Mass, HumanCommensal, Insectivore)
+  select(Species2, Migratory, Mass, HumanCommensal, Omnivore, Insectivore)
 Spp_list <- Spp_list %>%
   left_join(AVONET_fields, by = c("ScientificName" = "Species2"))
 
