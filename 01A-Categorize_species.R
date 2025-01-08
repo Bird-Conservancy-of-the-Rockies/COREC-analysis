@@ -73,10 +73,18 @@ Spp_list <- Spp_list %>%
                                   Species %in% SaabPowell2005_BOW_nongrnd_spp, FALSE, NA)))
 
 # SGCN
-SGCN_spp <- read.csv("C:/Users/quresh.latif/files/data/CPW SWAP Species List.csv", header = TRUE) %>%
-  filter(Group == "Birds")
-Spp_list <- Spp_list %>%
-  mutate(SGCN = Species %in% SGCN_spp$Common_Name |
-           ScientificName %in% SGCN_spp$Species)
+#~~~~~~~~~For 2015 list~~~~~~~~~~~~~#
+# SGCN_spp <- read.csv("C:/Users/quresh.latif/files/data/CPW SWAP Species List.csv", header = TRUE) %>%
+#   filter(Group == "Birds")
+# Spp_list <- Spp_list %>%
+#   mutate(SGCN = Species %in% SGCN_spp$Common_Name |
+#            ScientificName %in% SGCN_spp$Species)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-write.csv(Spp_list, "data/Species_list_assigned.csv", row.names = FALSE)
+SGCN_spp <- read.csv("C:/Users/quresh.latif/files/data/CO Bird SGCN 2025.csv", header = TRUE) %>%
+  filter(Category != "SGIN")
+Spp_list <- Spp_list %>%
+  mutate(SGCN = Species %in% SGCN_spp$Common |
+           ScientificName %in% SGCN_spp$Taxonomic)
+
+write.csv(Spp_list, "data/Species_list_assigned_HabSpec0.csv", row.names = FALSE)

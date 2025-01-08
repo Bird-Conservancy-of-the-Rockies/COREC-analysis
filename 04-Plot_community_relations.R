@@ -12,7 +12,7 @@ load("data/Data_compiled.RData")
 
 #__________ Script inputs _____________#
 mod.nam <- "path"
-tab.plotting.values <- FALSE # Set to true if updating plotted values. Otherwise, will read from cached files.
+tab.plotting.values <- TRUE # Set to true if updating plotted values. Otherwise, will read from cached files.
 git.repo <- "COREC-analysis/"
 mod <- R.utils::loadObject(str_c("mod_", mod.nam))
 nsims <- dim(mod$mcmcOutput)[1]
@@ -109,7 +109,7 @@ for(g in names(groups)) {
                  "geom_line(data = dat.plt.HP1, aes(x = LogTrafficVol, y = ", g,
                  ".md), linewidth = 1) +",
                  "geom_errorbar(data = dat.plt.HP0, aes(x = LogTrafficVol,",
-                 "ymin = ", g, ".lo, ymax = ", g,".hi), size = 1) +",
+                 "ymin = ", g, ".lo, ymax = ", g,".hi), linewidth = 1) +",
                  "geom_point(data = dat.plt.HP0, aes(x = LogTrafficVol, y = ", g,
                  ".md), size = 3) +",
                  "scale_x_continuous(breaks = x.breaks, labels = x.labs.vals)+",
