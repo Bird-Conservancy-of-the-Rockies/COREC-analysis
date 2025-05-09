@@ -4,6 +4,7 @@ ngrdyrs <- max(CovIndMat[, "GrdYrInd"])
 nDet <- sum(n > 0)
 yearInd <- CovIndMat[, "YearInd"]
 nyear <- max(yearInd)
+ngrid <- max(CovIndMat[, "GridInd"])
 
 effort <- CovIndMat[, "Effort"]
 
@@ -75,17 +76,33 @@ if(any(beta.vars.quad)) {
 n.Xbeta <- dim(X.beta)[2]
 
 if(str_detect(mod.nam, "path")) {
-  ngrdyrs.hpresent <- sum(CovIndMat[, "HumanPresence"] == 1)
-  ind.hpresent <- which(CovIndMat[, "HumanPresence"] == 1)
+  CovIndMat.grid <- CovIndMat %>% data.frame() %>%
+    group_by(GridInd) %>%
+    summarise(HumanPresence = mean(HumanPresence, na.rm = TRUE),
+              LogTrafficNoZeros = mean(LogTrafficNoZeros, na.rm = TRUE),
+              Speed = mean(Speed, na.rm = TRUE)) %>%
+    data.matrix()
   
-  ngrdyrs.Speed <- sum(!is.na(CovIndMat[, "Speed"]))
-  ind.SpeedPresent <- which(!is.na(CovIndMat[, "Speed"]))
+  ngrid.hpresent <- sum(CovIndMat.grid[, "HumanPresence"] == 1)
+  ind.hpresent <- which(CovIndMat.grid[, "HumanPresence"] == 1)
+  
+  ngrid.Speed <- sum(!is.na(CovIndMat.grid[, "Speed"]))
+  ind.SpeedPresent <- which(!is.na(CovIndMat.grid[, "Speed"]))
+
+  X.beta.grid <- X.beta %>% data.frame() %>%
+    bind_cols(GridInd = CovIndMat[, "GridInd"]) %>%
+    group_by(GridInd) %>%
+    summarise(TrailTotm = mean(TrailTotm),
+              RoadTotm = mean(RoadTotm),
+              Prp_MotRestricted = mean(Prp_MotRestricted)) %>%
+    select(-GridInd) %>%
+    data.matrix()
   
   for(i in 1:length(Human.vars)) assign(str_c("ind.", Human.vars[i]),
-                                        which(dimnames(X.beta.raw)[[2]] == Human.vars[i]))
+                                        which(dimnames(CovIndMat.grid)[[2]] == Human.vars[i]))
   for(i in 1:length(Mangmt.vars)) assign(str_c("ind.", Mangmt.vars[i]),
-                                         which(dimnames(X.beta)[[2]] == Mangmt.vars[i]))
-  HumanPresence <- X.beta.raw[, ind.HumanPresence]
-  Traffic <- exp(X.beta.raw[ind.hpresent, ind.LogTrafficNoZeros])
-  Speed <- X.beta.raw[ind.SpeedPresent, ind.Speed]
+                                         which(dimnames(X.beta.grid)[[2]] == Mangmt.vars[i]))
+  HumanPresence <- CovIndMat.grid[, ind.HumanPresence]
+  Traffic <- exp(CovIndMat.grid[ind.hpresent, ind.LogTrafficNoZeros])
+  Speed <- CovIndMat.grid[ind.SpeedPresent, ind.Speed]
 }

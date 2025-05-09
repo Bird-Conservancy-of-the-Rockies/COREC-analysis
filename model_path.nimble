@@ -68,10 +68,10 @@ model <<- nimbleCode({
         ##~~~~~~~~~~~~~~~ Observation models ~~~~~~~~~~~~~~~~~~~##
         # Distance sampling
         
-        if(n.Xpp > 1) {
+        if(n.Xpp > 1) { # Kept this for generalizability, but this version is inactive for this study.
           log(a[s, j]) <- zeta0[s] + inprod(zetaVec[s, 1:n.Xpp], X.pp[j, 1:n.Xpp])
         }
-        if(n.Xpp == 1) {
+        if(n.Xpp == 1) { # This is the version active for this study since there was only one covariate on perceptiblity.
           log(a[s, j]) <- zeta0[s] + zetaVec[s, 1] * X.pp[j, 1]
         }
 
@@ -131,13 +131,13 @@ model <<- nimbleCode({
   BETA.Prp_MotRestricted.Speed ~ dnorm(0, 0.66667)
   shape.Speed ~ dgamma(1, 0.1)
   
-  for(j in 1:ngrdyrs) {
+  for(j in 1:ngrid) {
     ## Human presence ##
     HumanPresence[j] ~ dbern(pred.HumanPresence[j])
     logit(pred.HumanPresence[j]) <- BETA0.HumanPresence +
-      BETA.TrailTotm.HumanPresence * X.beta[j, ind.TrailTotm] +
-      BETA.RoadTotm.HumanPresence * X.beta[j, ind.RoadTotm] +
-      BETA.Prp_MotRestricted.HumanPresence * X.beta[j, ind.Prp_MotRestricted]
+      BETA.TrailTotm.HumanPresence * X.beta.grid[j, ind.TrailTotm] +
+      BETA.RoadTotm.HumanPresence * X.beta.grid[j, ind.RoadTotm] +
+      BETA.Prp_MotRestricted.HumanPresence * X.beta.grid[j, ind.Prp_MotRestricted]
     #_____ GOF _____#
     LLobs.HumanPresence[j] <- (HumanPresence[j] * pred.HumanPresence[j]) +
       ((1 - HumanPresence[j]) * (1 - pred.HumanPresence[j]))
@@ -147,13 +147,13 @@ model <<- nimbleCode({
     #_______________#
   }
   
-  for(j in 1:ngrdyrs.hpresent) {
+  for(j in 1:ngrid.hpresent) {
     ## Traffic volume where humans are present ##
     Traffic[j] ~ dgamma(shape.Traffic, rate.Traffic[j])
     log(pred.Traffic[j]) <- BETA0.Traffic +
-      BETA.TrailTotm.Traffic * X.beta[ind.hpresent[j], ind.TrailTotm] +
-      BETA.RoadTotm.Traffic * X.beta[ind.hpresent[j], ind.RoadTotm] +
-      BETA.Prp_MotRestricted.Traffic * X.beta[ind.hpresent[j], ind.Prp_MotRestricted]
+      BETA.TrailTotm.Traffic * X.beta.grid[ind.hpresent[j], ind.TrailTotm] +
+      BETA.RoadTotm.Traffic * X.beta.grid[ind.hpresent[j], ind.RoadTotm] +
+      BETA.Prp_MotRestricted.Traffic * X.beta.grid[ind.hpresent[j], ind.Prp_MotRestricted]
     rate.Traffic[j] <- shape.Traffic / pred.Traffic[j]
     #_____ GOF _____#
     LLobs.Traffic[j] <- logdens.gamma(Traffic[j], shape.Traffic, rate.Traffic[j])
@@ -162,13 +162,13 @@ model <<- nimbleCode({
     #_______________#
   }
   
-  for(j in 1:ngrdyrs.Speed) {
+  for(j in 1:ngrid.Speed) {
     ## Traffic speed where humans are present ##
     Speed[j] ~ dgamma(shape.Speed, rate.Speed[j])
     log(pred.Speed[j]) <- BETA0.Speed +
-      BETA.TrailTotm.Speed * X.beta[ind.SpeedPresent[j], ind.TrailTotm] +
-      BETA.RoadTotm.Speed * X.beta[ind.SpeedPresent[j], ind.RoadTotm] +
-      BETA.Prp_MotRestricted.Speed * X.beta[ind.SpeedPresent[j], ind.Prp_MotRestricted]
+      BETA.TrailTotm.Speed * X.beta.grid[ind.SpeedPresent[j], ind.TrailTotm] +
+      BETA.RoadTotm.Speed * X.beta.grid[ind.SpeedPresent[j], ind.RoadTotm] +
+      BETA.Prp_MotRestricted.Speed * X.beta.grid[ind.SpeedPresent[j], ind.Prp_MotRestricted]
     rate.Speed[j] <- shape.Speed / pred.Speed[j]
     #_____ GOF _____#
     LLobs.Speed[j] <- logdens.gamma(Speed[j], shape.Speed, rate.Speed[j])
@@ -178,16 +178,16 @@ model <<- nimbleCode({
   }
 
   #_______ GOF _______#
-  dev.obs.HumanPresence <- -2 * sum(LLobs.HumanPresence[1:ngrdyrs])
-  dev.sim.HumanPresence <- -2 * sum(LLsim.HumanPresence[1:ngrdyrs])
+  dev.obs.HumanPresence <- -2 * sum(LLobs.HumanPresence[1:ngrid])
+  dev.sim.HumanPresence <- -2 * sum(LLsim.HumanPresence[1:ngrid])
   test.HumanPresence <- step(dev.sim.HumanPresence - dev.obs.HumanPresence)
   
-  dev.obs.Traffic <- -2 * sum(LLobs.Traffic[1:ngrdyrs.hpresent])
-  dev.sim.Traffic <- -2 * sum(LLsim.Traffic[1:ngrdyrs.hpresent])
+  dev.obs.Traffic <- -2 * sum(LLobs.Traffic[1:ngrid.hpresent])
+  dev.sim.Traffic <- -2 * sum(LLsim.Traffic[1:ngrid.hpresent])
   test.Traffic <- step(dev.sim.Traffic - dev.obs.Traffic)
   
-  dev.obs.Speed <- -2 * sum(LLobs.Speed[1:ngrdyrs.Speed])
-  dev.sim.Speed <- -2 * sum(LLsim.Speed[1:ngrdyrs.Speed])
+  dev.obs.Speed <- -2 * sum(LLobs.Speed[1:ngrid.Speed])
+  dev.sim.Speed <- -2 * sum(LLsim.Speed[1:ngrid.Speed])
   test.Speed <- step(dev.sim.Speed - dev.obs.Speed)
   #___________________#
   })

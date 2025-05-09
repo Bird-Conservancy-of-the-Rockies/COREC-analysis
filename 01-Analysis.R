@@ -4,8 +4,8 @@ library(tidyr)
 library(dplyr)
 library(FunctionsBCR)
 
-setwd("~/COREC")
-#setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
+# setwd("~/COREC")
+setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
@@ -31,7 +31,7 @@ nt <- 100 # thinning
 # Data objects to send to JAGS
 data.nams.comm <- c("n", "dclass", "tint",
                     "X.beta", "X.pp", "X.pa")
-data.nams.paths <- c("HumanPresence", "Traffic", "Speed", "X.beta")
+data.nams.paths <- c("HumanPresence", "Traffic", "Speed", "X.beta.grid")
 
 constant.nams.comm <- c("nspp", "ngrdyrs",
                         "yearInd", "nyear",
@@ -40,8 +40,8 @@ constant.nams.comm <- c("nspp", "ngrdyrs",
                         
                         "n.Xpa", "n.Xpp", "n.Xbeta",
                         "det.ind", "spp.ind", "nDet")
-constant.nams.path <- c("ngrdyrs", "ngrdyrs.hpresent",
-                        "ngrdyrs.Speed",
+constant.nams.path <- c("ngrid", "ngrid.hpresent",
+                        "ngrid.Speed",
                         
                         "ind.hpresent", "ind.SpeedPresent",
                         
