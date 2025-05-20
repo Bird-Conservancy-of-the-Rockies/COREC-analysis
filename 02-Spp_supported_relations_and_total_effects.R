@@ -5,7 +5,7 @@ library(mcmcOutput)
 library(FunctionsBCR)
 
 setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
-load(str_c("data/Data_compiled.RData"))
+load("data/Data_compiled.RData")
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"

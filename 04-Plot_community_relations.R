@@ -12,7 +12,7 @@ load("data/Data_compiled.RData")
 
 #__________ Script inputs _____________#
 mod.nam <- "path"
-tab.plotting.values <- TRUE # Set to true if updating plotted values. Otherwise, will read from cached files.
+tab.plotting.values <- FALSE # Set to true if updating plotted values. Otherwise, will read from cached files.
 git.repo <- "COREC-analysis/"
 mod <- R.utils::loadObject(str_c("mod_", mod.nam))
 nsims <- dim(mod$mcmcOutput)[1]

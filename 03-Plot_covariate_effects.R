@@ -8,7 +8,7 @@ library(FunctionsBCR)
 theme_set(theme_bw())
 
 setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
-load(str_c("data/Data_compiled.RData"))
+load("data/Data_compiled.RData")
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
@@ -31,12 +31,14 @@ covs <- dimnames(X.beta)[[2]]
 spp.plot <- R.utils::loadObject("data/Spp_results")
 
 ## Generate plots ##
+ncov.relations.supported <- 0
 for(cov in covs) {
   beta.ind <- which(dimnames(X.beta)[[2]] == cov)
   beta <- mod$mcmcOutput$betaVec[,,beta.ind]
   dat <- tabulate_community_effect(Spp, beta, BCIpercent = 80) %>%
     filter(Spp %in% spp.plot) %>%
     mutate(index = rank(index))
+  ncov.relations.supported <- ncov.relations.supported + sum(dat$beta.supp != "none")
   
   p <- plot_community_effects(dat = dat, min.y = min(dat$beta.lo), max.y = max(dat$beta.hi),
                               pnam = "beta", vnam = cov)

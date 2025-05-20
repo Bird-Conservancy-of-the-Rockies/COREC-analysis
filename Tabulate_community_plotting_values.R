@@ -90,7 +90,7 @@ write.csv(dat.plt, "data/Dat_plot_community_traffic.csv", row.names = FALSE)
 
 # Speed #
 x.Speed <- seq(quantile(X.beta[, "Speed"], probs = 0.01, type = 8),
-               quantile(X.beta[, "LogTrafficNoZeros"], probs = 0.99, type = 8),
+               quantile(X.beta[, "Speed"], probs = 0.99, type = 8),
                length.out = n.series)
 X.speed.series <- array(NA, c(nsims, ncol(X.beta), n.series))
 dimnames(X.speed.series)[[2]] <- dimnames(X.beta)[[2]]
@@ -103,7 +103,8 @@ for(i in 1:n.series) {
   N.speed.series[,,i] <- N.pred.calc(X.speed.series[,,i], Spp)
 }
 
-dat.plt = data.frame(Speed = (x.Speed * cov.sd["Speed"] + cov.mn["Speed"]))
+dat.plt = data.frame(Speed = (x.Speed * cov.sd["Speed"] + cov.mn["Speed"]) * 1.609)
+              #Multiplying by 1.609 converts mi/hr in data to km/hr for manuscript
 for(g in names(groups)) {
   spp <- groups[[g]]
   D <- apply(N.speed.series[,spp,], c(1, 3), HillShannon)
