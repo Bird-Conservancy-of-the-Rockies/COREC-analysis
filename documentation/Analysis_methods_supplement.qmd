@@ -66,9 +66,9 @@ $$\mathbf{y_{[a],ijt}} \sim Multinomial \left(n_{ijt},\mathbf{π_{[a],ijt}^{[c]}
 
 <center>and</center>
 
-$$\mathbf{y_{[p],ijt}} \sim Multinomial \left(n_{ijt},\mathbf{π_{[p],ijt}^{[c]}} \right),$$ {#eq-obs_y_p}
+$$\mathbf{y_{[p],ijt}} \sim Multinomial \left(n_{ijt},\mathbf{π_{[p],ijt}^{[c]}} \right).$$ {#eq-obs_y_p}
 
-where $\mathbf{y_{[a],ijt}}$ and $\mathbf{y_{[p],ijt}}$ are vectors of counts within time removal and distance bins. Bin probabilities for availability assume constant availability across the survey period,
+Bin probabilities for availability assume constant availability across the survey period,
 
 $$π_{[a],ijtr}=p_{[ar],ijt} (1-p_{[ar],ijt})^{r-1},$$ {#eq-obs_pi_a_bin}
 
