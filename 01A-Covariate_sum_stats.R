@@ -6,6 +6,7 @@ library(FunctionsBCR)
 setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 load(str_c("data/Data_compiled.RData"))
 
+covariates$Speed <- covariates$Speed * 1.609 # Convert mi per hour to km per hour
 sumStats <- FunctionsBCR::SumStats_df(covariates,
                           vars = c("TrailTotm", "RoadTotm", "Prp_MotRestricted",
                                    "HumanPresence", "LogTrafficNoZeros", "Speed",
