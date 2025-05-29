@@ -1,0 +1,206 @@
+---
+title: "Supplement B: Model description and analysis methods"
+output: html
+number-sections: true
+css: styles.css
+bibliography: references.bib
+---
+
+## Analysis model
+
+### Indices
+
+$i$ - species; $I=150$ for all species
+
+$j$ - grid cells; $J=285$
+
+$t$ - years; $T=3$
+
+$d$ - distance bins; $d_{[max]}=10$
+
+$d_{[mid]}$, $d_{[low]}$, and $d_{[high]}$ are the distance mid-point, lower bound, and upper bound for distance bin $d$. $d_{[max,high]}$ is the upper bound for the furthest distance bin (i.e., the radius of the entire point-level plot).
+
+$r$ – 2-min time removal bins within the 6-min survey; $R=3$
+
+### Data
+
+A primary bird count observation consisted of the number of independent clusters detected for species $i$ at grid cell $j$ in year $t$. The primary analysis model for birds therefore estimated species-specific abundance of clusters, which we multiplied by cluster size to derive predicted abundance of individuals (further details in @sec-N_p). We organized primary count data as a 3-dimensional data array $\mathbf{n}$, where element $n_{ijt}$ is the number of clusters detected for species $i$ in grid cell $j$ and year $t$. We accompanied this primary data array with two secondary arrays representing the distribution of counted individuals among time removal and distance bins, $\mathbf{y_{[a]}}$ and $\mathbf{y_{[p]}}$, where elements $y_{[a],ijtr}$ and $y_{[p],ijtd}$ are counts within time removal bin $r$ and distance bin $d$, respectively. For $y_{[p],ijtd}$, we truncated the the furthest 5% of detections for each species for which we had $\geq75$ detections. Thus, for species with sufficient detections, the area of estimation corresponded with a circle of radius equal to the truncation distance centered on each surveyed point within a grid cell, and radius equal to the max distance for species with fewer detections.
+
+To support path analysis, we accompanied the bird model with a series of path models relating human mobility with management covariates. For each path model, data were unscaled values for a human mobility covariate, $X_{[H],j}$, transformed as necessary to meet distributional requirements for corresponding generalized linear models. Because management and human mobility covariates only varied spatially (see main text for rationale), data for path models were only indexed by grid cell. Moreover, $X_{[H_{Traffic~volume}],j}$ was restricted to grid cells where $X_{[H_{Human~presence}],j}=1$ ($n=175$), and $X_{[H_{Speed}],j}$ was restricted to grid cells in which >1 ping was recorded for at least one cell phone user in a single day ($n=121$).
+
+### Ecological process
+
+We modeled species abundance as
+
+$$N_{ijt} \sim Poisson(\lambda_{ijt}),$$ {#eq-eco_N}
+
+where $\lambda_{ijt}$ is mean abundance and $N_{ijt}$ is latent (cluster) abundance. We modeled abundance variability as
+
+$$log(\lambda_{ijt})=β_{0,i}+d_{[β_0],it}+\mathbf{β_{1,i}}×\mathbf{X_{jt}}$$ {#eq-eco_lambda}
+
+where $\beta_{0,i}$ is the intercept, $d_{[β],it}$ is a year-specific offset, and $\mathbf{β_i}$ is a vector of covariate relationships. We modeled $\beta_{0,i}$ and $\mathbf{β_i}$ as species-specific random effects, and $d_{[β],it}$ as a species×year-specific random effect. Hyper-parameter priors for these random effects were
+
+$$\overline{\beta} \sim Normal(0,1),$$ {#eq-eco_beta_mean}
+$$SD_{\beta} \sim gamma(1,1),$$ {#eq-eco_beta_SD}
+$$\overline{d_{[β_0]}} = 0,$$ {#eq-eco_d_mean}
+<center>and</center>
+$$SD_{d_{[β_0]}} \sim gamma(1,1).$$ {#eq-eco_d_SD}
+
+### Observation process
+
+We modeled count data as
+
+$$n_{ijt} \sim Binomial\left(N_{ijt},p_{[p],ijt}×p_{[a],ijt}×\left(\frac{E_{jt}}{16}\right)\right),$$ {#eq-obs_n}
+
+where $p_{[p],ijt}$ and $p_{[a],ijt}$ are perceptibility and availability components of detection probability, and $E_{jt}$ is the number of point surveys completed in the grid cell (i.e., effort, so $\frac{E_{jt}}{16}$ is proportion effort). Each detection component can be expressed as the sum of probability vectors:
+
+$$p_{[a],ijt}=\Sigma_{r=1}^{R} \pi_{[a],ijtr}$$ {#eq-obs_p_a}
+
+<center>and</center>
+
+$$p_{[p],ijt}=∑_{d=1}^{d_{max}} π_{[p],ijtd},$$ {#eq-obs_p_p}
+
+where $π_{[a],ijtr}$ and $π_{[p],ijtd}$ are detection probabilities within time removal and distance bins (hereafter bin probabilities), respectively. We modeled the distribution of counted clusters among time removal and distance bins, respectively, as
+
+$$\mathbf{y_{[a],ijt}} \sim Multinomial \left(n_{ijt},\mathbf{π_{[a],ijt}^{[c]}} \right)$$ {#eq-obs_y_a}
+
+<center>and</center>
+
+$$\mathbf{y_{[p],ijt}} \sim Multinomial \left(n_{ijt},\mathbf{π_{[p],ijt}^{[c]}} \right),$$ {#eq-obs_y_p}
+
+where $\mathbf{y_{[a],ijt}}$ and $\mathbf{y_{[p],ijt}}$ are vectors of counts within time removal and distance bins. Bin probabilities for availability assume constant availability across the survey period,
+
+$$π_{[a],ijtr}=p_{[ar],ijt} (1-p_{[ar],ijt})^{r-1},$$ {#eq-obs_pi_a_bin}
+
+where $p_{[ar],ijt}$ is the availability for a single 2-min time removal bin. Bin probabilities for perceptibility account for increasing area of bins with increasing distance from the surveyor,
+
+$$π_{[p],ijtd}=\frac{p_{[pd],ijtd}A_d}{∑_{d=1}^{d_{[max]}}A_d},$$ {#eq-abundance_pi_p_bin}
+
+where $p_{[pd],ijtd}$ is the perceptibility within distance bin $d$ in year $t$, and $A_d$ is the area of distance bin $d$. Multinomial cell probabilites for modeling $\mathbf{y_{[a],ijt}}$ and $\mathbf{y_{[p],ijt}}$ represent bin probabilites scaled to sum to 1:
+
+$$π_{[a],ijtr}^{[c]}=π_{[a],ijtr}⁄p_{[a],ijt},$$ {#eq-obs_pi_a_cell}
+
+<center>and</center>
+
+$$π_{[p],ijtd}^{[c]}=π_{[p],ijtd}⁄p_{[p],ijt}.$$ {#eq-obs_pi_p_cell}
+
+We modeled $p_{[pd],ijtd}$ using a hazard rate distance sampling model. Because of the lack of an analytical solution to the integral of the hazard rate function, we calculated $p_{[pd],ijtd}$ at the midpoint, $d_{[mid]}$, of each distance class:
+
+$$p_{[pd],ijtd}=1-exp\left(-\left(\frac{d_{[mid]}}{h_{ijt}}\right)^{b_i}\right),$$ {#eq-obs_p_pd}
+
+where $h_{ijt}$ and $b_i$ are estimated parameters for the hazard function.
+
+We used link functions to model spatial and temporal variability in availability and perceptibility:
+
+$$logit(p_{[ar],ijt}) = \theta_{0,i}+\mathbf{\theta_{1,i}}×\mathbf{X_{jt}}$$ {#eq-obs_p_ar}
+
+<center>and</center>
+
+$$log(h_{ijt}) = \zeta_{0,i}+\mathbf{\zeta_{1,i}}×\mathbf{X_{jt}},$$ {#eq-obs_h}
+
+where $\theta_{0,i}$ and $\zeta_{0,i}$ are intercepts and $\mathbf{\theta_i}$ and $\mathbf{\zeta_i}$ are coefficient vectors for covariate relationships. As with ecological parameters, we modeled all intercepts and covariate coefficients as species-specific random effects. Hyper-parameter priors for detectability random effects were
+
+$$\overline{\zeta_0} \sim Normal(4.5,0.67),$$ {#eq-obs_zeta0_mean}
+$$\overline{\zeta_1} \sim Normal(0,1),$$ {#eq-obs_zeta_mean}
+$$SD_{\zeta_0},SD_{\zeta_1} \sim gamma(1,1),$$ {#eq-obs_beta_SD}
+$$\overline{b} \sim Uniform(0,20),$$ {#eq-obs_b_mean}
+$$SD_{b} \sim gamma(1,1),$$ {#eq-obs_b_SD}
+$$\overline{\theta_0} \sim Normal(0,0.67),$$ {#eq-obs_theta0_mean}
+$$\overline{\theta_1} \sim Normal(0,1),$$ {#eq-obs_theta_SD}
+<center>and</center>
+$$SD_{\theta_0},SD_{\theta_1} \sim gamma(1,1).$$ {#eq-obs_b_SD}
+
+### Path models
+
+We modeled each human mobility covariate as a function of management covariates using a generalized linear model:
+
+$$X_{[H],j} \sim F(p_{[H],j})$$ {#eq-path_distribution}
+
+<center>and</center>
+
+$$p_{[H],j} = f(B_{[H,0]}+\mathbf{B_{[H,1]}×X_{[M],j}}),$$ {#eq-path_link}
+
+wherein $F$ is a probability function (probability distribution for continuous or probability mass for discrete $X_{[H]}$, respectively), $p_{[H]}$ is a linear predictor, $f$ is a link function that scales the linear predictor, $B_{[H,0]}$ is a regression intercept, and $\mathbf{B_{[H,1]}}$ is a vector of regression slope parameters quantifying relationships with management covariates $\mathbf{X_{[M]}}$. We modeled human presence as Bernoulli distributed,
+
+$$X_{[H],j}\sim Bernoulli(p_{[H],j}),$$ {#eq-Human_presence_distribution}
+
+with a logit link function,
+
+$$logit(p_{[H],j}) = B_{[H,0]}+\mathbf{B_{[H,1]}}×\mathbf{X_{[M],j}}.$$ {#eq-Human_presence_link}
+
+We modeled traffic volume and speed as gamma distributed,
+
+$$X_{[H],j}\sim Gamma(r_{[H]}, r_{[H]} / p_{[H],j}),$$ {#eq-Traffic_volume_speed_distribution}
+
+with a log link function for the linear predictor,
+
+$$log(p_{[H],j}) = B_{[H,0]}+\mathbf{B_{[H,1]}}×\mathbf{X_{[M],j}},$$ {#eq-Traffic_volume_speed_link}
+
+and $r_{[H]}$ representing an additionally estimated shape parameter. We used $B \sim Normal(0,0.66667)$ priors for all regression parameters (@eq-Human_presence_link and @eq-Traffic_volume_speed_distribution) and $r \sim gamma(1,1)$ for Gamma regression shape parameters ($r_{[H]}$ in @eq-Traffic_volume_speed_distribution). For path models, we implemented posterior predictive goodness-of-fit (GOF) checks, whereby p-values quantified the proportion of deviances for simuated datasets that exceeded those of observed data [@GelmanHill-2007]. None of the p-values for these models were extreme ($p=0.4$), indicating no evidence for lack of fit.
+
+## Model fitting
+
+We fitted our analysis model in R [@R-base] using the R package NIMBLE [@Nimble-2017;-@Nimble-2023]. We ran three parallel MCMC chains with burn-in = 10000. We checked convergence and sampling metrics every 20100 iterations, limited the number of posterior samples saved to 1000, and discontinued sampling once we had reached $\widehat{R} \le 1.1$ and $n_{effective} \ge 100$ for all parameters [@GelmanHill-2007]. With these specifications and constraints, our final chain length = 482400 iterations with a thinning rate of 472.4. We also visually inspected trace plots for parameters with the least $n_{effective}$ and greatest $\widehat{R}$ to further verify arrival of MCMC sampling at a stationary distribution.
+
+## Derived parameters
+
+### Predicted abundance adjusted for cluster size {#sec-N_p}
+
+We drew inference primarily from comparisons of predicted diversity across covariate space, which first required predicting species abundance. If we represent a location in covariate space to which we wanted to predict as $\mathbf{X_p}$, we predicted mean abundance at that location as
+
+$$N_{p,i}=\lambda_{p,i}×c_i,$$ {#eq-pred_N}
+
+where $\lambda_{p,i}$ is calculated as
+
+$$log(\lambda_{p,i})=β_{0,i}+\mathbf{β_{1,i}}×\mathbf{X_p},$$ {#eq-pred_lambda}
+
+and $c_i$ is cluster size for species $i$. Of $51,163$ detected clusters, $97.4\%$ consisted of a single detected individual and the remaining $2.6\%$ of clusters consisted of $\geq 2$ non-independently detected individuals (e.g., members of breeding pair detected together). When possible, we derived $c_i$ by drawing values for each MCMC posterior sample from a truncated normal distribution, $\widehat{\overline{c_i}} \sim Normal(\overline{X_{c_i}},SE_{X_{c_i}})T(1,)$, where $\overline{X_{c_i}}$ and $SE_{X_{c_i}}$ are the sample mean and standard error ($SE_{X_{c_i}}=SD_{X_{c_i}}/\sqrt{n}$), respectively. For 55 species, we either recorded all cluster sizes = 1 or detected only one cluster, in which case $SE_{X_{c_i}}$ was undefined so $c_i=\overline{X_{c_i}}$.
+
+### Diversity
+We used the Hill-Shannon index to quantify bird diversity [@RoswellEtAl-2021]. For any species group $I$, we derived predicted diversity as
+
+$$D_p = exp\left(-1×\sum_{i=1}^{I}\left(\frac{N_{p,i}}{\sum_{i=1}^{I}N_{p,i}}×log\left(\frac{N_{p,i}}{\sum_{i=1}^{I}N_{p,i}}\right)\right)\right).$$ {#eq-pred_D}
+
+Figures 3 and 4 present $D_p$ along covariate gradients, and we used differences in $D_p$ between alternative locations in covariate space to partition management relationships with diversity into their underlying components (see @sec-path_analysis).
+
+## Path analysis {#sec-path_analysis}
+
+### Total management relationships {#sec-total_relations}
+
+We followed @Clough-2012 to quantify components of management relationships with bird diversity. We expressed the total relationship of a management covariate, $X_{[M]}$, with bird diversity as
+
+$$B_{[M,T]}^{[D]}=log(D_{p,M}/D_{p,R}),$$ {#eq-total_management_effect}
+
+where $D_{p,M}$ and $D_{p,R}$ are predicted diversity (@eq-pred_D) calculated with covariate values representing management and reference scenarios, respectively. The set of covariate values representing management and reference scenarios depended on which management relationship we were deriving. We identified 5 fundamental scenarios for calculating total management relationships (vegetation covariates set to their mean for all scenarios):
+
+<div class="hanging-indent">
+*Baseline* - $X_{p}^{[Base]}$ - Trail and road densities are set to $0$, and proportion no OHV set to its mean.<br>
+</div>
+<div class="hanging-indent">
+*Some trails, average OHV* - $X_{p}^{[Trails,\overline{OHV}]}$ - Trail density is set to $2.0~km/km^2$ (i.e., $0+1SD$), road density to $0$, and proportion no OHV to its mean.<br>
+</div>
+<div class="hanging-indent">
+*Some trails, no OHV* - $X_{p}^{[Trails,OHV=0]}$ - Trail density is set to $2.0~km/km^2$, road density to $0$, and proportion no OHV to $0$.<br>
+</div>
+<div class="hanging-indent">
+*Some trails, unrestricted OHV* - $X_{p}^{[Trails,OHV=1]}$ - Trail density is set to $2.0~km/km^2$, road density to $0$, and proportion no OHV to $1$.<br>
+</div>
+<div class="hanging-indent">
+*Some roads* - $X_{p}^{[Roads]}$ - Road density is set to $1.0~km/km^2$ (i.e., $0+1SD$), trail density to $0$, and proportion no OHV to its mean.<br>
+</div>
+
+For total management relationships, we set values for each human mobility covariate, $X_{[H],p}$, to $p_{[H]}$ from the corresponding path model (@eq-Human_presence_link or @eq-Traffic_volume_speed_link) informed with scenario-specific management covariate values. We then assigned management and reference scenarios for calculating total management relationships (@eq-total_management_effect) as follows:
+
+Trail density - management = *Some trails, average OHV*; reference = *Baseline*<br>
+Road density - management = *Some roads*; reference = *Baseline*<br>
+Proportion no OHV - management = *Some trails, no OHV*; reference = *Some trails, unrestricted OHV*<br>
+
+### Mechanistic contributions {#sec-mech_contributions}
+
+We quantified the percent contribution of human mobility to management relationships with diversity by calculating the portion of the total relationship explained by human mobility [i.e., indirect relationship *sensu* @Clough-2012], and then dividing the explained by the total relationship (and multiplying by 100). For the explained portion of the total relationship, we first defined a counter-factual scenario wherein human mobility covariates were set to values representing the reference instead of management levels. For example, the counter-factual scenario for calculating the proportion of the trail density effect would be represented by setting management covariates to *Some trails, average OHV* but human mobility covariates to *Baseline*. We then calculated the explained portion of the management relationship as
+
+$$B_{[M,E]}^{[D]}=log(D_{p,M}/D_{p,C}),$$ {#eq-explained_management_effect}
+
+where $D_{p,C}$ is predicted diversity under the counter-factual scenarios. We then calculate the percent contribution of human mobility as
+
+$$P_{H}=\left(B_{[M,E]}/B_{[M,T]}\right)×100.$$ {#eq-percent_explained}
