@@ -36,6 +36,8 @@ tabulate_community_effect <- function(Spp, beta, BCIpercent = 95) {
 }
 
 plot_community_effects <- function(dat, min.y, max.y, pnam, vnam) {
+  quadratic <- str_sub(vnam, -2, -1) == "^2"
+  if(quadratic) vnam <- str_sub(vnam, 1, -3)
   p <- ggplot(dat = dat, aes(x = index, y = beta.md)) +
     geom_errorbar(aes(ymin = beta.lo, ymax = beta.hi, color = beta.supp),
                   linewidth = 1, width = 0) +
@@ -53,7 +55,11 @@ plot_community_effects <- function(dat, min.y, max.y, pnam, vnam) {
       p <- p + scale_color_manual(values = c("#D55E00"))
     }
   }
-  eval(parse(text = str_c("p <- p + ylab(expression(hat(", pnam, ")['", vnam, "']))")))
+  if(quadratic) {
+    eval(parse(text = str_c("p <- p + ylab(expression(hat(", pnam, ")['", vnam, "'^2]))")))
+  } else {
+    eval(parse(text = str_c("p <- p + ylab(expression(hat(", pnam, ")['", vnam, "']))")))
+  }
   p <- p + xlab(NULL) +
     theme(axis.title.y=element_text(size=30)) +
     theme(axis.title.x=element_text(size=30)) +

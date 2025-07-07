@@ -1,5 +1,5 @@
 ---
-title: "Supplement B: Model description and analysis methods"
+title: "Suppl. S2: Model description and analysis methods"
 output: html
 number-sections: true
 css: styles.css
@@ -26,7 +26,7 @@ $r$ – 2-min time removal bins within the 6-min survey; $R=3$
 
 A primary bird count observation consisted of the number of independent clusters detected for species $i$ at grid cell $j$ in year $t$. The primary analysis model for birds therefore estimated species-specific abundance of clusters, which we multiplied by cluster size to derive predicted abundance of individuals (further details in @sec-N_p). We organized primary count data as a 3-dimensional data array $\mathbf{n}$, where element $n_{ijt}$ is the number of clusters detected for species $i$ in grid cell $j$ and year $t$. We accompanied this primary data array with two secondary arrays representing the distribution of counted individuals among time removal and distance bins, $\mathbf{y_{[a]}}$ and $\mathbf{y_{[p]}}$, where elements $y_{[a],ijtr}$ and $y_{[p],ijtd}$ are counts within time removal bin $r$ and distance bin $d$, respectively. For $y_{[p],ijtd}$, we truncated the the furthest 5% of detections for each species for which we had $\geq75$ detections. Thus, for species with sufficient detections, the area of estimation corresponded with a circle of radius equal to the truncation distance centered on each surveyed point within a grid cell, and radius equal to the max distance for species with fewer detections.
 
-To support path analysis, we accompanied the bird model with a series of path models relating human mobility with management covariates. For each path model, data were unscaled values for a human mobility covariate, $X_{[H],j}$, transformed as necessary to meet distributional requirements for corresponding generalized linear models. Because management and human mobility covariates only varied spatially (see main text for rationale), data for path models were only indexed by grid cell. Moreover, $X_{[H_{Traffic~volume}],j}$ was restricted to grid cells where $X_{[H_{Human~presence}],j}=1$ ($n=175$), and $X_{[H_{Speed}],j}$ was restricted to grid cells in which >1 ping was recorded for at least one cell phone user in a single day ($n=121$).
+To support path analysis, we accompanied the bird model with a series of path models relating human traffic with management covariates. For each path model, data were unscaled values for a human traffic covariate, $X_{[H],j}$, transformed as necessary to meet distributional requirements for corresponding generalized linear models. Because management and human traffic covariates only varied spatially (see main text for rationale), data for path models were only indexed by grid cell. Moreover, $X_{[H_{Conditional~traffic~intensity}],j}$ was restricted to grid cells where $X_{[H_{Humans~detected}],j}=1$ ($n=175$), and $X_{[H_{Traffic~speed}],j}$ was restricted to grid cells in which >1 ping was recorded for at least one cell phone user in a single day ($n=121$).
 
 ### Ecological process
 
@@ -88,7 +88,7 @@ We modeled $p_{[pd],ijtd}$ using a hazard rate distance sampling model. Because 
 
 $$p_{[pd],ijtd}=1-exp\left(-\left(\frac{d_{[mid]}}{h_{ijt}}\right)^{b_i}\right),$$ {#eq-obs_p_pd}
 
-where $h_{ijt}$ and $b_i$ are estimated parameters for the hazard function.
+where $h_{ijt}$ and $b_i$ are estimated parameters for the hazard function. A critical assumption with distance sampling is that distance measurements are exact. With point-based surveys in particular, random measurement error can positively bias abundance estimates. Binning distances as we did here relaxes this assumption [@BucklandEtAl-2001]. Moreover, we train observers to collect accurate distance measurements from aural detections following the recommendation of Buckland et al.(2001, pg. 300), who state "It is the nearer detections for which accurate distance estimation is most critical, and for these, it is usually possible to determine which tree, bush or vegetation patch a singing or calling bird is in. Laser binoculars can then be used to measure the distance to an object (a tree, branch, bush, patch of ground, etc.) that is at about the same distance as the bird. Note that it is much better to measure accurately to a guessed location than to guess the distance to a guessed location. Not only does it remove a source of bias and variability but it also removes rounding error from distance estimates, making the task of modelling the data more straightforward."
 
 We used link functions to model spatial and temporal variability in availability and perceptibility:
 
@@ -112,7 +112,7 @@ $$SD_{\theta_0},SD_{\theta_1} \sim gamma(1,1).$$ {#eq-obs_b_SD}
 
 ### Path models
 
-We modeled each human mobility covariate as a function of management covariates using a generalized linear model:
+We modeled each human traffic covariate as a function of management covariates using a generalized linear model:
 
 $$X_{[H],j} \sim F(p_{[H],j})$$ {#eq-path_distribution}
 
@@ -120,23 +120,23 @@ $$X_{[H],j} \sim F(p_{[H],j})$$ {#eq-path_distribution}
 
 $$p_{[H],j} = f(B_{[H,0]}+\mathbf{B_{[H,1]}×X_{[M],j}}),$$ {#eq-path_link}
 
-wherein $F$ is a probability function (probability distribution for continuous or probability mass for discrete $X_{[H]}$, respectively), $p_{[H]}$ is a linear predictor, $f$ is a link function that scales the linear predictor, $B_{[H,0]}$ is a regression intercept, and $\mathbf{B_{[H,1]}}$ is a vector of regression slope parameters quantifying relationships with management covariates $\mathbf{X_{[M]}}$. We modeled human presence as Bernoulli distributed,
+wherein $F$ is a probability function (probability distribution for continuous or probability mass for discrete $X_{[H]}$, respectively), $p_{[H]}$ is a linear predictor, $f$ is a link function that scales the linear predictor, $B_{[H,0]}$ is a regression intercept, and $\mathbf{B_{[H,1]}}$ is a vector of regression slope parameters quantifying relationships with management covariates $\mathbf{X_{[M]}}$. We modeled humans detected as Bernoulli distributed,
 
-$$X_{[H],j}\sim Bernoulli(p_{[H],j}),$$ {#eq-Human_presence_distribution}
+$$X_{[H],j}\sim Bernoulli(p_{[H],j}),$$ {#eq-Humans_detected_distribution}
 
 with a logit link function,
 
-$$logit(p_{[H],j}) = B_{[H,0]}+\mathbf{B_{[H,1]}}×\mathbf{X_{[M],j}}.$$ {#eq-Human_presence_link}
+$$logit(p_{[H],j}) = B_{[H,0]}+\mathbf{B_{[H,1]}}×\mathbf{X_{[M],j}}.$$ {#eq-Humans_detected_link}
 
-We modeled traffic volume and speed as gamma distributed,
+We modeled traffic intensity and speed as gamma distributed,
 
-$$X_{[H],j}\sim Gamma(r_{[H]}, r_{[H]} / p_{[H],j}),$$ {#eq-Traffic_volume_speed_distribution}
+$$X_{[H],j}\sim Gamma(r_{[H]}, r_{[H]} / p_{[H],j}),$$ {#eq-Traffic_intensity_speed_distribution}
 
 with a log link function for the linear predictor,
 
-$$log(p_{[H],j}) = B_{[H,0]}+\mathbf{B_{[H,1]}}×\mathbf{X_{[M],j}},$$ {#eq-Traffic_volume_speed_link}
+$$log(p_{[H],j}) = B_{[H,0]}+\mathbf{B_{[H,1]}}×\mathbf{X_{[M],j}},$$ {#eq-Traffic_intensity_speed_link}
 
-and $r_{[H]}$ representing an additionally estimated shape parameter. We used $B \sim Normal(0,0.66667)$ priors for all regression parameters (@eq-Human_presence_link and @eq-Traffic_volume_speed_distribution) and $r \sim gamma(1,1)$ for Gamma regression shape parameters ($r_{[H]}$ in @eq-Traffic_volume_speed_distribution). For path models, we implemented posterior predictive goodness-of-fit (GOF) checks, whereby p-values quantified the proportion of deviances for simuated datasets that exceeded those of observed data [@GelmanHill-2007]. None of the p-values for these models were extreme ($p=0.4$), indicating no evidence for lack of fit.
+and $r_{[H]}$ representing an additionally estimated shape parameter. We used $B \sim Normal(0,0.66667)$ priors for all regression parameters (@eq-Humans_detected_link and @eq-Traffic_intensity_speed_distribution) and $r \sim gamma(1,1)$ for Gamma regression shape parameters ($r_{[H]}$ in @eq-Traffic_intensity_speed_distribution). For path models, we implemented posterior predictive goodness-of-fit (GOF) checks, whereby p-values quantified the proportion of deviances for simuated datasets that exceeded those of observed data [@GelmanHill-2007]. None of the p-values for these models were extreme ($p=0.4$), indicating no evidence for lack of fit.
 
 ## Model fitting
 
@@ -189,7 +189,7 @@ where $D_{p,M}$ and $D_{p,R}$ are predicted diversity (@eq-pred_D) calculated wi
 *Some roads* - $X_{p}^{[Roads]}$ - Road density is set to $1.0~km/km^2$ (i.e., $0+1SD$), trail density to $0$, and proportion no OHV to its mean.<br>
 </div>
 
-For total management relationships, we set values for each human mobility covariate, $X_{[H],p}$, to $p_{[H]}$ from the corresponding path model (@eq-Human_presence_link or @eq-Traffic_volume_speed_link) informed with scenario-specific management covariate values. We then assigned management and reference scenarios for calculating total management relationships (@eq-total_management_effect) as follows:
+For total management relationships, we set values for each human traffic covariate, $X_{[H],p}$, to $p_{[H]}$ from the corresponding path model (@eq-Humans_detected_link or @eq-Traffic_intensity_speed_link) informed with scenario-specific management covariate values. We then assigned management and reference scenarios for calculating total management relationships (@eq-total_management_effect) as follows:
 
 Trail density - management = *Some trails, average OHV*; reference = *Baseline*<br>
 Road density - management = *Some roads*; reference = *Baseline*<br>
@@ -197,10 +197,10 @@ Proportion no OHV - management = *Some trails, no OHV*; reference = *Some trails
 
 ### Mechanistic contributions {#sec-mech_contributions}
 
-We quantified the percent contribution of human mobility to management relationships with diversity by calculating the portion of the total relationship explained by human mobility [i.e., indirect relationship *sensu* @Clough-2012], and then dividing the explained by the total relationship (and multiplying by 100). For the explained portion of the total relationship, we first defined a counter-factual scenario wherein human mobility covariates were set to values representing the reference instead of management levels. For example, the counter-factual scenario for calculating the proportion of the trail density effect would be represented by setting management covariates to *Some trails, average OHV* but human mobility covariates to *Baseline*. We then calculated the explained portion of the management relationship as
+We quantified the percent contribution of human traffic to management relationships with diversity by calculating the portion of the total relationship explained by human traffic [i.e., indirect relationship *sensu* @Clough-2012], and then dividing the explained by the total relationship (and multiplying by 100). For the explained portion of the total relationship, we first defined a counter-factual scenario wherein human traffic covariates were set to values representing the reference instead of management levels. For example, the counter-factual scenario for calculating the proportion of the trail density effect would be represented by setting management covariates to *Some trails, average OHV* but human traffic covariates to *Baseline*. We then calculated the explained portion of the management relationship as
 
 $$B_{[M,E]}^{[D]}=log(D_{p,M}/D_{p,C}),$$ {#eq-explained_management_effect}
 
-where $D_{p,C}$ is predicted diversity under the counter-factual scenarios. We then calculate the percent contribution of human mobility as
+where $D_{p,C}$ is predicted diversity under the counter-factual scenarios. We then calculate the percent contribution of human traffic as
 
 $$P_{H}=\left(B_{[M,E]}/B_{[M,T]}\right)×100.$$ {#eq-percent_explained}
