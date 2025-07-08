@@ -1,10 +1,17 @@
+TITLE: Human traffic explains recreation impacts for Colorado breeding bird diversity<br>
+AUTHORS: Quresh S. Latif, Liza G. Rossi, Matthew F. McLaren, Jennifer M. Timmer, Melissa A. Dressen, Christopher C. Keefe, Heather N. Abernathy, Mark A. Ditmer<br>
+JOURNAL: Ecological Applications
+
 ---
-title: "Suppl. S2: Model description and analysis methods"
 output: html
 number-sections: true
 css: styles.css
 bibliography: references.bib
 ---
+
+<p style="text-align: center;">
+<span style="font-size: 35px;">Appendix S2: Model description and analysis methods</span>
+</p>
 
 ## Analysis model
 

@@ -39,6 +39,20 @@ groups <- list(
   SGCN = spp_assignments %>% filter(SGCN) %>% pull(BirdCode)
 )
 write.csv(data.frame(Groups = names(groups), nSpec = lengths(groups)), "nSpp_groups.csv", row.names = FALSE)
+spp_assignments %>% # Write assignments to table for manuscript
+  mutate(DietSpecialist = !Omnivore,
+         Small = Mass < median(Mass)) %>%
+  select(Species, ScientificName, BirdCode, Sum_counts, Hab_specialist, Migratory,
+         Small, HumanCommensal, DietSpecialist, Insectivore, Ground, SGCN) %>%
+  mutate(Hab_specialist = as.numeric(Hab_specialist),
+         Migratory = as.integer(Migratory),
+         Small = as.integer(Small),
+         HumanCommensal = as.integer(HumanCommensal),
+         DietSpecialist = as.integer(DietSpecialist),
+         Insectivore = as.integer(Insectivore),
+         Ground = as.integer(Ground),
+         SGCN = as.integer(SGCN)) %>%
+  write.csv("data/Species_list_assignments_final.csv", row.names = FALSE)
 
 ##########################
 # Compile values to plot #
