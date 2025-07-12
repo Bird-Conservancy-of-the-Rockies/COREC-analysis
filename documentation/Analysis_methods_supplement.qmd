@@ -3,7 +3,7 @@ AUTHORS: Quresh S. Latif, Liza G. Rossi, Matthew F. McLaren, Jennifer M. Timmer,
 JOURNAL: Ecological Applications
 
 ---
-output: html
+output: pdf
 number-sections: true
 css: styles.css
 bibliography: references.bib
@@ -25,13 +25,13 @@ $t$ - years; $T=3$
 
 $d$ - distance bins; $d_{[max]}=10$
 
-$d_{[mid]}$, $d_{[low]}$, and $d_{[high]}$ are the distance mid-point, lower bound, and upper bound for distance bin $d$. $d_{[max,high]}$ is the upper bound for the furthest distance bin (i.e., the radius of the entire point-level plot).
+$d_{[mid],i}$, $d_{[low],i}$, and $d_{[high],i}$ are the distance mid-point, lower bound, and upper bound for distance bin $d$ and species $i$. $d_{[max,high],i}$ is the upper bound for the furthest distance bin (i.e., the radius of the entire point-level plot) for species $i$.
 
 $r$ – 2-min time removal bins within the 6-min survey; $R=3$
 
 ### Data
 
-A primary bird count observation consisted of the number of independent clusters detected for species $i$ at grid cell $j$ in year $t$. The primary analysis model for birds therefore estimated species-specific abundance of clusters, which we multiplied by cluster size to derive predicted abundance of individuals (further details in @sec-N_p). We organized primary count data as a 3-dimensional data array $\mathbf{n}$, where element $n_{ijt}$ is the number of clusters detected for species $i$ in grid cell $j$ and year $t$. We accompanied this primary data array with two secondary arrays representing the distribution of counted individuals among time removal and distance bins, $\mathbf{y_{[a]}}$ and $\mathbf{y_{[p]}}$, where elements $y_{[a],ijtr}$ and $y_{[p],ijtd}$ are counts within time removal bin $r$ and distance bin $d$, respectively. For $y_{[p],ijtd}$, we truncated the the furthest 5% of detections for each species for which we had $\geq75$ detections. Thus, for species with sufficient detections, the area of estimation corresponded with a circle of radius equal to the truncation distance centered on each surveyed point within a grid cell, and radius equal to the max distance for species with fewer detections.
+A primary bird count observation consisted of the number of independent clusters detected for species $i$ at grid cell $j$ in year $t$. The primary analysis model for birds therefore estimated species-specific abundance of clusters, which we multiplied by cluster size to derive predicted abundance of individuals (further details in @sec-N_p). We organized primary count data as a 3-dimensional data array $\mathbf{n}$, where element $n_{ijt}$ is the number of clusters detected for species $i$ in grid cell $j$ and year $t$. We accompanied this primary data array with two secondary arrays representing the distribution of counted individuals among time removal and distance bins, $\mathbf{y_{[a]}}$ and $\mathbf{y_{[p]}}$, where elements $y_{[a],ijtr}$ and $y_{[p],ijtd}$ are counts within time removal bin $r$ and distance bin $d$, respectively. For $y_{[p],ijtd}$, we truncated the the furthest 5% of detections for each species $i$ for which we had $\geq75$ detections; for these species, the area of estimation corresponded with a circle of radius equal to $d_{[max,high],i}$ centered on each surveyed point within a grid cell. For species with $<75$ detections, the radius for the area of estimation equaled the max distance recorded.
 
 To support path analysis, we accompanied the bird model with a series of path models relating human traffic with management covariates. For each path model, data were unscaled values for a human traffic covariate, $X_{[H],j}$, transformed as necessary to meet distributional requirements for corresponding generalized linear models. Because management and human traffic covariates only varied spatially (see main text for rationale), data for path models were only indexed by grid cell. Moreover, $X_{[H_{Conditional~traffic~intensity}],j}$ was restricted to grid cells where $X_{[H_{Humans~detected}],j}=1$ ($n=175$), and $X_{[H_{Traffic~speed}],j}$ was restricted to grid cells in which >1 ping was recorded for at least one cell phone user in a single day ($n=121$).
 
@@ -91,9 +91,9 @@ $$π_{[a],ijtr}^{[c]}=π_{[a],ijtr}⁄p_{[a],ijt},$$ {#eq-obs_pi_a_cell}
 
 $$π_{[p],ijtd}^{[c]}=π_{[p],ijtd}⁄p_{[p],ijt}.$$ {#eq-obs_pi_p_cell}
 
-We modeled $p_{[pd],ijtd}$ using a hazard rate distance sampling model. Because of the lack of an analytical solution to the integral of the hazard rate function, we calculated $p_{[pd],ijtd}$ at the midpoint, $d_{[mid]}$, of each distance class:
+We modeled $p_{[pd],ijtd}$ using a hazard rate distance sampling model. Because of the lack of an analytical solution to the integral of the hazard rate function, we calculated $p_{[pd],ijtd}$ at the midpoint, $d_{[mid],i}$, of each distance class:
 
-$$p_{[pd],ijtd}=1-exp\left(-\left(\frac{d_{[mid]}}{h_{ijt}}\right)^{b_i}\right),$$ {#eq-obs_p_pd}
+$$p_{[pd],ijtd}=1-exp\left(-\left(\frac{d_{[mid],i}}{h_{ijt}}\right)^{b_i}\right),$$ {#eq-obs_p_pd}
 
 where $h_{ijt}$ and $b_i$ are estimated parameters for the hazard function. A critical assumption with distance sampling is that distance measurements are exact. With point-based surveys in particular, random measurement error can positively bias abundance estimates. Binning distances as we did here relaxes this assumption [@BucklandEtAl-2001]. Moreover, we train observers to collect accurate distance measurements from aural detections following the recommendation of Buckland et al.(2001, pg. 300), who state "It is the nearer detections for which accurate distance estimation is most critical, and for these, it is usually possible to determine which tree, bush or vegetation patch a singing or calling bird is in. Laser binoculars can then be used to measure the distance to an object (a tree, branch, bush, patch of ground, etc.) that is at about the same distance as the bird. Note that it is much better to measure accurately to a guessed location than to guess the distance to a guessed location. Not only does it remove a source of bias and variability but it also removes rounding error from distance estimates, making the task of modelling the data more straightforward."
 

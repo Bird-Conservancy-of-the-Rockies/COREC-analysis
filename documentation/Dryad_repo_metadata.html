@@ -353,9 +353,14 @@ display: none;
 
 
 <!---
-This README uses Markdown syntax, though it is saved in .txt format.
-To view the file with its intended text formatting, use the R package 'rmarkdown'
-to render the file as html.
+This README uses Markdown syntax and was originally written and saved as a .md file.
+To view the file with its intended formatting, use the R package 'rmarkdown'
+to render the file as html. Then print the html file to a PDF. The PDF version of
+this file is the one that is provided in the Dryad data repository that this file
+describes. The original markdown version of the file is saved in the git repository
+containing all code for the study and manuscript entitled "Human traffic explains
+recreation impacts for Colorado breeding bird diversity" in the "documentation"
+sub-folder.
 --->
 <div id="reference-information" class="section level1">
 <h1>Reference Information</h1>
@@ -429,18 +434,23 @@ Ecological Applications.</p></li>
 <div id="acknowledgements" class="section level2">
 <h2>Acknowledgements</h2>
 <ul>
-<li>Funding sources: Colorado Parks and Wildlife (CPW) and the U.S.
-Bureau of Land Management (BLM) provided funding for data collection and
-analysis.</li>
+<li>Funding sources: Colorado Parks and Wildlife (CPW), the U.S. Bureau
+of Land Management (BLM), the USDA Forest Service, and various other
+partners of the Integrated Monitoring in Bird Conservation Regions
+(IMBCR) funded the background monitoring effort that provided large
+portion of the data for this study. CPW and BLM provided additional
+project-specific funding for supplementary data collection and analysis.
+The USDA Forest Service Rocky Mountain Research Station funded
+acquisition and curation of the GPS smartphone data that formed the
+basis for human traffic metrics.</li>
 </ul>
 </div>
 <div id="dates-and-locations" class="section level2">
 <h2>Dates and Locations</h2>
 <ul>
 <li><p>Dates of data collection: Field data collected between during
-bird breeding seasons of 2001 - 2003 following protocols and sampling
-design established under Integrated Monitoring in Bird Conservation
-Regions (IMBCR).</p></li>
+bird breeding seasons of 2001-2003 following IMBCR protocols and
+sampling design.</p></li>
 <li><p>Geographic locations of data collection: Fieldwork conducted on
 public lands of western Colorado, U.S.A., managed by the U.S. Forest
 Service and BLM.</p></li>
@@ -461,72 +471,108 @@ details</li>
 <div id="species_list_and_groups.csv" class="section level2">
 <h2><code>Species_list_and_groups.csv</code></h2>
 <ul>
-<li><p>Description: A comma-delimited file containing elevation values
-for all sampling units summarized in the manuscript (referenced in one R
-script archived in the accompanying git repository).</p></li>
+<li><p>Description: A comma-delimited file listing species represented
+in the data analyzed for the manuscript and species trait group
+assignments.</p></li>
 <li><p>Format: .csv</p></li>
-<li><p>Dimensions: 100 rows X 2 columns</p></li>
+<li><p>Dimensions: 150 rows X 12 columns</p></li>
 <li><p>Fields:</p>
 <ul>
-<li>TrnsctN: Unique identifier of each IMBCR grid cell sampling unit
-represented in the study.</li>
-<li>Elev_m: Elevation of the grid cell centerpoint in meters.</li>
+<li>Common_name: Official species common name assigned by the American
+Ornithological Society</li>
+<li>Taxonomic_name: Species taxonomic name</li>
+<li>Code: 4-letter species code assigned by the American Ornithological
+Society and referenced in figures and tables in the manuscript</li>
+<li>Total_count: the sum of counts across grid cell survey
+observations</li>
+<li>HS: Binary indicator of whether the species was classified as a
+habitat specialist</li>
+<li>M: Binary indicator of whether the species was classified as
+migratory</li>
+<li>HC: Binary indicator of whether the species was classified as a
+human commensal</li>
+<li>S: Binary indicator of whether the species was classified as
+small-bodied</li>
+<li>DS: Binary indicator of whether the species was classified as a
+dietary specialist</li>
+<li>I: Binary indicator of whether the species was classified as an
+insectivore</li>
+<li>G: Binary indicator of whether the species was classified as one
+that nests or forages on or near the ground</li>
+<li>SGCN: Binary indicator of inclusion on the 2025 Colorado Species of
+Greatest Conservation Need list</li>
 </ul></li>
 </ul>
 </div>
-<div id="detection_parameter_estimates.xlsx" class="section level2">
-<h2><code>Detection_parameter_estimates.xlsx</code></h2>
+<div id="species_detection_parameter_estimates.csv" class="section level2">
+<h2><code>Species_detection_parameter_estimates.csv</code></h2>
 <ul>
-<li><p>Description: Spreadsheet listing parameter estimates from the
-avian community occupancy model quantifying species detectability.
-Species occupancy and richness estimates reported in the manuscript are
-correct for detectability represented in these estimates. Species are
-listed in taxonomic order. All estimates are reported as posterior
-median (and 80% credible intervals).</p></li>
-<li><p>Format: .xlsx</p></li>
-<li><p>Dimensions: 141 rows X 8 columns</p></li>
+<li><p>Description: A comma-delimited file listing detectability
+sub-model parameter estimates from the avian community abundance model.
+Species abundance estimates reported in the manuscript are corrected for
+detectability represented in these estimates. Species are ordered
+alphabetically by 4-letter code. All estimates are reported as posterior
+median (and 80% credible intervals), and asterices indicate covariate
+relationships supported with 90% confidence (i.e., where 80% CIs
+excluded zero).</p></li>
+<li><p>Format: .csv</p></li>
+<li><p>Dimensions: 150 rows X 8 columns</p></li>
 <li><p>Fields:</p>
 <ul>
-<li>Spp: 4-letter species codes. Complete species names are listed in
-see Spp_names_detections_guilds.xlsx.</li>
-<li><em>p</em>*: Species detectability for a 6-min survey at mean
-covariate values.</li>
-<li>ζ: Logit-linear covariate relationships. Asterisks mark where
-credible intervals excluded zero, i.e., where the relationship was
-statistically supported.</li>
+<li>Species: 4-letter species codes. Complete species names are listed
+in <code>Species_list_and_groups.csv</code>.</li>
+<li>a0: scale parameter for hazard function corresponding to the
+distance at which the species are detected at mean covariate values</li>
+<li>zeta.Traffic_intensity: log-linear relationship of perceptibility
+(scale parameter for hazard function) with scaled (centered and divided
+by SD) unconditional traffic intensity</li>
+<li>pa0: availability (i.e., the probability an individual of the
+species is available for detection if present within a 6-min survey
+period) at mean covariate values</li>
+<li>theta.Traffic_intensity: logit linear relationship of availability
+with scaled unconditional traffic intensity</li>
+<li>theta.Survey_date: logit linear relationship of availability with
+scaled survey day of year</li>
+<li>theta.Survey_time_since_sunrise = logit linear relationship of
+availability with scaled time (minutes) since sunrise</li>
+<li>theta.Survey_time_since_sunrise2 = logit linear relationship of
+availability with scaled time (minutes) since sunrise squared</li>
 </ul></li>
 </ul>
 </div>
-<div id="spp_names_detections_guilds.xlsx" class="section level2">
-<h2><code>Spp_names_detections_guilds.xlsx</code></h2>
+<div id="species_management_relations_and_human_traffic_contributions.csv" class="section level2">
+<h2><code>Species_management_relations_and_human_traffic_contributions.csv</code></h2>
 <ul>
-<li><p>Description: Spreadsheet listing species and their guild
-classifications represented in the data informing the avian community
-occupancy model analyzing energy development effects on occupancy and
-richness trends within the Atlantic Rim Natural Gas Development Project,
-Wyoming, U.S.A.</p></li>
-<li><p>Format: .xlsx</p></li>
-<li><p>Dimensions: 140 rows X 5 columns</p></li>
+<li><p>Description: A comma-delimited file listing total management
+relationship estimates and the percentage of these explained by human
+traffic relationships (i.e., mechanistic contributions of human
+traffic). Species are ordered alphabetically by 4-letter code. All
+estimates are reported as posterior median (and 80% credible intervals),
+and asterices indicate mechanistic contributions supported with 90%
+confidence (i.e., where 80% CIs excluded zero). Note that within our
+inferential framework, positive percent contributions are consistent
+with our <em>a priori</em> hypotheses and necessary (although not
+sufficient) to support strong inference of mechanism (see manuscript
+Methods for further detail).</p></li>
+<li><p>Format: .csv</p></li>
+<li><p>Dimensions: 150 rows X 7 columns</p></li>
 <li><p>Fields:</p>
 <ul>
-<li>Common name: English common names.</li>
-<li>Taxonomic name: Latin taxonomic name consisting of genus and species
-components.</li>
-<li>Code: 4-letter species codes following the Institute for Bird
-Populations (<a href="https://www.birdpop.org/pages/birdSpeciesCodes.php" class="uri">https://www.birdpop.org/pages/birdSpeciesCodes.php</a>).
-These codes are used for labeling species throughout the manuscript
-(e.g., figures, supplmenetary materials).</li>
-<li>Guild: Guild classifications based on dominant vegetation
-associations represented in the literature (Birds of the World 2022)
-supplemented with our judgement based on knowledge of the study area.
-The four sagebrush-associated species were also considered members of
-the shrubland guild.</li>
-<li>Detections: The number of point surveys (i.e., point × year survey
-occasions) the species was detected (max = 8916). Species never detected
-(Detections = 0) were detected in broader regional surveys and therefore
-included for data augmentation. Estimates for data augmentation species
-contributed only to species richness estimates and were never
-interpreted individually.</li>
+<li>Species: 4-letter species codes. Complete species names are listed
+in <code>Species_list_and_groups.csv</code>.</li>
+<li>Trail.total: Total relationship (direct + indirect) of species
+abundance with trail density</li>
+<li>Trail.pctExplained: estimated percent of total trail density
+relationship explained by human traffic</li>
+<li>OHV.total: Total relationship (direct + indirect) of species
+abundance with proportion of trails where OHVs were prohibited (i.e.,
+proportion no OHVs)</li>
+<li>OHV.pctExplained: estimated percent of total relationship with
+proportion no OHVs explained by human traffic</li>
+<li>Road.total: Total relationship (direct + indirect) of species
+abundance with road density</li>
+<li>Road.pctExplained: estimated percent of total road density
+relationship explained by human traffic</li>
 </ul></li>
 </ul>
 </div>
@@ -534,15 +580,15 @@ interpreted individually.</li>
 <h2><code>mod_path</code></h2>
 <ul>
 <li>Description: This file is an R object containing all model output as
-generated by the “01-Analysis.R” script file archived in an accompanying
-git repository (see Latif 2023). This file can be loaded using the R
-function ‘R.utils::loadObject()’. Broadly, this file contains posterior
-samples of parameter model estimates and their summaries as generated by
-the data analysis described in the manuscript and encoded in archived
-scripts (Latif 2023). This file is needed to replicate results summaries
-generated by various scripts located in the accompanying git repository
-(Latif 2023). As such, we do not provide a detailed catalog of the
-contents of this file.</li>
+generated by the “01-Analysis.R” script file archived in the
+accompanying git repository (Latif 2025). This file can be loaded using
+the R function ‘R.utils::loadObject()’. Broadly, this file contains
+posterior samples of parameter model estimates and their summaries as
+generated by the data analysis described in the manuscript and encoded
+in archived scripts (Latif 2023). This file is needed to replicate
+results summaries generated by various scripts located in the
+accompanying git repository (Latif 2025). As such, we do not provide a
+detailed catalog of the contents of this file.</li>
 </ul>
 </div>
 <div id="data_compiled.rdata" class="section level2">
@@ -556,81 +602,84 @@ results summaries associated with this manuscript.</p></li>
 workspace using the Base R function ‘load’.</p></li>
 <li><p>R objects contained in this workspace:</p>
 <ul>
-<li>aou.checklist: Table of standardized bird codes and species names
-downloaded from the Institute of Bird Populations (<a href="https://www.birdpop.org/pages/birdSpeciesCodes.php" class="uri">https://www.birdpop.org/pages/birdSpeciesCodes.php</a>).</li>
-<li>bird_data: Raw bird detection data, including sampling unit IDs
-(TransectNum, Point, Stratum, Point_year), Year, Date, survey timing
-(PointVisitStartTime), Species (BirdCode, Species), the time period the
-detection was recorded (TimePeriod), and additional data tangential to
-our analysis (CL_ID, radialDistance).</li>
-<li>cov_grid: Grid-cell level covariate values, including some that were
-not included in the analysis.</li>
-<li>cov_pntyr: Point x year covariate values primarily used for
-detectability and indexing during model definition.</li>
-<li>cov_point: Point and Point x year covariate values arranged in wide
-format with years as columns.</li>
-<li>spp.excluded: List of species excluded from analysis.</li>
-<li>spp.out: List of species included in data analysis.</li>
-<li>tab.datetime: Survey timing information compiled during intermediate
-step towards arranging data for analysis.</li>
-<li>TR.mat: Grid cell X year matrix containing time periods within
-surveys when detections were recorded (i.e.,
-<strong><em>y<sub>class,ijt</sub></em></strong> in Equation S3.1.2,
-Appendix S3).</li>
-<li>Y.mat: Grid cell X year matrix containing detection data compiled
-for analysis (i.e., <em>y<sub>ijt</sub></em> in Equation S3.1.1,
-Appendix S3).</li>
-<li>Cov_grid: Grid-cell level covariate values formatted as a grid cell
-X year X variable array (<em>contra</em> data frame for cov_grid)
-required for analysis.</li>
-<li>Cov_point: Point level values formatted as a point X year X
-covariate array (<em>contra</em> data frame for cov_pntyr) required for
-analysis.</li>
-<li>grid.list: Grid cell IDs representing how relevant data were ordered
-for analysis (e.g., in Cov_grid).</li>
-<li>PH.list: List of primary habitat codes (tangential to
-analysis).</li>
-<li>point.list: Point IDs representing how relevant data objects were
-ordered for analysis (e.g., in Cov_point).</li>
-<li>pointXyears.list: Point X year IDs representing how relevant data
-were ordered for analysis (e.g., in Y.mat).</li>
-<li>SampDesign: Sampling designs for data included in analysis
-(primarily relevant to those familiar with IMBCR data).</li>
-<li>spp.exclude: 4-letter codes for species excluded from analysis.</li>
-<li>spp.list: 4-letter codes for species included in analysis.</li>
-<li>strata: Strata IDs for data included in analysis (primarily relevant
-to those familiar with IMBCR data).</li>
-<li>years: Years represented by the data included in the analysis.</li>
+<li>area.band: The area (m^2) of distance bins for each species</li>
+<li>breaks: Break points for distance bins for each species</li>
+<li>covariates: Data frame containing raw covariate values for all grid
+cell x year occasions (includes several covariates not ultimately
+included in the analysis model)</li>
+<li>CovIndMat: Matrix with raw covariate values included in
+analysis</li>
+<li>dat_human: Data frame with grid cell values for human traffic
+metrics</li>
+<li>dat_trails: Data frame with grid cell values for management
+metrics</li>
+<li>detection.trim.summary: Summary of detection data trimmed for each
+species when filtering out the furthest 5% of detections (generated by
+<code>01-Data_wrangle.R</code> script in Latif 2025)</li>
+<li>detections: Bird detection dataset queried from the Bird Conservancy
+database</li>
+<li>detects.cutoff: Bird detection data retained after applying the
+distance cutoff for species with at least 75 detections</li>
+<li>detects.drop: Bird detection data dropped prior to analysis (i.e.,
+furthest 5% for species with at least 75 detections)</li>
+<li>dtobs: Species index, grid-year index, cluster size, distance bin,
+and time removal bin for all detections retained for analysis</li>
+<li>n.mat: Count data matrix (species x grid survey occasion)</li>
+<li>samples: Data frame with survey specific info (ID, Year, Date, time
+zone, number of point surveys completed, and time since sunrise when
+grid survey was initiated)</li>
+<li>Spp_list: Species list dataframe (species code, common name, and sum
+of all counts)</li>
+<li>area.circle: Point-level area of estimation for each species</li>
+<li>area.prop: Proportion of the area of estimation within each distance
+bin (same for all species)</li>
+<li>cutoff: Distance cutoff for each species (i.e., radius of
+point-level area of estimation)</li>
+<li>grid.list: Grid cell IDs</li>
+<li>gridXyears.list: Grid cell x year IDs</li>
+<li>min.n.trunc: Minimum number of detections required to apply a 5%
+distance threshold cutoff to a species</li>
+<li>nG: Number of distance bins</li>
+<li>Spp: List of species codes labeling rows or elements in data objects
+with a species dimension (e.g., first dimension of n.mat)</li>
+<li>trunc.pct: Proportion of detections to retain for species with at
+least 75 detections (determines distance cutoff)</li>
+<li>years: Years data were collected</li>
 </ul></li>
-<li><p>Metadata note: Because this file is provided primarily as a
-reference for replicating study results following processes encoded in
-an accompanying git repository (Latif 2023), these metadata only provide
-a relatively high level description of the file contents, i.e., we
-briefly describe data objects but we do not necessarily describe every
-field appearing within each data object. Additionally, we have scrubbed
-these data of all spatial coordinates for sampling units; sharing of
-spatial coordinates requires a data sharing agreement to protect private
-landowners.</p></li>
+<li><p>Metadata note: Because this file is provided primarily to allow
+replicability of study results using scripts provided in the
+accompanying git repository (Latif 2025), we only provide a relatively
+high level description of the contents of this file, i.e., we briefly
+describe data objects but we do not necessarily describe every field
+appearing in each object.</p></li>
+</ul>
+</div>
+<div id="code_reference_files.zip" class="section level2">
+<h2><code>code_reference_files.zip</code></h2>
+<ul>
+<li><p>Description: This zipped directory containing csv files
+referenced by R scripts archived by Latif (2025). Metadata is not
+provided for these files as they are simply provided for code
+reproducbility and are referenced by name by relevant scripts.</p></li>
+<li><p>Format: sub-directory</p></li>
 </ul>
 </div>
 </div>
 <div id="codesoftware" class="section level1">
 <h1>Code/Software</h1>
-<p>Linked with this data repository is a git repository (Latif 2023)
+<p>Linked with this data repository is a git repository (Latif 2025)
 containing all R scripts for compiling data, implementing all analyses,
 and generating all results reported in the manuscript. The README file
-within the git repository catalogs each script file contained along
-within it. Files contained in this data repository are primarily
-intended to promote transparency and repeatability of all results in the
-manuscript by allowing interested persons to run scripts provided by
-Latif (2023).</p>
+within the git repository catalogs each script file contained therein.
+Files contained in this data repository are primarily intended to
+promote transparency and repeatability of all results in the manuscript
+by allowing interested persons to run scripts provided by Latif
+(2025).</p>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
-<p>Birds of the World. 2022. Edited by S. M. Billerman, B. K. Keeney, P.
-G. Rodewald, and T. S. Schulenberg. Cornell Laboratory of Ornithology,
-Ithaca, NY, USA. <a href="https://birdsoftheworld.org/bow/home" class="uri">https://birdsoftheworld.org/bow/home</a></p>
-<p>Latif, Q. S. 2023. qureshlatif/ARIM-analysis (v1.0.1). Zenodo. <a href="https://doi.org/10.5281/zenodo.7566617" class="uri">https://doi.org/10.5281/zenodo.7566617</a></p>
+<p>Latif, Q. S. 2025. Bird-Conservancy-of-the-Rockies/COREC-analysis
+(v0). To be archived at Zenodo. currently available at <a href="https://github.com/Bird-Conservancy-of-the-Rockies/COREC-analysis" class="uri">https://github.com/Bird-Conservancy-of-the-Rockies/COREC-analysis</a></p>
 <hr />
 <p>END OF README</p>
 </div>
