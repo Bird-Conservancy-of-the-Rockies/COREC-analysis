@@ -3,7 +3,7 @@ AUTHORS: Quresh S. Latif, Liza G. Rossi, Matthew F. McLaren, Jennifer M. Timmer,
 JOURNAL: Ecological Applications
 
 ---
-output: pdf
+output: html
 number-sections: true
 css: styles.css
 bibliography: references.bib
