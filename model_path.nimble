@@ -95,6 +95,9 @@ model <<- nimbleCode({
         prob_n[s, j] <- pp[s, j] * pa[s, j] * (effort[j] / 16)
         n[s, j] ~ dbin(prob_n[s, j], N[s, j])
         
+        ##~~~~~~~~~~~~~ GOF ~~~~~~~~~~~~~~##
+        n_sim[s, j] ~ dbin(prob_n[s, j], N[s, j])
+        
         ##~~~~~~~~~~~~~~ State process abundance model ~~~~~~~~~~~~~~##
         log(lambda[s, j]) <- beta0[s] + dev.beta0[s, yearInd[j]] + inprod(betaVec[s, 1:n.Xbeta], X.beta[j, 1:n.Xbeta])
         N[s, j] ~ dpois(lambda[s, j]) # Abundance state

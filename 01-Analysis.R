@@ -2,29 +2,29 @@ library(nimble)
 library(stringr)
 library(tidyr)
 library(dplyr)
-library(FunctionsBCR)
+library(manageNimble)
 
-# setwd("~/COREC")
-setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
+setwd("~/COREC")
+# setwd("C:/Users/quresh.latif/files/projects/CPW/Rec_overlay")
 
 #_____ Script inputs _____#
 git.repo <- "COREC-analysis/"
-#GOF <- FALSE # Set to true to include and monitor goodness of fit metrics (not sure if/how I'll do this.)
-mod.nam <- "interm_paths" # Options: "community", "interm_paths", "path
+GOF <- TRUE # Set to true to include and monitor n_sim for GOF (need to enable in model code)
+mod.nam <- "path" # Options: "community", "interm_paths", "path
 model.file <- str_c("model_", mod.nam, ".nimble")
 parallel.process <- T # Set to true if running nimble on analysis server (i.e., not Windows)
-max.samples.saved <- 1000 # Maximum number of posterior samples to save.
-par.ignore.Rht <- c() # Parameters to ignore for calculating Rhat and neff.
+max.samples.saved <- 310 # Maximum number of posterior samples to save.
+par.ignore.Rht <- c("n_sim", "prob_n") # Parameters to ignore for calculating Rhat and neff.
 #source(str_c(scripts.loc, "RunNimbleParallel_", data.set, ".R"))
 #_________________________#
 
-load("data/Data_compiled.RData")
+load("Data_compiled.RData")
 nspp <- length(Spp)
 
 # MCMC values
 nc <- 3 # number of chains
 nb <- 10000 # Proportion of chain to discard as burn in
-ni <- 20000 # number of iterations
+ni <- 20100 # number of iterations
 nt <- 100 # thinning
 #_________________________#
 
@@ -63,6 +63,10 @@ source(str_c(git.repo, "Param_list.R"))
 source(str_c(git.repo, "Data_processing.R"))
 source(str_c(git.repo, str_c("ModelInits.R")))
 
+if(GOF) {
+  parameters <- c(parameters, "n_sim", "prob_n")
+}
+
 # Generate data and constant objects to send to NIMBLE #
 #if(is.null(dim(X.pa))) data.nams <- data.nams[-which(data.nams == "X.pa")]
 data <- list()
@@ -82,11 +86,11 @@ for(i in 1:length(constant.nams)) {
 }
 names(constants) <- constant.nams[which(constants.nams.keep)]
 
-source(str_c(git.repo, model.file))
 rm(.Random.seed, envir=.GlobalEnv)
 
 # All at once using built-in wrapper... #
 if(!parallel.process) {
+  source(str_c(git.repo, model.file))
   out <- nimbleMCMC(code = model,
                     constants = constants,
                     data=data,
@@ -114,8 +118,10 @@ if(!parallel.process) {
 }
 
 if(parallel.process) {
-  RunNimbleParallel(model = model, inits = inits, data = data, constants = constants,
-                    parameters = parameters, par.ignore.Rht = par.ignore.Rht,
-                    nc = nc, ni = ni, nb = nb, nt = nt,
-                    mod.nam = str_c("mod_", mod.nam), max.samples.saved = max.samples.saved)
+  runNimble(model.path = str_c(git.repo, model.file), inits = inits,
+            data = data, constants = constants,
+            parameters = parameters, par.ignore = par.ignore.Rht,
+            nc = nc, ni = ni, nb = nb, nt = nt,
+            mod.nam = str_c("mod_", mod.nam), max.samples.saved = max.samples.saved,
+            check.freq = 1, max.tries = 100, delete.blocks = FALSE)
 }
