@@ -228,3 +228,74 @@ p <- ggdraw() +
   draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
 
 save_plot("community_relations/Management_plus_HumanCov_relations.jpg", p, ncol = 2, nrow = 4, dpi = 200)
+
+## Panels for manuscript revision (split management from traffic, show only supported management relations) ##
+# Management #
+p <- ggdraw() +
+  draw_plot(p.trail.community,           x = 0.05,   y = 0.75, width = 0.19,   height = 0.25) +
+  draw_plot(p.trail.HabitatSpecialist,   x = 0.24,   y = 0.75, width = 0.19,   height = 0.25) +
+  draw_plot(p.trail.migratory,           x = 0.43,   y = 0.75, width = 0.19,   height = 0.25) +
+  draw_plot(p.trail.small,               x = 0.62,   y = 0.75, width = 0.19,   height = 0.25) +
+  draw_plot(p.trail.HumComm,             x = 0.81,   y = 0.75, width = 0.19,   height = 0.25) +
+  
+  draw_plot(p.trail.DietSpecialist,      x = 0.05,   y = 0.50, width = 0.19,   height = 0.25) +
+  draw_plot(p.trail.insectivore,         x = 0.24,   y = 0.50, width = 0.19,   height = 0.25) +
+  draw_plot(p.trail.ground,              x = 0.43,   y = 0.50, width = 0.19,   height = 0.25) +
+  draw_plot(p.trail.SGCN,                x = 0.62,   y = 0.50, width = 0.19,   height = 0.25) +
+  draw_plot(p.ohv.community,             x = 0.81,   y = 0.50, width = 0.19,   height = 0.25) +
+  
+  draw_plot(p.road.small,                x = 0.05,   y = 0.25, width = 0.19,   height = 0.25) +
+  draw_plot(p.road.DietSpecialist,       x = 0.24,   y = 0.25, width = 0.19,   height = 0.25) +
+  draw_plot(p.road.ground,               x = 0.43,   y = 0.25, width = 0.19,   height = 0.25) +
+  draw_plot(p.ohv.HabitatSpecialist,     x = 0.62,   y = 0.25, width = 0.19,   height = 0.25) +
+  draw_plot(p.ohv.small,                 x = 0.81,   y = 0.25, width = 0.19,   height = 0.25) +
+  
+  draw_plot(p.ohv.DietSpecialist,        x = 0.05,   y = 0.00, width = 0.2375, height = 0.25) +
+  draw_plot(p.ohv.insectivore,           x = 0.2875, y = 0.00, width = 0.2375, height = 0.25) +
+  draw_plot(p.ohv.ground,                x = 0.5250, y = 0.00, width = 0.2375, height = 0.25) +
+  draw_plot(p.ohv.SGCN,                  x = 0.7625, y = 0.00, width = 0.2375, height = 0.25) +
+  draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
+
+save_plot("community_relations/Management_relations_supp.jpg", p, ncol = 2, nrow = 2.5, dpi = 200)
+
+# Traffic #
+# p <- ggdraw() + # This just keeps relationships associated with supported mechanisms, but need them all to support paragraph in the Discussion
+#   draw_plot(p.traffic.community,         x = 0.0500000, y = 0.6667,   width = 0.3166667, height = 0.3333) +
+#   draw_plot(p.traffic.HabitatSpecialist, x = 0.3666667, y = 0.6667,   width = 0.3166667, height = 0.3333) +
+#   draw_plot(p.speed.HabitatSpecialist,   x = 0.6833333, y = 0.6667,   width = 0.3166667, height = 0.3333) +
+# 
+#   draw_plot(p.traffic.migratory,         x = 0.0500000, y = 0.3333,   width = 0.3166667, height = 0.3333) +
+#   draw_plot(p.traffic.small,             x = 0.3666667, y = 0.3333,   width = 0.3166667, height = 0.3333) +
+#   draw_plot(p.traffic.HumComm,           x = 0.6833333, y = 0.3333,   width = 0.3166667, height = 0.3333) +
+#   
+#   draw_plot(p.traffic.DietSpecialist,    x = 0.0500000, y = 0.0000,   width = 0.3166667, height = 0.3333) +
+#   draw_plot(p.traffic.insectivore,       x = 0.3666667, y = 0.0000,   width = 0.3166667, height = 0.3333) +
+#   draw_plot(p.traffic.SGCN,              x = 0.6833333, y = 0.0000,   width = 0.3166667, height = 0.3333) +
+#   draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
+
+p <- ggdraw() +
+  draw_plot(p.traffic.community,         x = 0.0500, y = 0.8, width = 0.2375, height = 0.2) +
+  draw_plot(p.traffic.HabitatSpecialist, x = 0.2875, y = 0.8, width = 0.2375, height = 0.2) +
+  draw_plot(p.speed.community,           x = 0.5250, y = 0.8, width = 0.2375, height = 0.2) +
+  draw_plot(p.speed.HabitatSpecialist,   x = 0.7625, y = 0.8, width = 0.2375, height = 0.2) +
+  
+  draw_plot(p.traffic.migratory,         x = 0.0500, y = 0.6, width = 0.2375, height = 0.2) +
+  draw_plot(p.traffic.small,             x = 0.2875, y = 0.6, width = 0.2375, height = 0.2) +
+  draw_plot(p.speed.migratory,           x = 0.5250, y = 0.6, width = 0.2375, height = 0.2) +
+  draw_plot(p.speed.small,               x = 0.7625, y = 0.6, width = 0.2375, height = 0.2) +
+  
+  draw_plot(p.traffic.HumComm,           x = 0.0500, y = 0.4, width = 0.2375, height = 0.2) +
+  draw_plot(p.traffic.DietSpecialist,    x = 0.2875, y = 0.4, width = 0.2375, height = 0.2) +
+  draw_plot(p.speed.HumComm,             x = 0.5250, y = 0.4, width = 0.2375, height = 0.2) +
+  draw_plot(p.speed.DietSpecialist,      x = 0.7625, y = 0.4, width = 0.2375, height = 0.2) +
+  
+  draw_plot(p.traffic.insectivore,       x = 0.0500, y = 0.2, width = 0.2375, height = 0.2) +
+  draw_plot(p.traffic.ground,            x = 0.2875, y = 0.2, width = 0.2375, height = 0.2) +
+  draw_plot(p.speed.insectivore,         x = 0.5250, y = 0.2, width = 0.2375, height = 0.2) +
+  draw_plot(p.speed.ground,              x = 0.7625, y = 0.2, width = 0.2375, height = 0.2) +
+  
+  draw_plot(p.traffic.SGCN,              x = 0.0500, y = 0.0, width = 0.475,  height = 0.2) +
+  draw_plot(p.speed.SGCN,                x = 0.5250, y = 0.0, width = 0.475,  height = 0.2) +
+  draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
+
+save_plot("community_relations/HumanCov_relations.jpg", p, ncol = 2, nrow = 2.5, dpi = 200)

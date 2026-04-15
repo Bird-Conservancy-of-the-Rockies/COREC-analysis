@@ -45,7 +45,7 @@ where $\lambda_{ijt}$ is mean abundance and $N_{ijt}$ is latent (cluster) abunda
 
 $$log(\lambda_{ijt})=β_{0,i}+d_{[β_0],it}+\mathbf{β_{1,i}}×\mathbf{X_{jt}}$$ {#eq-eco_lambda}
 
-where $\beta_{0,i}$ is the intercept, $d_{[β],it}$ is a year-specific offset, and $\mathbf{β_i}$ is a vector of covariate relationships. We modeled $\beta_{0,i}$ and $\mathbf{β_i}$ as species-specific random effects, and $d_{[β],it}$ as a species×year-specific random effect. Hyper-parameter priors for these random effects were
+where $\beta_{0,i}$ is the intercept, $d_{[β],it}$ is a year-specific offset, $\mathbf{β_i}$ is a vector of covariate relationships, and $\mathbf{X_{jt}}$ is a matrix of values for all management and human traffic covariates. We modeled $\beta_{0,i}$ and $\mathbf{β_i}$ as species-specific random effects, and $d_{[β],it}$ as a species×year-specific random effect. Hyper-parameter priors for these random effects were
 
 $$\overline{\beta} \sim Normal(0,1),$$ {#eq-eco_beta_mean}
 $$SD_{\beta} \sim gamma(1,1),$$ {#eq-eco_beta_SD}
@@ -75,15 +75,15 @@ $$\mathbf{y_{[a],ijt}} \sim Multinomial \left(n_{ijt},\mathbf{π_{[a],ijt}^{[c]}
 
 $$\mathbf{y_{[p],ijt}} \sim Multinomial \left(n_{ijt},\mathbf{π_{[p],ijt}^{[c]}} \right).$$ {#eq-obs_y_p}
 
-Bin probabilities for availability assume constant availability across the survey period,
+Bin probabilities for availability assumed constant availability across the survey period,
 
 $$π_{[a],ijtr}=p_{[ar],ijt} (1-p_{[ar],ijt})^{r-1},$$ {#eq-obs_pi_a_bin}
 
-where $p_{[ar],ijt}$ is the availability for a single 2-min time removal bin. Bin probabilities for perceptibility account for increasing area of bins with increasing distance from the surveyor,
+where $p_{[ar],ijt}$ is the availability for a single 2-min time removal bin. Bin probabilities for perceptibility accounted for increasing area of bins with increasing distance from the surveyor,
 
 $$π_{[p],ijtd}=\frac{p_{[pd],ijtd}A_d}{∑_{d=1}^{d_{[max]}}A_d},$$ {#eq-abundance_pi_p_bin}
 
-where $p_{[pd],ijtd}$ is the perceptibility within distance bin $d$ in year $t$, and $A_d$ is the area of distance bin $d$. Multinomial cell probabilites for modeling $\mathbf{y_{[a],ijt}}$ and $\mathbf{y_{[p],ijt}}$ represent bin probabilites scaled to sum to 1:
+where $p_{[pd],ijtd}$ is the perceptibility within distance bin $d$ in year $t$, and $A_d$ is the area of distance bin $d$. Multinomial cell probabilites for modeling $\mathbf{y_{[a],ijt}}$ and $\mathbf{y_{[p],ijt}}$ represented bin probabilites scaled to sum to 1:
 
 $$π_{[a],ijtr}^{[c]}=π_{[a],ijtr}⁄p_{[a],ijt},$$ {#eq-obs_pi_a_cell}
 
@@ -105,7 +105,7 @@ $$logit(p_{[ar],ijt}) = \theta_{0,i}+\mathbf{\theta_{1,i}}×\mathbf{X_{jt}}$$ {#
 
 $$log(h_{ijt}) = \zeta_{0,i}+\mathbf{\zeta_{1,i}}×\mathbf{X_{jt}},$$ {#eq-obs_h}
 
-where $\theta_{0,i}$ and $\zeta_{0,i}$ are intercepts and $\mathbf{\theta_i}$ and $\mathbf{\zeta_i}$ are coefficient vectors for covariate relationships. As with ecological parameters, we modeled all intercepts and covariate coefficients as species-specific random effects. Hyper-parameter priors for detectability random effects were
+where $\theta_{0,i}$ and $\zeta_{0,i}$ are intercepts, $\mathbf{\theta_i}$ and $\mathbf{\zeta_i}$ are coefficient vectors for covariate relationships, and $\mathbf{X_{jt}}$ are matrices of values for detectability covariates. For availability, these were unconditional traffic intensity, survey date, survey time, and squared values for date and time. For perceptibility, we only had unconditional traffic intensity as a covariate. As with ecological parameters, we modeled all intercepts and covariate coefficients as species-specific random effects. Hyper-parameter priors for detectability random effects were
 
 $$\overline{\zeta_0} \sim Normal(4.5,0.67),$$ {#eq-obs_zeta0_mean}
 $$\overline{\zeta_1} \sim Normal(0,1),$$ {#eq-obs_zeta_mean}
@@ -153,22 +153,22 @@ We fitted our analysis model in R [@R-base] using the R package NIMBLE [@Nimble-
 
 ### Predicted abundance adjusted for cluster size {#sec-N_p}
 
-We drew inference primarily from comparisons of predicted diversity across covariate space, which first required predicting species abundance. If we represent a location in covariate space to which we wanted to predict as $\mathbf{X_p}$, we predicted mean abundance at that location as
+We drew inference primarily from comparisons of predicted diversity across covariate space, which first required predicting species abundance. If we represent a location in covariate space to which we wanted to predict as $\mathbf{X_p}$ (the subscript $p$ indicating predicted parameters throughout this section), we predicted mean abundance at that location as
 
-$$N_{p,i}=\lambda_{p,i}×c_i,$$ {#eq-pred_N}
+$$N_{[PRED],i}=\lambda_{[PRED],i}×c_i,$$ {#eq-pred_N}
 
-where $\lambda_{p,i}$ is calculated as
+where $\lambda_{[PRED],i}$ is calculated as
 
-$$log(\lambda_{p,i})=β_{0,i}+\mathbf{β_{1,i}}×\mathbf{X_p},$$ {#eq-pred_lambda}
+$$log(\lambda_{[PRED],i})=β_{0,i}+\mathbf{β_{1,i}}×\mathbf{X_{[PRED]}},$$ {#eq-pred_lambda}
 
 and $c_i$ is cluster size for species $i$. Of $51,163$ detected clusters, $97.4\%$ consisted of a single detected individual and the remaining $2.6\%$ of clusters consisted of $\geq 2$ non-independently detected individuals (e.g., members of breeding pair detected together). When possible, we derived $c_i$ by drawing values for each MCMC posterior sample from a truncated normal distribution, $\widehat{\overline{c_i}} \sim Normal(\overline{X_{c_i}},SE_{X_{c_i}})T(1,)$, where $\overline{X_{c_i}}$ and $SE_{X_{c_i}}$ are the sample mean and standard error ($SE_{X_{c_i}}=SD_{X_{c_i}}/\sqrt{n}$), respectively. For 55 species, we either recorded all cluster sizes = 1 or detected only one cluster, in which case $SE_{X_{c_i}}$ was undefined so $c_i=\overline{X_{c_i}}$.
 
 ### Diversity
 We used the Hill-Shannon index to quantify bird diversity [@RoswellEtAl-2021]. For any species group $I$, we derived predicted diversity as
 
-$$D_p = exp\left(-1×\sum_{i=1}^{I}\left(\frac{N_{p,i}}{\sum_{i=1}^{I}N_{p,i}}×log\left(\frac{N_{p,i}}{\sum_{i=1}^{I}N_{p,i}}\right)\right)\right).$$ {#eq-pred_D}
+$$D_{[PRED]} = exp\left(-1×\sum_{i=1}^{I}\left(\frac{N_{[PRED],i}}{\sum_{i=1}^{I}N_{[PRED],i}}×log\left(\frac{N_{[PRED],i}}{\sum_{i=1}^{I}N_{[PRED],i}}\right)\right)\right).$$ {#eq-pred_D}
 
-Figures 3 and 4 present $D_p$ along covariate gradients, and we used differences in $D_p$ between alternative locations in covariate space to partition management relationships with diversity into their underlying components (see @sec-path_analysis).
+Figures 3 and 4 present $D_{[PRED]}$ along covariate gradients, and we used differences in $D_{[PRED]}$ between alternative locations in covariate space to partition management relationships with diversity into their underlying components (see @sec-path_analysis).
 
 ## Path analysis {#sec-path_analysis}
 
@@ -176,27 +176,27 @@ Figures 3 and 4 present $D_p$ along covariate gradients, and we used differences
 
 We followed @Clough-2012 to quantify components of management relationships with bird diversity. We expressed the total relationship of a management covariate, $X_{[M]}$, with bird diversity as
 
-$$B_{[M,T]}^{[D]}=log(D_{p,M}/D_{p,R}),$$ {#eq-total_management_effect}
+$$B_{[M,T]}^{[D]}=log(D_{[PRED,M]}/D_{[PRED,R]}),$$ {#eq-total_management_effect}
 
-where $D_{p,M}$ and $D_{p,R}$ are predicted diversity (@eq-pred_D) calculated with covariate values representing management and reference scenarios, respectively. The set of covariate values representing management and reference scenarios depended on which management relationship we were deriving. We identified 5 fundamental scenarios for calculating total management relationships (vegetation covariates set to their mean for all scenarios):
+where $D_{[PRED,M]}$ and $D_{[PRED,R]}$ are predicted diversity (@eq-pred_D) calculated with covariate values representing management and reference scenarios, respectively. The set of covariate values representing management and reference scenarios depended on which management relationship we were deriving. We identified 5 fundamental scenarios for calculating total management relationships (vegetation covariates set to their mean for all scenarios):
 
 <div class="hanging-indent">
-*Baseline* - $X_{p}^{[Base]}$ - Trail and road densities are set to $0$, and proportion no OHV set to its mean.<br>
+*Baseline* - $X_{[PRED]}^{[Base]}$ - Trail and road densities are set to $0$, and proportion no OHV set to its mean.<br>
 </div>
 <div class="hanging-indent">
-*Some trails, average OHV* - $X_{p}^{[Trails,\overline{OHV}]}$ - Trail density is set to $2.0~km/km^2$ (i.e., $0+1SD$), road density to $0$, and proportion no OHV to its mean.<br>
+*Some trails, average OHV* - $X_{[PRED]}^{[Trails,\overline{OHV}]}$ - Trail density is set to $2.0~km/km^2$ (i.e., $0+1SD$), road density to $0$, and proportion no OHV to its mean.<br>
 </div>
 <div class="hanging-indent">
-*Some trails, no OHV* - $X_{p}^{[Trails,OHV=0]}$ - Trail density is set to $2.0~km/km^2$, road density to $0$, and proportion no OHV to $0$.<br>
+*Some trails, no OHV* - $X_{[PRED]}^{[Trails,OHV=0]}$ - Trail density is set to $2.0~km/km^2$, road density to $0$, and proportion no OHV to $0$.<br>
 </div>
 <div class="hanging-indent">
-*Some trails, unrestricted OHV* - $X_{p}^{[Trails,OHV=1]}$ - Trail density is set to $2.0~km/km^2$, road density to $0$, and proportion no OHV to $1$.<br>
+*Some trails, unrestricted OHV* - $X_{[PRED]}^{[Trails,OHV=1]}$ - Trail density is set to $2.0~km/km^2$, road density to $0$, and proportion no OHV to $1$.<br>
 </div>
 <div class="hanging-indent">
-*Some roads* - $X_{p}^{[Roads]}$ - Road density is set to $1.0~km/km^2$ (i.e., $0+1SD$), trail density to $0$, and proportion no OHV to its mean.<br>
+*Some roads* - $X_{[PRED]^{[Roads]}$ - Road density is set to $1.0~km/km^2$ (i.e., $0+1SD$), trail density to $0$, and proportion no OHV to its mean.<br>
 </div>
 
-For total management relationships, we set values for each human traffic covariate, $X_{[H],p}$, to $p_{[H]}$ from the corresponding path model (@eq-Humans_detected_link or @eq-Traffic_intensity_speed_link) informed with scenario-specific management covariate values. We then assigned management and reference scenarios for calculating total management relationships (@eq-total_management_effect) as follows:
+For total management relationships, we set values for each human traffic covariate, $X_{[PRED,H]}$, to $p_{[H]}$ from the corresponding path model (@eq-Humans_detected_link or @eq-Traffic_intensity_speed_link) informed with scenario-specific management covariate values. We then assigned management and reference scenarios for calculating total management relationships (@eq-total_management_effect) as follows:
 
 Trail density - management = *Some trails, average OHV*; reference = *Baseline*<br>
 Road density - management = *Some roads*; reference = *Baseline*<br>
@@ -206,8 +206,8 @@ Proportion no OHV - management = *Some trails, no OHV*; reference = *Some trails
 
 We quantified the percent contribution of human traffic to management relationships with diversity by calculating the portion of the total relationship explained by human traffic [i.e., indirect relationship *sensu* @Clough-2012], and then dividing the explained by the total relationship (and multiplying by 100). For the explained portion of the total relationship, we first defined a counter-factual scenario wherein human traffic covariates were set to values representing the reference instead of management levels. For example, the counter-factual scenario for calculating the proportion of the trail density effect would be represented by setting management covariates to *Some trails, average OHV* but human traffic covariates to *Baseline*. We then calculated the explained portion of the management relationship as
 
-$$B_{[M,E]}^{[D]}=log(D_{p,M}/D_{p,C}),$$ {#eq-explained_management_effect}
+$$B_{[M,E]}^{[D]}=log(D_{[PRED,M]}/D_{[PRED,C]}),$$ {#eq-explained_management_effect}
 
-where $D_{p,C}$ is predicted diversity under the counter-factual scenarios. We then calculate the percent contribution of human traffic as
+where $D_{[PRED,C]}$ is predicted diversity under the counter-factual scenarios. We then calculate the percent contribution of human traffic as
 
 $$P_{H}=\left(B_{[M,E]}/B_{[M,T]}\right)×100.$$ {#eq-percent_explained}

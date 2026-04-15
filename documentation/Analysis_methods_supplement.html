@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.42">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -44,15 +44,17 @@ div.csl-indent {
 
 
 <script src="Analysis_methods_supplement_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Analysis_methods_supplement_files/libs/quarto-html/quarto.js"></script>
+<script src="Analysis_methods_supplement_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Analysis_methods_supplement_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Analysis_methods_supplement_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="Analysis_methods_supplement_files/libs/quarto-html/popper.min.js"></script>
 <script src="Analysis_methods_supplement_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="Analysis_methods_supplement_files/libs/quarto-html/anchor.min.js"></script>
 <link href="Analysis_methods_supplement_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Analysis_methods_supplement_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="Analysis_methods_supplement_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="Analysis_methods_supplement_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Analysis_methods_supplement_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Analysis_methods_supplement_files/libs/bootstrap/bootstrap-1bc8a17f135ab3d594c857e9f48e611b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="Analysis_methods_supplement_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -68,7 +70,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -87,7 +89,7 @@ window.Quarto = {
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="fullcontent">
+<body class="fullcontent quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 
@@ -122,7 +124,7 @@ window.Quarto = {
 <p><span id="eq-eco_N"><span class="math display">\[N_{ijt} \sim Poisson(\lambda_{ijt}), \tag{1}\]</span></span></p>
 <p>where <span class="math inline">\(\lambda_{ijt}\)</span> is mean abundance and <span class="math inline">\(N_{ijt}\)</span> is latent (cluster) abundance. We modeled abundance variability as</p>
 <p><span id="eq-eco_lambda"><span class="math display">\[log(\lambda_{ijt})=β_{0,i}+d_{[β_0],it}+\mathbf{β_{1,i}}×\mathbf{X_{jt}} \tag{2}\]</span></span></p>
-<p>where <span class="math inline">\(\beta_{0,i}\)</span> is the intercept, <span class="math inline">\(d_{[β],it}\)</span> is a year-specific offset, and <span class="math inline">\(\mathbf{β_i}\)</span> is a vector of covariate relationships. We modeled <span class="math inline">\(\beta_{0,i}\)</span> and <span class="math inline">\(\mathbf{β_i}\)</span> as species-specific random effects, and <span class="math inline">\(d_{[β],it}\)</span> as a species×year-specific random effect. Hyper-parameter priors for these random effects were</p>
+<p>where <span class="math inline">\(\beta_{0,i}\)</span> is the intercept, <span class="math inline">\(d_{[β],it}\)</span> is a year-specific offset, <span class="math inline">\(\mathbf{β_i}\)</span> is a vector of covariate relationships, and <span class="math inline">\(\mathbf{X_{jt}}\)</span> is a matrix of values for all management and human traffic covariates. We modeled <span class="math inline">\(\beta_{0,i}\)</span> and <span class="math inline">\(\mathbf{β_i}\)</span> as species-specific random effects, and <span class="math inline">\(d_{[β],it}\)</span> as a species×year-specific random effect. Hyper-parameter priors for these random effects were</p>
 <span id="eq-eco_beta_mean"><span class="math display">\[\overline{\beta} \sim Normal(0,1), \tag{3}\]</span></span> <span id="eq-eco_beta_SD"><span class="math display">\[SD_{\beta} \sim gamma(1,1), \tag{4}\]</span></span> <span id="eq-eco_d_mean"><span class="math display">\[\overline{d_{[β_0]}} = 0, \tag{5}\]</span></span>
 <center>
 and
@@ -145,11 +147,11 @@ and
 and
 </center>
 <p><span id="eq-obs_y_p"><span class="math display">\[\mathbf{y_{[p],ijt}} \sim Multinomial \left(n_{ijt},\mathbf{π_{[p],ijt}^{[c]}} \right). \tag{11}\]</span></span></p>
-<p>Bin probabilities for availability assume constant availability across the survey period,</p>
+<p>Bin probabilities for availability assumed constant availability across the survey period,</p>
 <p><span id="eq-obs_pi_a_bin"><span class="math display">\[π_{[a],ijtr}=p_{[ar],ijt} (1-p_{[ar],ijt})^{r-1}, \tag{12}\]</span></span></p>
-<p>where <span class="math inline">\(p_{[ar],ijt}\)</span> is the availability for a single 2-min time removal bin. Bin probabilities for perceptibility account for increasing area of bins with increasing distance from the surveyor,</p>
+<p>where <span class="math inline">\(p_{[ar],ijt}\)</span> is the availability for a single 2-min time removal bin. Bin probabilities for perceptibility accounted for increasing area of bins with increasing distance from the surveyor,</p>
 <p><span id="eq-abundance_pi_p_bin"><span class="math display">\[π_{[p],ijtd}=\frac{p_{[pd],ijtd}A_d}{∑_{d=1}^{d_{[max]}}A_d}, \tag{13}\]</span></span></p>
-<p>where <span class="math inline">\(p_{[pd],ijtd}\)</span> is the perceptibility within distance bin <span class="math inline">\(d\)</span> in year <span class="math inline">\(t\)</span>, and <span class="math inline">\(A_d\)</span> is the area of distance bin <span class="math inline">\(d\)</span>. Multinomial cell probabilites for modeling <span class="math inline">\(\mathbf{y_{[a],ijt}}\)</span> and <span class="math inline">\(\mathbf{y_{[p],ijt}}\)</span> represent bin probabilites scaled to sum to 1:</p>
+<p>where <span class="math inline">\(p_{[pd],ijtd}\)</span> is the perceptibility within distance bin <span class="math inline">\(d\)</span> in year <span class="math inline">\(t\)</span>, and <span class="math inline">\(A_d\)</span> is the area of distance bin <span class="math inline">\(d\)</span>. Multinomial cell probabilites for modeling <span class="math inline">\(\mathbf{y_{[a],ijt}}\)</span> and <span class="math inline">\(\mathbf{y_{[p],ijt}}\)</span> represented bin probabilites scaled to sum to 1:</p>
 <p><span id="eq-obs_pi_a_cell"><span class="math display">\[π_{[a],ijtr}^{[c]}=π_{[a],ijtr}⁄p_{[a],ijt}, \tag{14}\]</span></span></p>
 <center>
 and
@@ -164,7 +166,7 @@ and
 and
 </center>
 <p><span id="eq-obs_h"><span class="math display">\[log(h_{ijt}) = \zeta_{0,i}+\mathbf{\zeta_{1,i}}×\mathbf{X_{jt}}, \tag{18}\]</span></span></p>
-<p>where <span class="math inline">\(\theta_{0,i}\)</span> and <span class="math inline">\(\zeta_{0,i}\)</span> are intercepts and <span class="math inline">\(\mathbf{\theta_i}\)</span> and <span class="math inline">\(\mathbf{\zeta_i}\)</span> are coefficient vectors for covariate relationships. As with ecological parameters, we modeled all intercepts and covariate coefficients as species-specific random effects. Hyper-parameter priors for detectability random effects were</p>
+<p>where <span class="math inline">\(\theta_{0,i}\)</span> and <span class="math inline">\(\zeta_{0,i}\)</span> are intercepts, <span class="math inline">\(\mathbf{\theta_i}\)</span> and <span class="math inline">\(\mathbf{\zeta_i}\)</span> are coefficient vectors for covariate relationships, and <span class="math inline">\(\mathbf{X_{jt}}\)</span> are matrices of values for detectability covariates. For availability, these were unconditional traffic intensity, survey date, survey time, and squared values for date and time. For perceptibility, we only had unconditional traffic intensity as a covariate. As with ecological parameters, we modeled all intercepts and covariate coefficients as species-specific random effects. Hyper-parameter priors for detectability random effects were</p>
 <span id="eq-obs_zeta0_mean"><span class="math display">\[\overline{\zeta_0} \sim Normal(4.5,0.67), \tag{19}\]</span></span> <span id="eq-obs_zeta_mean"><span class="math display">\[\overline{\zeta_1} \sim Normal(0,1), \tag{20}\]</span></span> <span id="eq-obs_beta_SD"><span class="math display">\[SD_{\zeta_0},SD_{\zeta_1} \sim gamma(1,1), \tag{21}\]</span></span> <span id="eq-obs_b_mean"><span class="math display">\[\overline{b} \sim Uniform(0,20), \tag{22}\]</span></span> <span id="eq-obs_b_SD"><span class="math display">\[SD_{b} \sim gamma(1,1), \tag{23}\]</span></span> <span id="eq-obs_theta0_mean"><span class="math display">\[\overline{\theta_0} \sim Normal(0,0.67), \tag{24}\]</span></span> <span id="eq-obs_theta_SD"><span class="math display">\[\overline{\theta_1} \sim Normal(0,1), \tag{25}\]</span></span>
 <center>
 and
@@ -198,17 +200,17 @@ and
 <h2 data-number="3" class="anchored" data-anchor-id="derived-parameters"><span class="header-section-number">3</span> Derived parameters</h2>
 <section id="sec-N_p" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="sec-N_p"><span class="header-section-number">3.1</span> Predicted abundance adjusted for cluster size</h3>
-<p>We drew inference primarily from comparisons of predicted diversity across covariate space, which first required predicting species abundance. If we represent a location in covariate space to which we wanted to predict as <span class="math inline">\(\mathbf{X_p}\)</span>, we predicted mean abundance at that location as</p>
-<p><span id="eq-pred_N"><span class="math display">\[N_{p,i}=\lambda_{p,i}×c_i, \tag{33}\]</span></span></p>
-<p>where <span class="math inline">\(\lambda_{p,i}\)</span> is calculated as</p>
-<p><span id="eq-pred_lambda"><span class="math display">\[log(\lambda_{p,i})=β_{0,i}+\mathbf{β_{1,i}}×\mathbf{X_p}, \tag{34}\]</span></span></p>
+<p>We drew inference primarily from comparisons of predicted diversity across covariate space, which first required predicting species abundance. If we represent a location in covariate space to which we wanted to predict as <span class="math inline">\(\mathbf{X_p}\)</span> (the subscript <span class="math inline">\(p\)</span> indicating predicted parameters throughout this section), we predicted mean abundance at that location as</p>
+<p><span id="eq-pred_N"><span class="math display">\[N_{[PRED],i}=\lambda_{[PRED],i}×c_i, \tag{33}\]</span></span></p>
+<p>where <span class="math inline">\(\lambda_{[PRED],i}\)</span> is calculated as</p>
+<p><span id="eq-pred_lambda"><span class="math display">\[log(\lambda_{[PRED],i})=β_{0,i}+\mathbf{β_{1,i}}×\mathbf{X_{[PRED]}}, \tag{34}\]</span></span></p>
 <p>and <span class="math inline">\(c_i\)</span> is cluster size for species <span class="math inline">\(i\)</span>. Of <span class="math inline">\(51,163\)</span> detected clusters, <span class="math inline">\(97.4\%\)</span> consisted of a single detected individual and the remaining <span class="math inline">\(2.6\%\)</span> of clusters consisted of <span class="math inline">\(\geq 2\)</span> non-independently detected individuals (e.g., members of breeding pair detected together). When possible, we derived <span class="math inline">\(c_i\)</span> by drawing values for each MCMC posterior sample from a truncated normal distribution, <span class="math inline">\(\widehat{\overline{c_i}} \sim Normal(\overline{X_{c_i}},SE_{X_{c_i}})T(1,)\)</span>, where <span class="math inline">\(\overline{X_{c_i}}\)</span> and <span class="math inline">\(SE_{X_{c_i}}\)</span> are the sample mean and standard error (<span class="math inline">\(SE_{X_{c_i}}=SD_{X_{c_i}}/\sqrt{n}\)</span>), respectively. For 55 species, we either recorded all cluster sizes = 1 or detected only one cluster, in which case <span class="math inline">\(SE_{X_{c_i}}\)</span> was undefined so <span class="math inline">\(c_i=\overline{X_{c_i}}\)</span>.</p>
 </section>
 <section id="diversity" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="diversity"><span class="header-section-number">3.2</span> Diversity</h3>
 <p>We used the Hill-Shannon index to quantify bird diversity <span class="citation" data-cites="RoswellEtAl-2021">(<a href="#ref-RoswellEtAl-2021" role="doc-biblioref">Roswell, Dushoff, and Winfree 2021</a>)</span>. For any species group <span class="math inline">\(I\)</span>, we derived predicted diversity as</p>
-<p><span id="eq-pred_D"><span class="math display">\[D_p = exp\left(-1×\sum_{i=1}^{I}\left(\frac{N_{p,i}}{\sum_{i=1}^{I}N_{p,i}}×log\left(\frac{N_{p,i}}{\sum_{i=1}^{I}N_{p,i}}\right)\right)\right). \tag{35}\]</span></span></p>
-<p>Figures 3 and 4 present <span class="math inline">\(D_p\)</span> along covariate gradients, and we used differences in <span class="math inline">\(D_p\)</span> between alternative locations in covariate space to partition management relationships with diversity into their underlying components (see <a href="#sec-path_analysis" class="quarto-xref">Section&nbsp;4</a>).</p>
+<p><span id="eq-pred_D"><span class="math display">\[D_{[PRED]} = exp\left(-1×\sum_{i=1}^{I}\left(\frac{N_{[PRED],i}}{\sum_{i=1}^{I}N_{[PRED],i}}×log\left(\frac{N_{[PRED],i}}{\sum_{i=1}^{I}N_{[PRED],i}}\right)\right)\right). \tag{35}\]</span></span></p>
+<p>Figures 3 and 4 present <span class="math inline">\(D_{[PRED]}\)</span> along covariate gradients, and we used differences in <span class="math inline">\(D_{[PRED]}\)</span> between alternative locations in covariate space to partition management relationships with diversity into their underlying components (see <a href="#sec-path_analysis" class="quarto-xref">Section&nbsp;4</a>).</p>
 </section>
 </section>
 <section id="sec-path_analysis" class="level2" data-number="4">
@@ -216,31 +218,31 @@ and
 <section id="sec-total_relations" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="sec-total_relations"><span class="header-section-number">4.1</span> Total management relationships</h3>
 <p>We followed <span class="citation" data-cites="Clough-2012">Clough (<a href="#ref-Clough-2012" role="doc-biblioref">2012</a>)</span> to quantify components of management relationships with bird diversity. We expressed the total relationship of a management covariate, <span class="math inline">\(X_{[M]}\)</span>, with bird diversity as</p>
-<p><span id="eq-total_management_effect"><span class="math display">\[B_{[M,T]}^{[D]}=log(D_{p,M}/D_{p,R}), \tag{36}\]</span></span></p>
-<p>where <span class="math inline">\(D_{p,M}\)</span> and <span class="math inline">\(D_{p,R}\)</span> are predicted diversity (<a href="#eq-pred_D" class="quarto-xref">Equation&nbsp;35</a>) calculated with covariate values representing management and reference scenarios, respectively. The set of covariate values representing management and reference scenarios depended on which management relationship we were deriving. We identified 5 fundamental scenarios for calculating total management relationships (vegetation covariates set to their mean for all scenarios):</p>
+<p><span id="eq-total_management_effect"><span class="math display">\[B_{[M,T]}^{[D]}=log(D_{[PRED,M]}/D_{[PRED,R]}), \tag{36}\]</span></span></p>
+<p>where <span class="math inline">\(D_{[PRED,M]}\)</span> and <span class="math inline">\(D_{[PRED,R]}\)</span> are predicted diversity (<a href="#eq-pred_D" class="quarto-xref">Equation&nbsp;35</a>) calculated with covariate values representing management and reference scenarios, respectively. The set of covariate values representing management and reference scenarios depended on which management relationship we were deriving. We identified 5 fundamental scenarios for calculating total management relationships (vegetation covariates set to their mean for all scenarios):</p>
 <div class="hanging-indent">
-<p><em>Baseline</em> - <span class="math inline">\(X_{p}^{[Base]}\)</span> - Trail and road densities are set to <span class="math inline">\(0\)</span>, and proportion no OHV set to its mean.<br></p>
+<p><em>Baseline</em> - <span class="math inline">\(X_{[PRED]}^{[Base]}\)</span> - Trail and road densities are set to <span class="math inline">\(0\)</span>, and proportion no OHV set to its mean.<br></p>
 </div>
 <div class="hanging-indent">
-<p><em>Some trails, average OHV</em> - <span class="math inline">\(X_{p}^{[Trails,\overline{OHV}]}\)</span> - Trail density is set to <span class="math inline">\(2.0~km/km^2\)</span> (i.e., <span class="math inline">\(0+1SD\)</span>), road density to <span class="math inline">\(0\)</span>, and proportion no OHV to its mean.<br></p>
+<p><em>Some trails, average OHV</em> - <span class="math inline">\(X_{[PRED]}^{[Trails,\overline{OHV}]}\)</span> - Trail density is set to <span class="math inline">\(2.0~km/km^2\)</span> (i.e., <span class="math inline">\(0+1SD\)</span>), road density to <span class="math inline">\(0\)</span>, and proportion no OHV to its mean.<br></p>
 </div>
 <div class="hanging-indent">
-<p><em>Some trails, no OHV</em> - <span class="math inline">\(X_{p}^{[Trails,OHV=0]}\)</span> - Trail density is set to <span class="math inline">\(2.0~km/km^2\)</span>, road density to <span class="math inline">\(0\)</span>, and proportion no OHV to <span class="math inline">\(0\)</span>.<br></p>
+<p><em>Some trails, no OHV</em> - <span class="math inline">\(X_{[PRED]}^{[Trails,OHV=0]}\)</span> - Trail density is set to <span class="math inline">\(2.0~km/km^2\)</span>, road density to <span class="math inline">\(0\)</span>, and proportion no OHV to <span class="math inline">\(0\)</span>.<br></p>
 </div>
 <div class="hanging-indent">
-<p><em>Some trails, unrestricted OHV</em> - <span class="math inline">\(X_{p}^{[Trails,OHV=1]}\)</span> - Trail density is set to <span class="math inline">\(2.0~km/km^2\)</span>, road density to <span class="math inline">\(0\)</span>, and proportion no OHV to <span class="math inline">\(1\)</span>.<br></p>
+<p><em>Some trails, unrestricted OHV</em> - <span class="math inline">\(X_{[PRED]}^{[Trails,OHV=1]}\)</span> - Trail density is set to <span class="math inline">\(2.0~km/km^2\)</span>, road density to <span class="math inline">\(0\)</span>, and proportion no OHV to <span class="math inline">\(1\)</span>.<br></p>
 </div>
 <div class="hanging-indent">
-<p><em>Some roads</em> - <span class="math inline">\(X_{p}^{[Roads]}\)</span> - Road density is set to <span class="math inline">\(1.0~km/km^2\)</span> (i.e., <span class="math inline">\(0+1SD\)</span>), trail density to <span class="math inline">\(0\)</span>, and proportion no OHV to its mean.<br></p>
+<p><em>Some roads</em> - <span class="math inline">\(X_{[PRED]^{[Roads]}\)</span> - Road density is set to <span class="math inline">\(1.0~km/km^2\)</span> (i.e., <span class="math inline">\(0+1SD\)</span>), trail density to <span class="math inline">\(0\)</span>, and proportion no OHV to its mean.<br></p>
 </div>
-<p>For total management relationships, we set values for each human traffic covariate, <span class="math inline">\(X_{[H],p}\)</span>, to <span class="math inline">\(p_{[H]}\)</span> from the corresponding path model (<a href="#eq-Humans_detected_link" class="quarto-xref">Equation&nbsp;30</a> or <a href="#eq-Traffic_intensity_speed_link" class="quarto-xref">Equation&nbsp;32</a>) informed with scenario-specific management covariate values. We then assigned management and reference scenarios for calculating total management relationships (<a href="#eq-total_management_effect" class="quarto-xref">Equation&nbsp;36</a>) as follows:</p>
+<p>For total management relationships, we set values for each human traffic covariate, <span class="math inline">\(X_{[PRED,H]}\)</span>, to <span class="math inline">\(p_{[H]}\)</span> from the corresponding path model (<a href="#eq-Humans_detected_link" class="quarto-xref">Equation&nbsp;30</a> or <a href="#eq-Traffic_intensity_speed_link" class="quarto-xref">Equation&nbsp;32</a>) informed with scenario-specific management covariate values. We then assigned management and reference scenarios for calculating total management relationships (<a href="#eq-total_management_effect" class="quarto-xref">Equation&nbsp;36</a>) as follows:</p>
 <p>Trail density - management = <em>Some trails, average OHV</em>; reference = <em>Baseline</em><br> Road density - management = <em>Some roads</em>; reference = <em>Baseline</em><br> Proportion no OHV - management = <em>Some trails, no OHV</em>; reference = <em>Some trails, unrestricted OHV</em><br></p>
 </section>
 <section id="sec-mech_contributions" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="sec-mech_contributions"><span class="header-section-number">4.2</span> Mechanistic contributions</h3>
 <p>We quantified the percent contribution of human traffic to management relationships with diversity by calculating the portion of the total relationship explained by human traffic <span class="citation" data-cites="Clough-2012">(i.e., indirect relationship <em>sensu</em> <a href="#ref-Clough-2012" role="doc-biblioref">Clough 2012</a>)</span>, and then dividing the explained by the total relationship (and multiplying by 100). For the explained portion of the total relationship, we first defined a counter-factual scenario wherein human traffic covariates were set to values representing the reference instead of management levels. For example, the counter-factual scenario for calculating the proportion of the trail density effect would be represented by setting management covariates to <em>Some trails, average OHV</em> but human traffic covariates to <em>Baseline</em>. We then calculated the explained portion of the management relationship as</p>
-<p><span id="eq-explained_management_effect"><span class="math display">\[B_{[M,E]}^{[D]}=log(D_{p,M}/D_{p,C}), \tag{37}\]</span></span></p>
-<p>where <span class="math inline">\(D_{p,C}\)</span> is predicted diversity under the counter-factual scenarios. We then calculate the percent contribution of human traffic as</p>
+<p><span id="eq-explained_management_effect"><span class="math display">\[B_{[M,E]}^{[D]}=log(D_{[PRED,M]}/D_{[PRED,C]}), \tag{37}\]</span></span></p>
+<p>where <span class="math inline">\(D_{[PRED,C]}\)</span> is predicted diversity under the counter-factual scenarios. We then calculate the percent contribution of human traffic as</p>
 <p><span id="eq-percent_explained"><span class="math display">\[P_{H}=\left(B_{[M,E]}/B_{[M,T]}\right)×100. \tag{38}\]</span></span></p>
 
 </section>
@@ -251,7 +253,7 @@ and
 Buckland, Stephen T., David R. Anderson, Kenneth P. Burnham, Jeffery L. Laake, David L. Borchers, and Len Thomas. 2001. <em>Introduction to Distance Sampling: Estimating Abundance of Biological Populations</em>. Oxford, United Kingdom: Oxford University Press.
 </div>
 <div id="ref-Clough-2012" class="csl-entry" role="listitem">
-Clough, Yann. 2012. <em>A Generalized Approach to Modeling and Estimating Indirect Effects in Ecology</em>. <em>Ecology</em>. Vol. 93. <a href="https://doi.org/10.1890/11-1899.1">https://doi.org/10.1890/11-1899.1</a>.
+Clough, Yann. 2012. <span>“A Generalized Approach to Modeling and Estimating Indirect Effects in Ecology.”</span> <em>Ecology</em> 93: 1809–15. <a href="https://doi.org/10.1890/11-1899.1">https://doi.org/10.1890/11-1899.1</a>.
 </div>
 <div id="ref-GelmanHill-2007" class="csl-entry" role="listitem">
 Gelman, Andrew, and Jennifer Hill. 2007. <em>Data Analysis Using Regression and Multilevel/ Hierarchical Models</em>. New York, NY: Cambridge University Press.
@@ -260,247 +262,254 @@ Gelman, Andrew, and Jennifer Hill. 2007. <em>Data Analysis Using Regression and 
 R Core Team. 2023. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
 </div>
 <div id="ref-RoswellEtAl-2021" class="csl-entry" role="listitem">
-Roswell, Michael, Jonathan Dushoff, and Rachael Winfree. 2021. <em>A Conceptual Guide to Measuring Species Diversity</em>. <em>Oikos</em>. Vol. 130. <a href="https://doi.org/10.1111/oik.07202">https://doi.org/10.1111/oik.07202</a>.
+Roswell, Michael, Jonathan Dushoff, and Rachael Winfree. 2021. <span>“A Conceptual Guide to Measuring Species Diversity.”</span> <em>Oikos</em> 130: 321–38. <a href="https://doi.org/10.1111/oik.07202">https://doi.org/10.1111/oik.07202</a>.
 </div>
 <div id="ref-Nimble-2023" class="csl-entry" role="listitem">
 Valpine, Perry de, Chris Paciorek, Daniel Turek, N. Michaud, Clifford Anderson-Bergman, F. Obermeyer, C. Wehrhahn Cortes, A. Rodrìguez, Duncan Temple Lang, and S. Paganin. 2023. <em>_NIMBLE User Manual_</em>. R package manual version 1.0.1. <a href="https://doi.org/10.5281/zenodo.1211190">https://doi.org/10.5281/zenodo.1211190</a>.
 </div>
 <div id="ref-Nimble-2017" class="csl-entry" role="listitem">
-Valpine, Perry de, Daniel Turek, Chris J. Paciorek, Clifford Anderson-Bergman, Duncan Temple Lang, and Rastislav Bodik. 2017. <em>Programming with Models: Writing Statistical Algorithms for General Model Structures with NIMBLE</em>. <em>Journal of Computational and Graphical Statistics</em>. Vol. 26. <a href="https://doi.org/10.1080/10618600.2016.1172487">https://doi.org/10.1080/10618600.2016.1172487</a>.
+Valpine, Perry de, Daniel Turek, Chris J. Paciorek, Clifford Anderson-Bergman, Duncan Temple Lang, and Rastislav Bodik. 2017. <span>“Programming with Models: Writing Statistical Algorithms for General Model Structures with NIMBLE.”</span> <em>Journal of Computational and Graphical Statistics</em> 26: 403–13. <a href="https://doi.org/10.1080/10618600.2016.1172487">https://doi.org/10.1080/10618600.2016.1172487</a>.
 </div>
 </div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
       }
+      return false;
     }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
       }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
       for (const childEl of codeEl.children) {
         if (isCodeAnnotation(childEl)) {
           childEl.remove();
         }
       }
       return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
     });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
     }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
-    };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
         }
-        return container.innerHTML
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -508,185 +517,161 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 </div> <!-- /content -->
 
 
