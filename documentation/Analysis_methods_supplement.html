@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>analysis_methods_supplement</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -24,7 +27,6 @@ ul.task-list li input[type="checkbox"] {
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -46,18 +48,17 @@ div.csl-indent {
 <script src="Analysis_methods_supplement_files/libs/clipboard/clipboard.min.js"></script>
 <script src="Analysis_methods_supplement_files/libs/quarto-html/quarto.js" type="module"></script>
 <script src="Analysis_methods_supplement_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="Analysis_methods_supplement_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="Analysis_methods_supplement_files/libs/quarto-html/popper.min.js"></script>
 <script src="Analysis_methods_supplement_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="Analysis_methods_supplement_files/libs/quarto-html/anchor.min.js"></script>
 <link href="Analysis_methods_supplement_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Analysis_methods_supplement_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="Analysis_methods_supplement_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="Analysis_methods_supplement_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Analysis_methods_supplement_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Analysis_methods_supplement_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="Analysis_methods_supplement_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -166,7 +167,7 @@ and
 and
 </center>
 <p><span id="eq-obs_h"><span class="math display">\[log(h_{ijt}) = \zeta_{0,i}+\mathbf{\zeta_{1,i}}×\mathbf{X_{jt}}, \tag{18}\]</span></span></p>
-<p>where <span class="math inline">\(\theta_{0,i}\)</span> and <span class="math inline">\(\zeta_{0,i}\)</span> are intercepts, <span class="math inline">\(\mathbf{\theta_i}\)</span> and <span class="math inline">\(\mathbf{\zeta_i}\)</span> are coefficient vectors for covariate relationships, and <span class="math inline">\(\mathbf{X_{jt}}\)</span> are matrices of values for detectability covariates. For availability, these were unconditional traffic intensity, survey date, survey time, and squared values for date and time. For perceptibility, we only had unconditional traffic intensity as a covariate. As with ecological parameters, we modeled all intercepts and covariate coefficients as species-specific random effects. Hyper-parameter priors for detectability random effects were</p>
+<p>where <span class="math inline">\(\theta_{0,i}\)</span> and <span class="math inline">\(\zeta_{0,i}\)</span> are intercepts, <span class="math inline">\(\mathbf{\theta_{1,i}}\)</span> and <span class="math inline">\(\mathbf{\zeta_{1,i}}\)</span> are coefficient vectors for covariate relationships, and <span class="math inline">\(\mathbf{X_{jt}}\)</span> are matrices of values for detectability covariates. For availability, these were unconditional traffic intensity, survey date, survey time, and squared values for date and time. For perceptibility, we only had unconditional traffic intensity as a covariate. As with ecological parameters, we modeled all intercepts and covariate coefficients as species-specific random effects. Hyper-parameter priors for detectability random effects were</p>
 <span id="eq-obs_zeta0_mean"><span class="math display">\[\overline{\zeta_0} \sim Normal(4.5,0.67), \tag{19}\]</span></span> <span id="eq-obs_zeta_mean"><span class="math display">\[\overline{\zeta_1} \sim Normal(0,1), \tag{20}\]</span></span> <span id="eq-obs_beta_SD"><span class="math display">\[SD_{\zeta_0},SD_{\zeta_1} \sim gamma(1,1), \tag{21}\]</span></span> <span id="eq-obs_b_mean"><span class="math display">\[\overline{b} \sim Uniform(0,20), \tag{22}\]</span></span> <span id="eq-obs_b_SD"><span class="math display">\[SD_{b} \sim gamma(1,1), \tag{23}\]</span></span> <span id="eq-obs_theta0_mean"><span class="math display">\[\overline{\theta_0} \sim Normal(0,0.67), \tag{24}\]</span></span> <span id="eq-obs_theta_SD"><span class="math display">\[\overline{\theta_1} \sim Normal(0,1), \tag{25}\]</span></span>
 <center>
 and
@@ -208,7 +209,7 @@ and
 </section>
 <section id="diversity" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="diversity"><span class="header-section-number">3.2</span> Diversity</h3>
-<p>We used the Hill-Shannon index to quantify bird diversity <span class="citation" data-cites="RoswellEtAl-2021">(<a href="#ref-RoswellEtAl-2021" role="doc-biblioref">Roswell, Dushoff, and Winfree 2021</a>)</span>. For any species group <span class="math inline">\(I\)</span>, we derived predicted diversity as</p>
+<p>We used the Hill-Shannon index to quantify bird diversity <span class="citation" data-cites="RoswellEtAl-2021">(<a href="#ref-RoswellEtAl-2021" role="doc-biblioref">Roswell et al. 2021</a>)</span>. For any species group <span class="math inline">\(I\)</span>, we derived predicted diversity as</p>
 <p><span id="eq-pred_D"><span class="math display">\[D_{[PRED]} = exp\left(-1×\sum_{i=1}^{I}\left(\frac{N_{[PRED],i}}{\sum_{i=1}^{I}N_{[PRED],i}}×log\left(\frac{N_{[PRED],i}}{\sum_{i=1}^{I}N_{[PRED],i}}\right)\right)\right). \tag{35}\]</span></span></p>
 <p>Figures 3 and 4 present <span class="math inline">\(D_{[PRED]}\)</span> along covariate gradients, and we used differences in <span class="math inline">\(D_{[PRED]}\)</span> between alternative locations in covariate space to partition management relationships with diversity into their underlying components (see <a href="#sec-path_analysis" class="quarto-xref">Section&nbsp;4</a>).</p>
 </section>
@@ -248,24 +249,24 @@ and
 </section>
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-BucklandEtAl-2001" class="csl-entry" role="listitem">
-Buckland, Stephen T., David R. Anderson, Kenneth P. Burnham, Jeffery L. Laake, David L. Borchers, and Len Thomas. 2001. <em>Introduction to Distance Sampling: Estimating Abundance of Biological Populations</em>. Oxford, United Kingdom: Oxford University Press.
+Buckland, Stephen T., David R. Anderson, Kenneth P. Burnham, Jeffery L. Laake, David L. Borchers, and Len Thomas. 2001. <em>Introduction to Distance Sampling: Estimating Abundance of Biological Populations</em>. Oxford University Press.
 </div>
 <div id="ref-Clough-2012" class="csl-entry" role="listitem">
 Clough, Yann. 2012. <span>“A Generalized Approach to Modeling and Estimating Indirect Effects in Ecology.”</span> <em>Ecology</em> 93: 1809–15. <a href="https://doi.org/10.1890/11-1899.1">https://doi.org/10.1890/11-1899.1</a>.
 </div>
 <div id="ref-GelmanHill-2007" class="csl-entry" role="listitem">
-Gelman, Andrew, and Jennifer Hill. 2007. <em>Data Analysis Using Regression and Multilevel/ Hierarchical Models</em>. New York, NY: Cambridge University Press.
+Gelman, Andrew, and Jennifer Hill. 2007. <em>Data Analysis Using Regression and Multilevel/ Hierarchical Models</em>. Cambridge University Press.
 </div>
 <div id="ref-R-base" class="csl-entry" role="listitem">
-R Core Team. 2023. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+R Core Team. 2023. <em>R: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
 </div>
 <div id="ref-RoswellEtAl-2021" class="csl-entry" role="listitem">
 Roswell, Michael, Jonathan Dushoff, and Rachael Winfree. 2021. <span>“A Conceptual Guide to Measuring Species Diversity.”</span> <em>Oikos</em> 130: 321–38. <a href="https://doi.org/10.1111/oik.07202">https://doi.org/10.1111/oik.07202</a>.
 </div>
 <div id="ref-Nimble-2023" class="csl-entry" role="listitem">
-Valpine, Perry de, Chris Paciorek, Daniel Turek, N. Michaud, Clifford Anderson-Bergman, F. Obermeyer, C. Wehrhahn Cortes, A. Rodrìguez, Duncan Temple Lang, and S. Paganin. 2023. <em>_NIMBLE User Manual_</em>. R package manual version 1.0.1. <a href="https://doi.org/10.5281/zenodo.1211190">https://doi.org/10.5281/zenodo.1211190</a>.
+Valpine, Perry de, Chris Paciorek, Daniel Turek, et al. 2023. <em>_NIMBLE User Manual_</em>. R package manual version 1.0.1. <a href="https://doi.org/10.5281/zenodo.1211190">https://doi.org/10.5281/zenodo.1211190</a>.
 </div>
 <div id="ref-Nimble-2017" class="csl-entry" role="listitem">
 Valpine, Perry de, Daniel Turek, Chris J. Paciorek, Clifford Anderson-Bergman, Duncan Temple Lang, and Rastislav Bodik. 2017. <span>“Programming with Models: Writing Statistical Algorithms for General Model Structures with NIMBLE.”</span> <em>Journal of Computational and Graphical Statistics</em> 26: 403–13. <a href="https://doi.org/10.1080/10618600.2016.1172487">https://doi.org/10.1080/10618600.2016.1172487</a>.

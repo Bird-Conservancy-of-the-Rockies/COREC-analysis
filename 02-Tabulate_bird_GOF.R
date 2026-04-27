@@ -52,10 +52,10 @@ calculate_bayes_R2 <- function(E.n) {
 out_GOF <- data.frame(
   Spp = Spp,
   n = apply(n, 1, sum),
-  # r.md = as.numeric(NA),
-  # r.10 = as.numeric(NA),
-  # r.90 = as.numeric(NA),
-  # r.pct.na = as.numeric(NA),
+  r.md = as.numeric(NA),
+  r.10 = as.numeric(NA),
+  r.90 = as.numeric(NA),
+  r.pct.na = as.numeric(NA),
   ChiSqr_p = as.numeric(NA),
   Bays_Rsqr.md = as.numeric(NA),
   Bays_Rsqr.10 = as.numeric(NA),
@@ -63,43 +63,32 @@ out_GOF <- data.frame(
 )
 
 n.sim <- mod$mcmcOutput$n_sim
-E.n <- mod$mcmcOutput$prob_n
+E.n <- mod$mcmcOutput$prob_n * mod$mcmcOutput$lambda
 npsamp <- dim(mod$mcmcOutput)[1]
 
 for(sp in Spp) {
   sp.ind <- which(Spp == sp)
-  n.obs.sp <- n[sp.ind,]
+  n.obs.sp <- n[sp.ind,] %>% array(dim = c(ngrdyrs, npsamp)) %>% t
   n.sim.sp <- n.sim[,sp.ind,]
   E.n.sp <- E.n[,sp.ind,]
   
   # Correlation of n obs vs sim
-  # r <- suppressWarnings(apply(n.sim.sp, 1, function(x) cor(x, n.obs.sp)))
-  # if(!any(is.na(r))) {
-  #   out_GOF$r.md[sp.ind] <- median(r)
-  #   out_GOF$r.10[sp.ind] <- quantile(r, probs = 0.1, type = 8)
-  #   out_GOF$r.90[sp.ind] <- quantile(r, probs = 0.9, type = 8)
-  # } else {
-  #   out_GOF$r.md[sp.ind] <- median(r[which(!is.na(r))])
-  #   out_GOF$r.10[sp.ind] <- quantile(r[which(!is.na(r))], probs = 0.1, type = 8)
-  #   out_GOF$r.90[sp.ind] <- quantile(r[which(!is.na(r))], probs = 0.9, type = 8)
-  # }
-  # out_GOF$r.pct.na[sp.ind] <- round(sum(is.na(r)) / npsamp * 100)
+  r <- suppressWarnings(sapply(1:npsamp, function(i) cor(n.sim.sp[i,], n.obs.sp[i,])))
+  if(!any(is.na(r))) {
+    out_GOF$r.md[sp.ind] <- median(r)
+    out_GOF$r.10[sp.ind] <- quantile(r, probs = 0.1, type = 8)
+    out_GOF$r.90[sp.ind] <- quantile(r, probs = 0.9, type = 8)
+  } else {
+    out_GOF$r.md[sp.ind] <- median(r[which(!is.na(r))])
+    out_GOF$r.10[sp.ind] <- quantile(r[which(!is.na(r))], probs = 0.1, type = 8)
+    out_GOF$r.90[sp.ind] <- quantile(r[which(!is.na(r))], probs = 0.9, type = 8)
+  }
+  out_GOF$r.pct.na[sp.ind] <- round(sum(is.na(r)) / npsamp * 100)
   
   # Chi-square GOF
-  Diff_prod_obs <- t((n.obs.sp - mean(n.obs.sp)) *
-    t(E.n.sp - apply(E.n.sp, 1, mean)))
-  Diff_prod_sim <- (n.sim.sp - apply(n.sim.sp, 1, mean)) *
-    (E.n.sp - apply(E.n.sp, 1, mean))
-  Diff_sqr_obs <- ((n.obs.sp - mean(n.obs.sp)) ^ 2) %>%
-    matrix(nrow = ngrdyrs, ncol = npsamp) %>% t
-  Diff_sqr_sim <- (n.sim.sp - apply(n.sim.sp, 1, mean)) ^ 2
-  Diff_sqr_En <- (E.n.sp - apply(E.n.sp, 1, mean)) ^ 2
-  
-  GOF_X2_obs <- apply(Diff_prod_obs, 1, sum) /
-    sqrt(apply(Diff_sqr_obs, 1, sum) * apply(Diff_sqr_En, 1, sum))
-  GOF_X2_sim <- apply(Diff_prod_sim, 1, sum) /
-    sqrt(apply(Diff_sqr_sim, 1, sum) * apply(Diff_sqr_En, 1, sum))
-  out_GOF$ChiSqr_p[sp.ind] <- sum(GOF_X2_sim - GOF_X2_obs > 0) / npsamp
+  T_obs <- apply(((n.obs.sp - E.n.sp) ^ 2) / E.n.sp, 1, sum) # Observed discrepancy
+  T_sim <- apply(((n.sim.sp - E.n.sp) ^ 2) / E.n.sp, 1, sum) # Simulated discrepancy
+  out_GOF$ChiSqr_p[sp.ind] <- sum(T_sim - T_obs > 0) / npsamp
   
   # Bayesian R-sqr
   R2_spp <- calculate_bayes_R2(E.n.sp)
@@ -113,23 +102,7 @@ for(sp in Spp) {
 # BCI(r.global, BCIpercent = 80, flag.sig = FALSE, ndig = 3)
 # # Result: 80% BCI = "0.792 (0.788,0.796)"
 
-# Global chi-square
-Diff_prod_obs <- (array(n - mean(n), dim = c(dim(n), npsamp)) %>%
-                    aperm(perm = c(3, 1, 2))) *
-  (E.n - apply(E.n, 1, mean))
-Diff_prod_sim <- (n.sim - apply(n.sim, 1, mean)) *
-  (E.n - apply(E.n, 1, mean))
-Diff_sqr_obs <- ((n - mean(n)) ^ 2) %>%
-  array(dim = c(dim(n), npsamp)) %>%
-  aperm(perm = c(3, 1, 2))
-Diff_sqr_sim <- (n.sim - apply(n.sim, 1, mean)) ^ 2
-Diff_sqr_En <- (E.n - apply(E.n, 1, mean)) ^ 2
-
-GOF_X2_obs <- apply(Diff_prod_obs, 1, sum) /
-  sqrt(apply(Diff_sqr_obs, 1, sum) * apply(Diff_sqr_En, 1, sum))
-GOF_X2_sim <- apply(Diff_prod_sim, 1, sum) /
-  sqrt(apply(Diff_sqr_sim, 1, sum) * apply(Diff_sqr_En, 1, sum))
-sum(GOF_X2_sim - GOF_X2_obs > 0) / npsamp
+# Global chi-square (not doing this - pointless)
 # p = 1
 
 # Bayesian R-squared

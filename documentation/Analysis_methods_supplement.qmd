@@ -105,7 +105,7 @@ $$logit(p_{[ar],ijt}) = \theta_{0,i}+\mathbf{\theta_{1,i}}×\mathbf{X_{jt}}$$ {#
 
 $$log(h_{ijt}) = \zeta_{0,i}+\mathbf{\zeta_{1,i}}×\mathbf{X_{jt}},$$ {#eq-obs_h}
 
-where $\theta_{0,i}$ and $\zeta_{0,i}$ are intercepts, $\mathbf{\theta_i}$ and $\mathbf{\zeta_i}$ are coefficient vectors for covariate relationships, and $\mathbf{X_{jt}}$ are matrices of values for detectability covariates. For availability, these were unconditional traffic intensity, survey date, survey time, and squared values for date and time. For perceptibility, we only had unconditional traffic intensity as a covariate. As with ecological parameters, we modeled all intercepts and covariate coefficients as species-specific random effects. Hyper-parameter priors for detectability random effects were
+where $\theta_{0,i}$ and $\zeta_{0,i}$ are intercepts, $\mathbf{\theta_{1,i}}$ and $\mathbf{\zeta_{1,i}}$ are coefficient vectors for covariate relationships, and $\mathbf{X_{jt}}$ are matrices of values for detectability covariates. For availability, these were unconditional traffic intensity, survey date, survey time, and squared values for date and time. For perceptibility, we only had unconditional traffic intensity as a covariate. As with ecological parameters, we modeled all intercepts and covariate coefficients as species-specific random effects. Hyper-parameter priors for detectability random effects were
 
 $$\overline{\zeta_0} \sim Normal(4.5,0.67),$$ {#eq-obs_zeta0_mean}
 $$\overline{\zeta_1} \sim Normal(0,1),$$ {#eq-obs_zeta_mean}
