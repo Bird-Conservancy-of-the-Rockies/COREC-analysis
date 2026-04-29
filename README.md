@@ -24,6 +24,7 @@ This repository contains scripts for analysis of species abundance and diversity
 
 # Results
 `02-Spp_supported_relations_and_total_effects.R` - Tabulates species-specific management relationships<br>
+`02-Tabulate_bird_GOF` - Tabulate species-specific model performance metrics to be included in Dryad data repository<br>
 `02-Tabulate_parameters` - Tabulates species parameter estimates for review<br>
 `02-Trail_human_correlations.R` - Tabulates correlations between human traffic and management covariates<br>
 `03-Plot_covariate_effects.R` - Generates figures displaying species-specific log-linear covariate relationships with abundance<br>
