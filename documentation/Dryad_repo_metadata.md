@@ -230,7 +230,7 @@ References
 
 Gelman, A., B. Goodrich, J. Gabry, and A. Vehtari. 2019. R-squared for Bayesian regression models. The American Statistician 73:307–309.
 
-Latif, Q. S. 2026. Bird-Conservancy-of-the-Rockies/COREC-analysis (v1.1). Zenodo. https://doi.org/10.5281/zenodo.19895940
+Latif, Q. S. 2026. Bird-Conservancy-of-the-Rockies/COREC-analysis (v1.2). Zenodo. https://doi.org/10.5281/zenodo.19896609
 
 - - -
 END OF README
