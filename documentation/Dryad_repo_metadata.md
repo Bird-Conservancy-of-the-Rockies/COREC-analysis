@@ -16,16 +16,16 @@ Provenance for this README
 
 * File name: Dryad_repo_metadata.md
 * Author: Quresh S. Latif
-* Co-authors for manuscript: Liza G. Rossi, Matthew F. McLaren, Jennifer M. Timmer, Melissa A. Dressen, Christopher C. Keefe, Heather N. Abernathy, Mark A. Ditmer
-* Date created: 2023-01-25
-* Date modified: 2023-02-01
+* Co-authors for manuscript: Liza G. Rossi, Matthew F. McLaren, Jennifer M. Timmer, Melissa A. Dressen, Christopher C. Keefe, Heather N. Abernathy, Rob A. Sparks, Mark A. Ditmer
+* Date created: 2025-07-09
+* Date modified: 2026-04-29
 
 Dataset Version and Release History
 -----------------------------------
 
 * Current Version:
-  * Number: 0.0
-  * Date: 2025-07-09
+  * Number: 0.1
+  * Date: 2026-04-29
   * Persistent identifier: DOI: 10.5061/dryad.0rxwdbscz
 
 Dataset Attribution and Usage
@@ -33,9 +33,9 @@ Dataset Attribution and Usage
 
 * Dataset Title: Data for the article "Human traffic explains recreation impacts for Colorado breeding bird diversity"
 
-* Persistent Identifier: TBD
+* Persistent Identifier: DOI: 10.5061/dryad.0rxwdbscz
 
-* Dataset Contributors: Matthew F. McLaren, Jennifer M. Timmer, Heather N. Abernathy, Mark A. Ditmer
+* Dataset Contributors: Matthew F. McLaren, Jennifer M. Timmer, Heather N. Abernathy, Rob A. Sparks, Mark A. Ditmer
 
 * Publisher: Bird Conservancy of the Rockies
 
@@ -47,7 +47,7 @@ Dataset Attribution and Usage
 
 * Suggested Citations:
 
-  - Dataset citation: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, and M. A. Ditmer. 2025. Data for the article "Human traffic explains recreation impacts for Colorado breeding bird diversity", Dryad, Dataset. https://doi.org/DOI:10.5061/dryad.0rxwdbscz.
+  - Dataset citation: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, R. A. Sparks, and M. A. Ditmer. 2025. Data for the article "Human traffic explains recreation impacts for Colorado breeding bird diversity", Dryad, Dataset. https://doi.org/DOI:10.5061/dryad.0rxwdbscz.
 
   - Corresponding publication: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, and M. A. Ditmer. In Review. Human traffic explains recreation impacts for Colorado breeding bird diversity. Ecological Applications.
 
@@ -88,7 +88,26 @@ Methodological Information
 
 File metadata
 =============
- 
+
+`Species_detection_parameter_estimates.csv`
+-------------------------------------------
+
+* Description: A comma-delimited file listing detectability sub-model parameter estimates from the avian community abundance model. Species abundance estimates reported in the manuscript are corrected for detectability represented in these estimates. Species are ordered alphabetically by 4-letter code. All estimates are reported as posterior median (and 80% credible intervals), and asterices indicate covariate relationships supported with 90% confidence (i.e., where 80% CIs excluded zero).
+
+* Format: .csv
+
+* Dimensions: 150 rows X 8 columns
+
+* Fields:
+  * Species: 4-letter species codes. Complete species names are listed in `Species_list_and_groups.csv`.
+  * a0: scale parameter for hazard function corresponding to the distance at which the species are detected at mean covariate values
+  * zeta.Traffic_intensity: log-linear relationship of perceptibility (scale parameter for hazard function) with scaled (centered and divided by SD) unconditional traffic intensity
+  * pa0: availability (i.e., the probability an individual of the species is available for detection if present within a 6-min survey period) at mean covariate values
+  * theta.Traffic_intensity: logit linear relationship of availability with scaled unconditional traffic intensity
+  * theta.Survey_date: logit linear relationship of availability with scaled survey day of year
+  * theta.Survey_time_since_sunrise = logit linear relationship of availability with scaled time (minutes) since sunrise
+  * theta.Survey_time_since_sunrise2 = logit linear relationship of availability with scaled time (minutes) since sunrise squared
+
 `Species_list_and_groups.csv`
 -----------------------------
 
@@ -112,25 +131,6 @@ File metadata
   * G: Binary indicator of whether the species was classified as one that nests or forages on or near the ground
   * SGCN: Binary indicator of inclusion on the 2025 Colorado Species of Greatest Conservation Need list
 
-`Species_detection_parameter_estimates.csv`
--------------------------------------------
-
-* Description: A comma-delimited file listing detectability sub-model parameter estimates from the avian community abundance model. Species abundance estimates reported in the manuscript are corrected for detectability represented in these estimates. Species are ordered alphabetically by 4-letter code. All estimates are reported as posterior median (and 80% credible intervals), and asterices indicate covariate relationships supported with 90% confidence (i.e., where 80% CIs excluded zero).
-
-* Format: .csv
-
-* Dimensions: 150 rows X 8 columns
-
-* Fields:
-  * Species: 4-letter species codes. Complete species names are listed in `Species_list_and_groups.csv`.
-  * a0: scale parameter for hazard function corresponding to the distance at which the species are detected at mean covariate values
-  * zeta.Traffic_intensity: log-linear relationship of perceptibility (scale parameter for hazard function) with scaled (centered and divided by SD) unconditional traffic intensity
-  * pa0: availability (i.e., the probability an individual of the species is available for detection if present within a 6-min survey period) at mean covariate values
-  * theta.Traffic_intensity: logit linear relationship of availability with scaled unconditional traffic intensity
-  * theta.Survey_date: logit linear relationship of availability with scaled survey day of year
-  * theta.Survey_time_since_sunrise = logit linear relationship of availability with scaled time (minutes) since sunrise
-  * theta.Survey_time_since_sunrise2 = logit linear relationship of availability with scaled time (minutes) since sunrise squared
-
 `Species_management_relations_and_human_traffic_contributions.csv`
 ------------------------------------------------------------------
 
@@ -149,10 +149,32 @@ File metadata
   * Road.total: Total relationship (direct + indirect) of species abundance with road density
   * Road.pctExplained: estimated percent of total road density relationship explained by human traffic
 
+`Species_model_performance.csv`
+------------------------------------------------------------------
+
+* Description: A comma-delimited file listing species-specific model performance metrics. Species are ordered alphabetically by 4-letter code.
+
+* Format: .csv
+
+* Dimensions: 150 rows X 10 columns
+
+* Fields:
+  * Species: 4-letter species codes. Complete species names are listed in `Species_list_and_groups.csv`.
+  * n: Number of detections of the species recorded across all surveys in the data
+  * r.md, r.10, r.90: Posterior median, 10th, and 90th %-iles for Pearson's correlation coefficient relating observed counts with posterior predicted counts
+  * r.pct.na: Percentage of posterior samples for with the correlation coefficient relating observed with predicted counts could not be calculated due to predicted counts being all zero
+  * ChiSqr_p: Bayesian p-value indicating the proportion of posterior predicted datasets for which a Pearson's Chi-square goodness-of-fit test statistic was greater than the equivalent statistic for observed data
+  * Bays_Rsqr.md, Bays_Rsqr.10, Bays_Rsqr.90: Posterior median, 10th, and 90th %-iles for R-squared values quantifying overall standardized effect sizes for each species (Gelman et al. 2019)
+
 `mod_path`
 ----------
 
 * Description: This file is an R object containing all model output as generated by the “01-Analysis.R” script file archived in the accompanying git repository (Latif 2025). This file can be loaded using the R function 'R.utils::loadObject()'.  Broadly, this file contains posterior samples of parameter model estimates and their summaries as generated by the data analysis described in the manuscript and encoded in archived scripts (Latif 2023). This file is needed to replicate results summaries generated by various scripts located in the accompanying git repository (Latif 2025). As such, we do not provide a detailed catalog of the contents of this file.
+
+`mod_path_GOF`
+----------
+
+* Description: This file is an R object equivalent to `mod_path` but with additional parameters saved to calculate performance metrics and referenced by the “02-Tabulate_bird_GOF.R” script file archived in the accompanying git repository (Latif 2025). This file can be loaded using the R function 'R.utils::loadObject()'.
 
 `Data_compiled.RData`
 ---------------------
@@ -194,7 +216,7 @@ File metadata
 `code_reference_files.zip`
 ----------------------
 
-* Description: This zipped directory containing csv files referenced by R scripts archived by Latif (2025). Metadata is not provided for these files as they are simply provided for code reproducbility and are referenced by name by relevant scripts.
+* Description: This zipped directory containing csv files referenced by R scripts archived by Latif (2025). Metadata is not provided for these files as they are simply provided for code reproducibility and are referenced by name by relevant scripts.
 
 * Format: sub-directory
 
@@ -205,6 +227,8 @@ Linked with this data repository is a git repository (Latif 2025) containing all
 
 References
 ==========
+
+Gelman, A., B. Goodrich, J. Gabry, and A. Vehtari. 2019. R-squared for Bayesian regression models. The American Statistician 73:307–309.
 
 Latif, Q. S. 2025. Bird-Conservancy-of-the-Rockies/COREC-analysis (v0). To be archived at Zenodo. currently available at https://github.com/Bird-Conservancy-of-the-Rockies/COREC-analysis
 

@@ -355,12 +355,7 @@ display: none;
 <!---
 This README uses Markdown syntax and was originally written and saved as a .md file.
 To view the file with its intended formatting, use the R package 'rmarkdown'
-to render the file as html. Then print the html file to a PDF. The PDF version of
-this file is the one that is provided in the Dryad data repository that this file
-describes. The original markdown version of the file is saved in the git repository
-containing all code for the study and manuscript entitled "Human traffic explains
-recreation impacts for Colorado breeding bird diversity" in the "documentation"
-sub-folder.
+to render the file as html.
 --->
 <div id="reference-information" class="section level1">
 <h1>Reference Information</h1>
@@ -371,9 +366,9 @@ sub-folder.
 <li>Author: Quresh S. Latif</li>
 <li>Co-authors for manuscript: Liza G. Rossi, Matthew F. McLaren,
 Jennifer M. Timmer, Melissa A. Dressen, Christopher C. Keefe, Heather N.
-Abernathy, Mark A. Ditmer</li>
-<li>Date created: 2023-01-25</li>
-<li>Date modified: 2023-02-01</li>
+Abernathy, Rob A. Sparks, Mark A. Ditmer</li>
+<li>Date created: 2025-07-09</li>
+<li>Date modified: 2026-04-29</li>
 </ul>
 </div>
 <div id="dataset-version-and-release-history" class="section level2">
@@ -381,8 +376,8 @@ Abernathy, Mark A. Ditmer</li>
 <ul>
 <li>Current Version:
 <ul>
-<li>Number: 0.0</li>
-<li>Date: 2025-07-09</li>
+<li>Number: 0.1</li>
+<li>Date: 2026-04-29</li>
 <li>Persistent identifier: DOI: 10.5061/dryad.0rxwdbscz</li>
 </ul></li>
 </ul>
@@ -392,9 +387,9 @@ Abernathy, Mark A. Ditmer</li>
 <ul>
 <li><p>Dataset Title: Data for the article “Human traffic explains
 recreation impacts for Colorado breeding bird diversity”</p></li>
-<li><p>Persistent Identifier: TBD</p></li>
+<li><p>Persistent Identifier: DOI: 10.5061/dryad.0rxwdbscz</p></li>
 <li><p>Dataset Contributors: Matthew F. McLaren, Jennifer M. Timmer,
-Heather N. Abernathy, Mark A. Ditmer</p></li>
+Heather N. Abernathy, Rob A. Sparks, Mark A. Ditmer</p></li>
 <li><p>Publisher: Bird Conservancy of the Rockies</p></li>
 <li><p>License: Use of these data is covered by the following
 license:</p>
@@ -408,8 +403,8 @@ be discussed.</p></li>
 <li><p>Suggested Citations:</p>
 <ul>
 <li><p>Dataset citation: Latif, Q. S., M. F. McLaren, J. M. Timmer, H.
-N. Abernathy, and M. A. Ditmer. 2025. Data for the article “Human
-traffic explains recreation impacts for Colorado breeding bird
+N. Abernathy, R. A. Sparks, and M. A. Ditmer. 2025. Data for the article
+“Human traffic explains recreation impacts for Colorado breeding bird
 diversity”, Dryad, Dataset. <a href="https://doi.org/DOI:10.5061/dryad.0rxwdbscz" class="uri">https://doi.org/DOI:10.5061/dryad.0rxwdbscz</a>.</p></li>
 <li><p>Corresponding publication: Latif, Q. S., M. F. McLaren, J. M.
 Timmer, H. N. Abernathy, and M. A. Ditmer. In Review. Human traffic
@@ -468,42 +463,6 @@ details</li>
 </div>
 <div id="file-metadata" class="section level1">
 <h1>File metadata</h1>
-<div id="species_list_and_groups.csv" class="section level2">
-<h2><code>Species_list_and_groups.csv</code></h2>
-<ul>
-<li><p>Description: A comma-delimited file listing species represented
-in the data analyzed for the manuscript and species trait group
-assignments.</p></li>
-<li><p>Format: .csv</p></li>
-<li><p>Dimensions: 150 rows X 12 columns</p></li>
-<li><p>Fields:</p>
-<ul>
-<li>Common_name: Official species common name assigned by the American
-Ornithological Society</li>
-<li>Taxonomic_name: Species taxonomic name</li>
-<li>Code: 4-letter species code assigned by the American Ornithological
-Society and referenced in figures and tables in the manuscript</li>
-<li>Total_count: the sum of counts across grid cell survey
-observations</li>
-<li>HS: Binary indicator of whether the species was classified as a
-habitat specialist</li>
-<li>M: Binary indicator of whether the species was classified as
-migratory</li>
-<li>HC: Binary indicator of whether the species was classified as a
-human commensal</li>
-<li>S: Binary indicator of whether the species was classified as
-small-bodied</li>
-<li>DS: Binary indicator of whether the species was classified as a
-dietary specialist</li>
-<li>I: Binary indicator of whether the species was classified as an
-insectivore</li>
-<li>G: Binary indicator of whether the species was classified as one
-that nests or forages on or near the ground</li>
-<li>SGCN: Binary indicator of inclusion on the 2025 Colorado Species of
-Greatest Conservation Need list</li>
-</ul></li>
-</ul>
-</div>
 <div id="species_detection_parameter_estimates.csv" class="section level2">
 <h2><code>Species_detection_parameter_estimates.csv</code></h2>
 <ul>
@@ -537,6 +496,42 @@ scaled survey day of year</li>
 availability with scaled time (minutes) since sunrise</li>
 <li>theta.Survey_time_since_sunrise2 = logit linear relationship of
 availability with scaled time (minutes) since sunrise squared</li>
+</ul></li>
+</ul>
+</div>
+<div id="species_list_and_groups.csv" class="section level2">
+<h2><code>Species_list_and_groups.csv</code></h2>
+<ul>
+<li><p>Description: A comma-delimited file listing species represented
+in the data analyzed for the manuscript and species trait group
+assignments.</p></li>
+<li><p>Format: .csv</p></li>
+<li><p>Dimensions: 150 rows X 12 columns</p></li>
+<li><p>Fields:</p>
+<ul>
+<li>Common_name: Official species common name assigned by the American
+Ornithological Society</li>
+<li>Taxonomic_name: Species taxonomic name</li>
+<li>Code: 4-letter species code assigned by the American Ornithological
+Society and referenced in figures and tables in the manuscript</li>
+<li>Total_count: the sum of counts across grid cell survey
+observations</li>
+<li>HS: Binary indicator of whether the species was classified as a
+habitat specialist</li>
+<li>M: Binary indicator of whether the species was classified as
+migratory</li>
+<li>HC: Binary indicator of whether the species was classified as a
+human commensal</li>
+<li>S: Binary indicator of whether the species was classified as
+small-bodied</li>
+<li>DS: Binary indicator of whether the species was classified as a
+dietary specialist</li>
+<li>I: Binary indicator of whether the species was classified as an
+insectivore</li>
+<li>G: Binary indicator of whether the species was classified as one
+that nests or forages on or near the ground</li>
+<li>SGCN: Binary indicator of inclusion on the 2025 Colorado Species of
+Greatest Conservation Need list</li>
 </ul></li>
 </ul>
 </div>
@@ -576,6 +571,36 @@ relationship explained by human traffic</li>
 </ul></li>
 </ul>
 </div>
+<div id="species_model_performance.csv" class="section level2">
+<h2><code>Species_model_performance.csv</code></h2>
+<ul>
+<li><p>Description: A comma-delimited file listing species-specific
+model performance metrics. Species are ordered alphabetically by
+4-letter code.</p></li>
+<li><p>Format: .csv</p></li>
+<li><p>Dimensions: 150 rows X 10 columns</p></li>
+<li><p>Fields:</p>
+<ul>
+<li>Species: 4-letter species codes. Complete species names are listed
+in <code>Species_list_and_groups.csv</code>.</li>
+<li>n: Number of detections of the species recorded across all surveys
+in the data</li>
+<li>r.md, r.10, r.90: Posterior median, 10th, and 90th %-iles for
+Pearson’s correlation coefficient relating observed counts with
+posterior predicted counts</li>
+<li>r.pct.na: Percentage of posterior samples for with the correlation
+coefficient relating observed with predicted counts could not be
+calculated due to predicted counts being all zero</li>
+<li>ChiSqr_p: Bayesian p-value indicating the proportion of posterior
+predicted datasets for which a Pearson’s Chi-square goodness-of-fit test
+statistic was greater than the equivalent statistic for observed
+data</li>
+<li>Bays_Rsqr.md, Bays_Rsqr.10, Bays_Rsqr.90: Posterior median, 10th,
+and 90th %-iles for R-squared values quantifying overall standardized
+effect sizes for each species (Gelman et al. 2019)</li>
+</ul></li>
+</ul>
+</div>
 <div id="mod_path" class="section level2">
 <h2><code>mod_path</code></h2>
 <ul>
@@ -591,8 +616,19 @@ accompanying git repository (Latif 2025). As such, we do not provide a
 detailed catalog of the contents of this file.</li>
 </ul>
 </div>
+<div id="mod_path_gof" class="section level2">
+<h2><code>mod_path_GOF</code></h2>
+<ul>
+<li>Description: This file is an R object equivalent to
+<code>mod_path</code> but with additional parameters saved to calculate
+performance metrics and referenced by the “02-Tabulate_bird_GOF.R”
+script file archived in the accompanying git repository (Latif 2025).
+This file can be loaded using the R function
+‘R.utils::loadObject()’.</li>
+</ul>
+</div>
 <div id="data_compiled.rdata" class="section level2">
-<h2><code>Data_compiled.RDATA</code></h2>
+<h2><code>Data_compiled.RData</code></h2>
 <ul>
 <li><p>Description: This is an R workspace containing all data and R
 objects necessary to run R scripts implementing data analyses and
@@ -660,7 +696,7 @@ appearing in each object.</p></li>
 <li><p>Description: This zipped directory containing csv files
 referenced by R scripts archived by Latif (2025). Metadata is not
 provided for these files as they are simply provided for code
-reproducbility and are referenced by name by relevant scripts.</p></li>
+reproducibility and are referenced by name by relevant scripts.</p></li>
 <li><p>Format: sub-directory</p></li>
 </ul>
 </div>
@@ -678,6 +714,9 @@ by allowing interested persons to run scripts provided by Latif
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
+<p>Gelman, A., B. Goodrich, J. Gabry, and A. Vehtari. 2019. R-squared
+for Bayesian regression models. The American Statistician
+73:307–309.</p>
 <p>Latif, Q. S. 2025. Bird-Conservancy-of-the-Rockies/COREC-analysis
 (v0). To be archived at Zenodo. currently available at <a href="https://github.com/Bird-Conservancy-of-the-Rockies/COREC-analysis" class="uri">https://github.com/Bird-Conservancy-of-the-Rockies/COREC-analysis</a></p>
 <hr />
