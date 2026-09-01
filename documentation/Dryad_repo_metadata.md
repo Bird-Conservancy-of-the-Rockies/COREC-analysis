@@ -18,20 +18,20 @@ Provenance for this README
 * Author: Quresh S. Latif
 * Co-authors for manuscript: Liza G. Rossi, Matthew F. McLaren, Jennifer M. Timmer, Melissa A. Dressen, Christopher C. Keefe, Heather N. Abernathy, Rob A. Sparks, Mark A. Ditmer
 * Date created: 2025-07-09
-* Date modified: 2026-04-29
+* Date modified: 2026-08-29
 
 Dataset Version and Release History
 -----------------------------------
 
 * Current Version:
-  * Number: 0.1
-  * Date: 2026-04-29
+  * Number: 0.2
+  * Date: 2026-08-29
   * Persistent identifier: DOI: 10.5061/dryad.0rxwdbscz
 
 Dataset Attribution and Usage
 -----------------------------
 
-* Dataset Title: Data for the article "Human traffic explains recreation impacts for Colorado breeding bird diversity"
+* Dataset Title: Data for the article "Increased trail density negatively impacts breeding bird diversity on Colorado public lands due partly to human activity"
 
 * Persistent Identifier: DOI: 10.5061/dryad.0rxwdbscz
 
@@ -47,9 +47,9 @@ Dataset Attribution and Usage
 
 * Suggested Citations:
 
-  - Dataset citation: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, R. A. Sparks, and M. A. Ditmer. 2025. Data for the article "Human traffic explains recreation impacts for Colorado breeding bird diversity", Dryad, Dataset. https://doi.org/DOI:10.5061/dryad.0rxwdbscz.
+  - Dataset citation: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, R. A. Sparks, and M. A. Ditmer. 2025. Data for the article "Increased trail density negatively impacts breeding bird diversity on Colorado public lands due partly to human activity", Dryad, Dataset. https://doi.org/DOI:10.5061/dryad.0rxwdbscz.
 
-  - Corresponding publication: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, and M. A. Ditmer. In Review. Human traffic explains recreation impacts for Colorado breeding bird diversity. Ecological Applications.
+  - Corresponding publication: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, and M. A. Ditmer. In Review. Increased trail density negatively impacts breeding bird diversity on Colorado public lands due partly to human activity. Ecological Applications.
 
 Contact Information
 -------------------

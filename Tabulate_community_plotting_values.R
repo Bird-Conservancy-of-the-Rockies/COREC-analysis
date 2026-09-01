@@ -55,6 +55,50 @@ for(g in names(groups)) {
 }
 write.csv(dat.plt, "data/Dat_plot_community_OHV.csv", row.names = FALSE)
 
+# Percent change in diversity across the full covariate range (community  #
+# and HumComm only, total relationship) -- supports the percent-change    #
+# values reported without uncertainty in the Results "Diversity           #
+# relationships with management" paragraph (Reviewer 3, EAP25-0577 2nd    #
+# review, Results Line 274-277 comment). Computed per posterior draw at   #
+# the low/high ends of the series above, so draw-level correlation        #
+# between the two endpoints is preserved (unlike summarizing D.lo and     #
+# D.hi separately). Differs from 03-Tabulate_pct_explained.R, which       #
+# reports a log-ratio effect size for a +/-1SD covariate perturbation     #
+# (N.pred) rather than the full empirical range used here.                #
+PctChange <- function(N.arr, spp, ind.lo = 1, ind.hi = n.series) {
+  D.lo <- N.arr[, spp, ind.lo, "total"] %>% apply(1, HillShannon)
+  D.hi <- N.arr[, spp, ind.hi, "total"] %>% apply(1, HillShannon)
+  100 * (D.hi - D.lo) / D.lo
+}
+FormatPctChange <- function(pct.change, BCIpercent = 80, ndig = 0) {
+  # Manuscript-ready "increased/declined by X% (80% CI: A-B%)" string.
+  alpha <- (1 - BCIpercent / 100) / 2
+  ci <- quantile(pct.change, probs = c(alpha, 1 - alpha), type = 8)
+  md <- median(pct.change)
+  direction <- ifelse(md >= 0, "increased", "declined")
+  str_c(direction, " by ", round(abs(md), ndig), "% (80% CI: ",
+        round(min(abs(ci)), ndig), "-", round(max(abs(ci)), ndig), "%)")
+}
+pct.trail.community <- PctChange(N.trail.series, groups$community)
+pct.trail.HumComm <- PctChange(N.trail.series, groups$HumComm)
+pct.OHV.community <- PctChange(N.OHV.series, groups$community)
+dat.pct.change <- data.frame(
+  Group = c("community", "HumComm", "community"),
+  Covariate = c("TrailDensity", "TrailDensity", "OHVRestriction"),
+  Sentence = c(FormatPctChange(pct.trail.community), FormatPctChange(pct.trail.HumComm),
+               FormatPctChange(pct.OHV.community)),
+  # Median/Lo80/Hi80 are the raw *signed* percent change (negative =        #
+  # decline); Sentence reorders these into ascending magnitude for direct   #
+  # quoting in text.
+  Median = round(c(median(pct.trail.community), median(pct.trail.HumComm), median(pct.OHV.community)), 0),
+  Lo80 = round(c(quantile(pct.trail.community, 0.1, type = 8), quantile(pct.trail.HumComm, 0.1, type = 8),
+                 quantile(pct.OHV.community, 0.1, type = 8)), 0),
+  Hi80 = round(c(quantile(pct.trail.community, 0.9, type = 8), quantile(pct.trail.HumComm, 0.9, type = 8),
+                 quantile(pct.OHV.community, 0.9, type = 8)), 0)
+)
+write.csv(dat.pct.change, "data/Tab_diversity_pct_change_management.csv", row.names = FALSE)
+
+
 # Traffic #
 x.HumPres <- c(min(X.beta[,"HumanPresence"]), max(X.beta[,"HumanPresence"]) %>% rep(n.series - 1))
 x.Traffic <- c(0, seq(quantile(X.beta[, "LogTrafficNoZeros"], probs = 0.01, type = 8),

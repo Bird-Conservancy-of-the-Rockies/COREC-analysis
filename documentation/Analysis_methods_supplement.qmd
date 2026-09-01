@@ -31,7 +31,7 @@ $r$ – 2-min time removal bins within the 6-min survey; $R=3$
 
 ### Data
 
-A primary bird count observation consisted of the number of independent clusters detected for species $i$ at grid cell $j$ in year $t$. The primary analysis model for birds therefore estimated species-specific abundance of clusters, which we multiplied by cluster size to derive predicted abundance of individuals (further details in @sec-N_p). We organized primary count data as a 3-dimensional data array $\mathbf{n}$, where element $n_{ijt}$ is the number of clusters detected for species $i$ in grid cell $j$ and year $t$. We accompanied this primary data array with two secondary arrays representing the distribution of counted individuals among time removal and distance bins, $\mathbf{y_{[a]}}$ and $\mathbf{y_{[p]}}$, where elements $y_{[a],ijtr}$ and $y_{[p],ijtd}$ are counts within time removal bin $r$ and distance bin $d$, respectively. For $y_{[p],ijtd}$, we truncated the the furthest 5% of detections for each species $i$ for which we had $\geq75$ detections; for these species, the area of estimation corresponded with a circle of radius equal to $d_{[max,high],i}$ centered on each surveyed point within a grid cell. For species with $<75$ detections, the radius for the area of estimation equaled the max distance recorded.
+A primary bird count observation consisted of the number of independent clusters detected for species $i$ at grid cell $j$ in year $t$. We define a cluster as one or more tightly aggregated individuals of the same species detected within the same 1-minute interval and within 20 m of one another, excluding pairs of countersinging males, which are independently territorial rather than associated [@BucklandEtAl-2001; @McLarenEtAl-2025]. Clusters, rather than individuals, were our unit of observation because members of a cluster are not detected independently of one another; the large majority of clusters (97.4%) consisted of a single individual. The primary analysis model for birds therefore estimated species-specific abundance of clusters, which we multiplied by cluster size to derive predicted abundance of individuals (further details in @sec-N_p). We organized primary count data as a 3-dimensional data array $\mathbf{n}$, where element $n_{ijt}$ is the number of clusters detected for species $i$ in grid cell $j$ and year $t$. We accompanied this primary data array with two secondary arrays representing the distribution of counted individuals among time removal and distance bins, $\mathbf{y_{[a]}}$ and $\mathbf{y_{[p]}}$, where elements $y_{[a],ijtr}$ and $y_{[p],ijtd}$ are counts within time removal bin $r$ and distance bin $d$, respectively. For $y_{[p],ijtd}$, we truncated the the furthest 5% of detections for each species $i$ for which we had $\geq75$ detections; for these species, the area of estimation corresponded with a circle of radius equal to $d_{[max,high],i}$ centered on each surveyed point within a grid cell. For species with $<75$ detections, the radius for the area of estimation equaled the max distance recorded.
 
 To support path analysis, we accompanied the bird model with a series of path models relating human traffic with management covariates. For each path model, data were unscaled values for a human traffic covariate, $X_{[H],j}$, transformed as necessary to meet distributional requirements for corresponding generalized linear models. Because management and human traffic covariates only varied spatially (see main text for rationale), data for path models were only indexed by grid cell. Moreover, $X_{[H_{Conditional~traffic~intensity}],j}$ was restricted to grid cells where $X_{[H_{Humans~detected}],j}=1$ ($n=175$), and $X_{[H_{Traffic~speed}],j}$ was restricted to grid cells in which >1 ping was recorded for at least one cell phone user in a single day ($n=121$).
 
@@ -113,9 +113,9 @@ $$SD_{\zeta_0},SD_{\zeta_1} \sim gamma(1,1),$$ {#eq-obs_beta_SD}
 $$\overline{b} \sim Uniform(0,20),$$ {#eq-obs_b_mean}
 $$SD_{b} \sim gamma(1,1),$$ {#eq-obs_b_SD}
 $$\overline{\theta_0} \sim Normal(0,0.67),$$ {#eq-obs_theta0_mean}
-$$\overline{\theta_1} \sim Normal(0,1),$$ {#eq-obs_theta_SD}
+$$\overline{\theta_1} \sim Normal(0,1),$$ {#eq-obs_theta1_mean}
 <center>and</center>
-$$SD_{\theta_0},SD_{\theta_1} \sim gamma(1,1).$$ {#eq-obs_b_SD}
+$$SD_{\theta_0},SD_{\theta_1} \sim gamma(1,1).$$ {#eq-obs_theta_SD}
 
 ### Path models
 
@@ -143,11 +143,11 @@ with a log link function for the linear predictor,
 
 $$log(p_{[H],j}) = B_{[H,0]}+\mathbf{B_{[H,1]}}×\mathbf{X_{[M],j}},$$ {#eq-Traffic_intensity_speed_link}
 
-and $r_{[H]}$ representing an additionally estimated shape parameter. We used $B \sim Normal(0,0.66667)$ priors for all regression parameters (@eq-Humans_detected_link and @eq-Traffic_intensity_speed_distribution) and $r \sim gamma(1,1)$ for Gamma regression shape parameters ($r_{[H]}$ in @eq-Traffic_intensity_speed_distribution). For path models, we implemented posterior predictive goodness-of-fit (GOF) checks, whereby p-values quantified the proportion of deviances for simuated datasets that exceeded those of observed data [@GelmanHill-2007]. None of the p-values for these models were extreme ($p=0.4$), indicating no evidence for lack of fit.
+and $r_{[H]}$ representing an additionally estimated shape parameter. We used $B \sim Normal(0,0.66667)$ priors for all regression parameters (@eq-Humans_detected_link and @eq-Traffic_intensity_speed_link) and $r \sim gamma(1,1)$ for Gamma regression shape parameters ($r_{[H]}$ in @eq-Traffic_intensity_speed_distribution). For path models, we implemented posterior predictive goodness-of-fit (GOF) checks, whereby p-values quantified the proportion of deviances for simuated datasets that exceeded those of observed data [@GelmanHill-2007]. None of the p-values for these models were extreme ($p=0.4$), indicating no evidence for lack of fit.
 
 ## Model fitting
 
-We fitted our analysis model in R [@R-base] using the R package NIMBLE [@Nimble-2017;-@Nimble-2023]. We ran three parallel MCMC chains with burn-in = 10000. We checked convergence and sampling metrics every 20100 iterations, limited the number of posterior samples saved to 1000, and discontinued sampling once we had reached $\widehat{R} \le 1.1$ and $n_{effective} \ge 100$ for all parameters [@GelmanHill-2007]. With these specifications and constraints, our final chain length = 482400 iterations with a thinning rate of 472.4. We also visually inspected trace plots for parameters with the least $n_{effective}$ and greatest $\widehat{R}$ to further verify arrival of MCMC sampling at a stationary distribution.
+We fitted our analysis model in R [@R-base] using the R package NIMBLE [@Nimble-2017;-@Nimble-2023]. We ran three parallel MCMC chains with burn-in = 10000. We checked convergence and sampling metrics every 20100 iterations, limited the number of posterior samples saved to 1000 per chain, and discontinued sampling once we had reached $\widehat{R} \le 1.1$ and $n_{effective} \ge 100$ for all parameters [@GelmanHill-2007]. With these specifications and constraints, our final chain length = 482400 iterations with a thinning rate of 472.4. We also visually inspected trace plots for parameters with the least $n_{effective}$ and greatest $\widehat{R}$ to further verify arrival of MCMC sampling at a stationary distribution.
 
 ## Derived parameters
 
@@ -193,7 +193,7 @@ where $D_{[PRED,M]}$ and $D_{[PRED,R]}$ are predicted diversity (@eq-pred_D) cal
 *Some trails, unrestricted OHV* - $X_{[PRED]}^{[Trails,OHV=1]}$ - Trail density is set to $2.0~km/km^2$, road density to $0$, and proportion no OHV to $1$.<br>
 </div>
 <div class="hanging-indent">
-*Some roads* - $X_{[PRED]^{[Roads]}$ - Road density is set to $1.0~km/km^2$ (i.e., $0+1SD$), trail density to $0$, and proportion no OHV to its mean.<br>
+*Some roads* - $X_{[PRED]}^{[Roads]}$ - Road density is set to $1.0~km/km^2$ (i.e., $0+1SD$), trail density to $0$, and proportion no OHV to its mean.<br>
 </div>
 
 For total management relationships, we set values for each human traffic covariate, $X_{[PRED,H]}$, to $p_{[H]}$ from the corresponding path model (@eq-Humans_detected_link or @eq-Traffic_intensity_speed_link) informed with scenario-specific management covariate values. We then assigned management and reference scenarios for calculating total management relationships (@eq-total_management_effect) as follows:

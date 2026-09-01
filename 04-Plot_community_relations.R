@@ -90,8 +90,8 @@ row.names(dat.stat.supp) <- dat.pct.expl$Group
 dat.plt.traffic <- read.csv("data/Dat_plot_community_traffic.csv", header = TRUE, stringsAsFactors = FALSE)
 dat.plt.speed <- read.csv("data/Dat_plot_community_speed.csv", header = TRUE, stringsAsFactors = FALSE)
 
-y.labs <- c("All species", "Habitat specialists", "Migratory species", "Small species", "Human commensals",
-            "Diet specialists", "Insectivores", "Ground species", "SGCN species")
+y.labs <- c("All species", "Habitat specialists", "Migrants", "Small-bodied", "Human commensal",
+            "Diet specialist", "Insectivore", "Ground species", "CO SGCN")
 names(y.labs) <- names(groups)
 
 # Calculate y-axis limits and breaks (enforce y axis consistency across columns)
