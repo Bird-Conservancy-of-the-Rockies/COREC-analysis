@@ -16,7 +16,7 @@ Provenance for this README
 
 * File name: Dryad_repo_metadata.md
 * Author: Quresh S. Latif
-* Co-authors for manuscript: Liza G. Rossi, Matthew F. McLaren, Jennifer M. Timmer, Melissa A. Dressen, Christopher C. Keefe, Heather N. Abernathy, Rob A. Sparks, Mark A. Ditmer
+* Co-authors for manuscript: Liza G. Rossi, Matthew F. McLaren, Jennifer M. Timmer, Melissa A. Dressen, Christopher C. Keefe, Heather N. Abernathy, Robert A. Sparks, Mark A. Ditmer
 * Date created: 2025-07-09
 * Date modified: 2026-08-29
 
@@ -35,7 +35,7 @@ Dataset Attribution and Usage
 
 * Persistent Identifier: DOI: 10.5061/dryad.0rxwdbscz
 
-* Dataset Contributors: Matthew F. McLaren, Jennifer M. Timmer, Heather N. Abernathy, Rob A. Sparks, Mark A. Ditmer
+* Dataset Contributors: Matthew F. McLaren, Jennifer M. Timmer, Heather N. Abernathy, Robert A. Sparks, Mark A. Ditmer
 
 * Publisher: Bird Conservancy of the Rockies
 
@@ -49,7 +49,7 @@ Dataset Attribution and Usage
 
   - Dataset citation: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, R. A. Sparks, and M. A. Ditmer. 2025. Data for the article "Increased trail density negatively impacts breeding bird diversity on Colorado public lands due partly to human activity", Dryad, Dataset. https://doi.org/DOI:10.5061/dryad.0rxwdbscz.
 
-  - Corresponding publication: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, and M. A. Ditmer. In Review. Increased trail density negatively impacts breeding bird diversity on Colorado public lands due partly to human activity. Ecological Applications.
+  - Corresponding publication: Latif, Q. S., M. F. McLaren, J. M. Timmer, H. N. Abernathy, R. A. Sparks, and M. A. Ditmer. In Review. Increased trail density negatively impacts breeding bird diversity on Colorado public lands due partly to human activity. Ecological Applications.
 
 Contact Information
 -------------------
