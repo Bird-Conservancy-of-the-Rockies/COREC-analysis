@@ -229,6 +229,50 @@ p <- ggdraw() +
 
 save_plot("community_relations/Management_plus_HumanCov_relations.jpg", p, ncol = 2, nrow = 4, dpi = 200)
 
+##########################################################################################
+# Format the two manuscript figures below (Figs. 3 and 4) to meet Ecological Applications #
+# figure specs: <= 18 cm wide x 24 cm tall, all text 6-10 pt at final size, 600 ppi.     #
+# (The all-covariates figure saved above is not a manuscript figure and is left as is.)  #
+##########################################################################################
+# The earlier save_plot() calls make a 12-in-wide canvas (2 * 3.71 * 1.618), which is far wider than
+# the journal's 18 cm limit. The manuscript figures are instead saved at their final physical size
+# (18 cm wide, same proportions as before) at 600 ppi, with text sizes specified directly in points
+# at that final size: axis numbers 6.5 pt, axis titles 8 pt, shared y-axis label 9 pt.
+ms.axis.text <- 6.5
+ms.axis.title <- 8
+ms.label.size <- 9
+ms.width.cm <- 18
+ms.dpi <- 600
+# The panels were drawn for a 12-in-wide canvas, so line widths, point sizes and annotation sizes are
+# shrunk by the same factor (canvas -> 18 cm) to keep the look of the figures unchanged.
+ms.scale <- (ms.width.cm / 2.54) / (2 * 3.71 * 1.618)
+
+for(nm in ls(pattern = "^p\\.(trail|road|ohv|traffic|speed)\\.")) {
+  pnl <- get(nm)
+  if(inherits(pnl, "ggplot")) {
+    for(l in seq_along(pnl$layers)) {
+      ap <- pnl$layers[[l]]$aes_params
+      if(!is.null(ap$linewidth)) pnl$layers[[l]]$aes_params$linewidth <- ap$linewidth * ms.scale
+      if(!is.null(ap$size)) pnl$layers[[l]]$aes_params$size <- ap$size * ms.scale # points and significance stars
+    }
+    if(grepl("^p\\.(trail|road|ohv)\\.", nm)) pnl <- pnl + scale_x_continuous(n.breaks = 3) # fewer x-axis labels so numbers do not crowd
+    assign(nm, pnl +
+             theme(axis.text = element_text(size = ms.axis.text),
+                   axis.title = element_text(size = ms.axis.title),
+                   line = element_line(linewidth = 0.5 * ms.scale),
+                   rect = element_rect(linewidth = 0.5 * ms.scale)) +
+             guides(x = guide_axis(check.overlap = TRUE))) # drop x-axis labels that would collide
+  }
+}
+
+# Save at final size. nrow sets the figure height as nrow * 3.71 in on the original 12-in-wide canvas (i.e., the
+# same proportions, scaled to 18 cm wide). Slightly taller than before (3 and 3.5 rather than 2.5) so that the
+# larger axis titles fit within each panel; heights are 16.7 and 19.5 cm, below the 24-cm limit.
+save.ms.fig <- function(file, p, nrow) {
+  ms.height.cm <- ms.width.cm * (nrow * 3.71) / (2 * 3.71 * 1.618)
+  ggsave(file, p, width = ms.width.cm, height = ms.height.cm, units = "cm", dpi = ms.dpi, bg = "white", compression = "lzw")
+}
+
 ## Panels for manuscript revision (split management from traffic, show only supported management relations) ##
 # Management #
 p <- ggdraw() +
@@ -254,9 +298,9 @@ p <- ggdraw() +
   draw_plot(p.ohv.insectivore,           x = 0.2875, y = 0.00, width = 0.2375, height = 0.25) +
   draw_plot(p.ohv.ground,                x = 0.5250, y = 0.00, width = 0.2375, height = 0.25) +
   draw_plot(p.ohv.SGCN,                  x = 0.7625, y = 0.00, width = 0.2375, height = 0.25) +
-  draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
+  draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = ms.label.size, angle = 90, hjust = 0.5)
 
-save_plot("community_relations/Management_relations_supp.jpg", p, ncol = 2, nrow = 2.5, dpi = 200)
+save.ms.fig("community_relations/Management_relations_supp.tiff", p, nrow = 3)
 
 # Traffic #
 # p <- ggdraw() + # This just keeps relationships associated with supported mechanisms, but need them all to support paragraph in the Discussion
@@ -296,6 +340,6 @@ p <- ggdraw() +
   
   draw_plot(p.traffic.SGCN,              x = 0.0500, y = 0.0, width = 0.475,  height = 0.2) +
   draw_plot(p.speed.SGCN,                x = 0.5250, y = 0.0, width = 0.475,  height = 0.2) +
-  draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = 20, angle = 90, hjust = 0.5)
+  draw_plot_label("Hill-Shannon diversity", x = 0, y = 0.5, size = ms.label.size, angle = 90, hjust = 0.5)
 
-save_plot("community_relations/HumanCov_relations.jpg", p, ncol = 2, nrow = 2.5, dpi = 200)
+save.ms.fig("community_relations/HumanCov_relations.tiff", p, nrow = 3.5)
