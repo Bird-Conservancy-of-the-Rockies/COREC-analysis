@@ -692,11 +692,10 @@ in m within a 1-km^2 grid cell (i.e., equivalent to m per km^2);
 <code>Survey_tssr</code> is in minutes; <code>Speed</code> is in miles
 per hour (mi/h; the manuscript reports traffic speed in km per hour, and
 1 mi/h = 1.609 km/h); <code>TOD_mean</code> is in hours of the day
-(0-24); <code>Traffic_DOY_mn</code> and <code>Survey_DOY</code> are days
+(0-23); <code>Traffic_DOY_mn</code> and <code>Survey_DOY</code> are days
 of the year; proportions are unitless (0-1). <code>HumanTraffic</code>
-is in units of users x residency time per day [CONFIRM: units of
-residency time, e.g., minutes]; log-transformed versions are natural
-logarithms (log base e) of this quantity.</p></li>
+is in units of users x residency time (minutes) per day; log-transformed
+versions are natural logarithms (log base e) of this quantity.</p></li>
 <li><p>R objects contained in this workspace (dimensions are listed in
 parentheses):</p>
 <ul>
@@ -731,8 +730,9 @@ were available</li>
 <li>Speed: Mean speed (mi/h) of smartphone user movement; missing where
 no movement records were available. Note that the manuscript reports
 traffic speed in km per hour (1 mi/h = 1.609 km/h).</li>
-<li>TOD_mean: Mean time of day (hours) of smartphone location records
-[CONFIRM: time zone and 0-24 scale]; missing for some grid cells</li>
+<li>TOD_mean: Mean hour of the day (0–23 scale) at which smartphone
+locations were recorded within 100 m of the grid cell; missing for some
+grid cells</li>
 <li>TrailTotm: Total length (m) of trails within the grid cell</li>
 <li>RoadTotm: Total length (m) of roads within the grid cell</li>
 <li>Prp_MotRestricted: Proportion of trail length where motorized use
@@ -770,8 +770,8 @@ records; named <code>Traffic_DOY_mn</code> in <code>covariates</code>),
 <code>Speed</code> (mean speed in mi/h), <code>TOD_mean</code> (mean
 time of day in hours), and <code>HumanTraffic</code> (human traffic
 intensity: mean number of unique smartphone users per day multiplied by
-mean daily residency time within 100 m of the grid cell [CONFIRM units];
-0 where no smartphone locations were recorded). <code>Date_mn</code>,
+mean daily residency time (minutes) within 100 m of the grid cell; 0
+where no smartphone locations were recorded). <code>Date_mn</code>,
 <code>Speed</code>, and <code>TOD_mean</code> are missing for grid cells
 lacking the relevant records.</li>
 <li>dat_trails (data frame, 285 grid cells x 5): Grid cell values for
